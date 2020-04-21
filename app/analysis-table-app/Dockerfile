@@ -9,6 +9,7 @@ RUN apt-get update && \
     apt-get clean
     
 RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade git+https://gitlab.sd2e.org/dbryce/pysd2cat.git@develop
 
 ADD src /src
 ADD config.yml /config.yml
