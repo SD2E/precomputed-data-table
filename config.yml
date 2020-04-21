@@ -1,0 +1,27 @@
+---
+debug: false
+agave_app_id: sample-qc-app-0.1.0
+
+logs:
+  level: DEBUG
+  token: ~
+
+storagesystems:
+  data-sd2e-community:
+    posix_path: /work/projects/SD2E-Community/prod/data
+
+mongodb:
+  authn: ~
+  database: catalog_staging
+
+pipelines:
+  pipeline_uuid: 106378f3-412a-5606-becb-0875436a8ac3
+  pipeline_manager_id: pipelines-manager.prod
+  pipeline_manager_nonce: ~
+  job_manager_id: jobs-manager.prod
+  job_manager_nonce: ~
+  job_indexer_id: jobs-indexer.prod
+  job_indexer_nonce: ~
+  permission_manager: kyMWvg171Q3G6
+  process_uuid: 117a32a1-457c-5bfe-bded-ed0ca99e53f8
+admin_token_key: ~

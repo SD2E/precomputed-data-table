@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "title": "SamplesJsonMessageWithPipelineOpts",
+  "description": "Trigger processing and re-processing of samples.json files",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "experiment_id": {
+      "type": "string",
+      "description": "unique text identifier"
+    }
+  },
+  "required": ["experiment_id"]
+}
