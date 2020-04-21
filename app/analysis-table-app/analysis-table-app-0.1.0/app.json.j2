@@ -1,0 +1,53 @@
+{
+  "name": "{{ app.name }}",
+  "version": "{{ app.version }}",
+  "executionType": "HPC",
+  "executionSystem": "hpc-tacc-wrangler",
+  "parallelism": "SERIAL",
+  "deploymentPath": "apps/{{ app.bundle }}",
+  "deploymentSystem": "data-sd2e-app-assets",
+  "label": "analysis table",
+  "modules": [
+    "load tacc-singularity"
+  ],
+  "shortDescription": "First level analysis post data-converge",
+  "templatePath": "runner-template.sh",
+  "testPath": "tester.sh",
+  "inputs": [],
+  "parameters": [
+    {
+      "id": "CONTAINER_IMAGE",
+      "value": {
+        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
+        "description": "Container Image. Do not edit.",
+        "type": "string",
+        "visible": false,
+        "required": true
+      }
+    },
+    {
+      "id": "experiment_id",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "output",
+      "value": {
+        "default": "samples_labelled.csv"
+      },
+      "semantics": {
+        "ontology": [
+          "http://edamontology.org/format_3752"
+        ]
+      },
+      "details": {
+        "label": "Contains dataframe from the analysis table code"
+      }
+    }
+  ]
+}
