@@ -15,7 +15,7 @@ mongodb:
   database: catalog_staging
 
 pipelines:
-  pipeline_uuid: 1065c32a-6409-5e38-928a-aafe315bb20a
+  pipeline_uuid: 1060deac-b47b-5cfc-b73b-21b8582c03ae 
   pipeline_manager_id: pipelines-manager.prod
   pipeline_manager_nonce: ~
   job_manager_id: jobs-manager.prod
