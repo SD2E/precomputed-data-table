@@ -10,8 +10,8 @@ NOCLEANUP ?= 0
 
 GITREF=$(shell git rev-parse --short HEAD)
 
-export INIFILE := app/analysis-table-app/app.ini
-export APPDIR := app/analysis-table-app
+export INIFILE := app/precomputed-data-table-app/app.ini
+export APPDIR := app/precomputed-data-table-app
 
 .PHONY: tests app-container tests-local tests-reactor tests-deployed
 .SILENT: tests app-container tests-local tests-reactor tests-deployed

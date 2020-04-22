@@ -1,6 +1,6 @@
 ---
 debug: false
-agave_app_id: analysis-table-app-0.1.0
+agave_app_id: precomputed-data-table-app-0.1.0
 
 logs:
   level: DEBUG
