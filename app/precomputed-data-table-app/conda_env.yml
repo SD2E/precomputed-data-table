@@ -1,0 +1,16 @@
+name: sd2-precomputed_data_table
+channels:
+- defaults
+dependencies:
+    - python = 3.7
+    - pip
+    - pytest = 5.0.0
+    - numpy
+    - pandas = 0.24
+    - pymongo
+
+    - pip:
+      - pytest-html
+      - pytest-timeout
+      - flowcytometrytools
+      - agavepy
