@@ -6,7 +6,7 @@ dependencies:
     - pip
     - pytest = 5.0.0
     - numpy
-    - pandas = 0.24
+    - pandas
     - pymongo
 
     - pip:
@@ -14,3 +14,4 @@ dependencies:
       - pytest-timeout
       - flowcytometrytools
       - agavepy
+      - git+https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis.git@release

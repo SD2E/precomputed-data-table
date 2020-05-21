@@ -68,3 +68,29 @@ class TestRunPDT(object):
         expected_msg = 'Data status NOT 100% ok:\n{}'.format(bad_status)
         status_msg = check_er_status(record_json_path)
         assert status_msg == expected_msg
+
+    def test_fc_no_fc_etl_no_pr(self):
+        good_exp_ref = 'dc_YeastSTATES-OR-Gate-CRISPR-Dose-Response_20200427004659'
+        file_list = os.listdir(os.path.join(self.path_to_good_er_dirs, good_exp_ref))
+        file_list = [f for f in file_list if 'fc_raw' in f]
+        dtype_confirm_dict = confirm_data_types(file_list)
+        expected_dtype_confirm_dict = {'platereader': False, 'fc_raw_log10': True,
+                                       'fc_raw_events': True, 'fc_etl': False}
+        assert dtype_confirm_dict == expected_dtype_confirm_dict
+
+    def test_fc_etl_fc_no_pr(self):
+        good_exp_ref = 'dc_YeastSTATES-OR-Gate-CRISPR-Dose-Response_20200427004659'
+        file_list = os.listdir(os.path.join(self.path_to_good_er_dirs, good_exp_ref))
+        file_list = [f for f in file_list if 'fc' in f]
+        dtype_confirm_dict = confirm_data_types(file_list)
+        expected_dtype_confirm_dict = {'platereader': False, 'fc_raw_log10': True,
+                                       'fc_raw_events': True, 'fc_etl': True}
+        assert dtype_confirm_dict == expected_dtype_confirm_dict
+
+    def test_fc_etl_fc_pr(self):
+        good_exp_ref = 'dc_YeastSTATES-OR-Gate-CRISPR-Dose-Response_20200427004659'
+        file_list = os.listdir(os.path.join(self.path_to_good_er_dirs, good_exp_ref))
+        dtype_confirm_dict = confirm_data_types(file_list)
+        expected_dtype_confirm_dict = {'platereader': True, 'fc_raw_log10': True,
+                                       'fc_raw_events': True, 'fc_etl': True}
+        assert dtype_confirm_dict == expected_dtype_confirm_dict

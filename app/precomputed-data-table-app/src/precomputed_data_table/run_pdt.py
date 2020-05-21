@@ -14,6 +14,7 @@ import argparse
 import os
 import json
 from datetime import datetime
+import precomputed_data_table.run_od_growth_analysis as run_growth
 
 
 def get_latest_er(exp_ref, dc_dir):
@@ -59,6 +60,18 @@ def check_er_status(record_json):
             return 'Data status 100% ok:\n{}'.format(out_status)
 
 
+def confirm_data_types(er_file_list):
+
+    dtype_confirm_dict = {'platereader': False, 'fc_raw_log10': False,
+                          'fc_raw_events': False, 'fc_etl': False}
+
+    for dtype in dtype_confirm_dict.keys():
+        for file in er_file_list:
+            if dtype in file:
+                dtype_confirm_dict[dtype] = True
+
+    return dtype_confirm_dict
+
 # def main(exp_ref, out_dir, tacc_path_type, archive_system):
 def main(exp_ref, out_dir):
     # make a new dir for output
@@ -70,17 +83,28 @@ def main(exp_ref, out_dir):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
 
-    data_converge_dir = '/home/jupyter/sd2e-projects/sd2e-project-43/test'
+    # data_converge_dir = '/home/jupyter/sd2e-projects/sd2e-project-43/test'
+    # testing
+    data_converge_dir = '/Users/robertmoseley/Desktop/SD2/sd2e_git/apps/precomputed-data-table/app/precomputed-data-table-app/tests/data/good_er_dirs'
 
     # get latest data converge product for ER
     er_dir = get_latest_er(exp_ref, data_converge_dir)
+    path_to_er_dir = os.path.join(data_converge_dir, er_dir)
+
     # Check status of data in ER's record.json file
-    check_er_status(return_er_record_path(er_dir))
+    path_to_record_json = return_er_record_path(path_to_er_dir)
+    check_er_status(path_to_record_json)
+
+    # confirm presence of data(frame) types
+    data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
+
+    if data_confirm_dict['platereader']:
+        run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("experiment_ref", help="experiment reference from data science table")
+    parser.add_argument("experiment_ref", help="experimental reference from data science table")
     parser.add_argument("output_dir", help="directory where to write the output files")
     # parser.add_argument("tacc_path_type", help="either 'hpc_path' or 'jupyter_path'", )
     # parser.add_argument("-a", "--archive_system", help="tacc archive system, ex data-sd2e-projects.sd2e-project-45")
