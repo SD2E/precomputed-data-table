@@ -29,7 +29,7 @@ def grab_meta_dataframe(exp_ref, er_dir):
     return meta_df
 
 
-def growth_analysis(platereader_df, exp_ref):
+def growth_analysis(platereader_df, exp_ref, out_dir):
 
     od_analysis_df = analysis_frame_api.augment_dataframe(df=platereader_df, experiment_identifier=exp_ref)
 
@@ -63,25 +63,28 @@ def rows_to_replicate_groups(data_df, m_type):
         # ***
         return data_drop_df
 
-
+# happen outside of this module *****
 # def merge_growth_fc(growth_df, fc_meta_df):
 #
 #     growth_fc_df = fc_meta_df.merge(growth_df, )
 
 
-def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
+def run_od_analysis(exp_ref, exp_ref_dir, conf_dict, out_dir):
 
     pr_df = grab_pr_dataframe(exp_ref, exp_ref_dir)
-    initial_od_analysis_df = growth_analysis(pr_df, exp_ref)
+    od_analysis_initial_df = growth_analysis(pr_df, exp_ref, out_dir)
+    # od_analysis_initial_df.to_csv(os.path.join(out_dir, 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)))
+
     # make df rows = replicate groups
-    rg_od_analysis_df = rows_to_replicate_groups(initial_od_analysis_df, 'od')
+    rg_od_analysis_df = rows_to_replicate_groups(od_analysis_initial_df, 'od')
 
-    if conf_dict['fc_raw_log10']:
-        fc_meta_df = grab_meta_dataframe(exp_ref, exp_ref_dir)
-        rg_fc_meta_df = rows_to_replicate_groups(fc_meta_df, 'fc')
-
-    elif not conf_dict['fc_raw_log10']:
-        pass
+    # move outside of this module *****
+    # if conf_dict['fc_raw_log10']:
+    #     fc_meta_df = grab_meta_dataframe(exp_ref, exp_ref_dir)
+    #     rg_fc_meta_df = rows_to_replicate_groups(fc_meta_df, 'fc')
+    #
+    # elif not conf_dict['fc_raw_log10']:
+    #     pass
 
 
 if __name__ == '__main__':
@@ -91,10 +94,12 @@ if __name__ == '__main__':
     parser.add_argument('exp_ref_dir', help='path to experimental reference directory')
     parser.add_argument('data_confirm_dict', help='dictionary containing information on available data'
                                                   ' in experimental reference')
+    parser.add_argument("output_dir", help="directory where to write the output files")
     # parser.add_argument("output_dir", help="directory where to write the output files")
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_exp_ref_dir = args.exp_ref_dir
     arg_conf_dict = args.data_confirm_dict
+    arg_out_dir = args.output_dir
 
-    run_od_analysis(arg_exp_ref, arg_exp_ref_dir, arg_conf_dict)
+    run_od_analysis(arg_exp_ref, arg_exp_ref_dir, arg_conf_dict, arg_out_dir)

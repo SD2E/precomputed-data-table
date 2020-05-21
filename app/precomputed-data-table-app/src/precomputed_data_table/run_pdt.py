@@ -18,16 +18,15 @@ import precomputed_data_table.run_od_growth_analysis as run_growth
 
 
 def get_latest_er(exp_ref, dc_dir):
-
+    # must be looking in sd2e-projects/sd2e-project-43/reactor_outputs/complete
     all_er_dirs = os.listdir(dc_dir)
-    latest_dirs_dict = {x.split('_')[1]: x for x in sorted(all_er_dirs)}
-
-    if exp_ref in latest_dirs_dict.keys():
-        exp_ref_dir = latest_dirs_dict[exp_ref]
-        return exp_ref_dir
-    else:
-        no_er_dir_msg = 'Experimental Reference not in Data Converge'
+    if exp_ref not in all_er_dirs:
+        no_er_dir_msg = 'There is no complete version of the Experimental Reference from Data Converge'
         return no_er_dir_msg
+    else:
+        timestamp_dir_list = os.listdir(os.path.join(dc_dir, exp_ref))
+        latest_dir = sorted(timestamp_dir_list, reverse=True)[0]
+        return latest_dir
 
 
 def return_er_record_path(er_dir):
@@ -78,18 +77,18 @@ def main(exp_ref, out_dir):
     now = datetime.now()
     datetime_stamp = now.strftime('%Y%m%d%H%M%S')
     out_dir = os.path.abspath(out_dir)
-    out_dir = os.path.join(out_dir, "dc_{0:s}_{1:s}".format(exp_ref, datetime_stamp))
+    out_dir = os.path.join(out_dir, "pdt_{0:s}_{1:s}".format(exp_ref, datetime_stamp))
     print("making directory... ", out_dir)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
 
-    # data_converge_dir = '/home/jupyter/sd2e-projects/sd2e-project-43/test'
+    # data_converge_dir = ''
     # testing
-    data_converge_dir = '/Users/robertmoseley/Desktop/SD2/sd2e_git/apps/precomputed-data-table/app/precomputed-data-table-app/tests/data/good_er_dirs'
+    data_converge_dir = '/Users/robertmoseley/Desktop/SD2/sd2e_git/apps/precomputed-data-table/app/precomputed-data-table-app/tests/data/complete'
 
     # get latest data converge product for ER
     er_dir = get_latest_er(exp_ref, data_converge_dir)
-    path_to_er_dir = os.path.join(data_converge_dir, er_dir)
+    path_to_er_dir = os.path.join(data_converge_dir, exp_ref, er_dir)
 
     # Check status of data in ER's record.json file
     path_to_record_json = return_er_record_path(path_to_er_dir)
@@ -99,7 +98,7 @@ def main(exp_ref, out_dir):
     data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
 
     if data_confirm_dict['platereader']:
-        run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict)
+        run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict, out_dir)
 
 
 if __name__ == '__main__':
