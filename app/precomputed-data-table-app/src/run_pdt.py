@@ -14,7 +14,7 @@ import argparse
 import os
 import json
 from datetime import datetime
-import precomputed_data_table.run_od_growth_analysis as run_growth
+import run_od_growth_analysis as run_growth
 
 
 def get_latest_er(exp_ref, dc_dir):

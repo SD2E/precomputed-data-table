@@ -4,7 +4,7 @@ test running of main pdt script
 :authors: Robert C. Moseley (robert.moseley@duke.edu)
 """
 
-from precomputed_data_table.run_pdt import *
+from run_pdt import *
 import pytest
 
 

@@ -4,7 +4,7 @@ test running of run_od_growth_analysis script
 :authors: Robert C. Moseley (robert.moseley@duke.edu)
 """
 
-from precomputed_data_table.run_od_growth_analysis import *
+from run_od_growth_analysis import *
 import pytest
 
 class TestRunODGrowthAnalysis(object):
