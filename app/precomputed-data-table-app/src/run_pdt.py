@@ -72,7 +72,7 @@ def confirm_data_types(er_file_list):
     return dtype_confirm_dict
 
 # def main(exp_ref, out_dir, tacc_path_type, archive_system):
-def main(exp_ref, out_dir):
+def main(exp_ref, out_dir, data_converge_dir):
     # make a new dir for output
     now = datetime.now()
     datetime_stamp = now.strftime('%Y%m%d%H%M%S')
@@ -81,10 +81,6 @@ def main(exp_ref, out_dir):
     print("making directory... ", out_dir)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
-
-    # data_converge_dir = ''
-    # testing
-    data_converge_dir = '/Users/robertmoseley/Desktop/SD2/sd2e_git/apps/precomputed-data-table/app/precomputed-data-table-app/tests/data/complete'
 
     # get latest data converge product for ER
     er_dir = get_latest_er(exp_ref, data_converge_dir)
@@ -105,13 +101,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("experiment_ref", help="experimental reference from data science table")
     parser.add_argument("output_dir", help="directory where to write the output files")
-    # parser.add_argument("tacc_path_type", help="either 'hpc_path' or 'jupyter_path'", )
-    # parser.add_argument("-a", "--archive_system", help="tacc archive system, ex data-sd2e-projects.sd2e-project-45")
+    parser.add_argument("data_converge_dir", help="path to Data Converge directory", )
+
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_out_dir = args.output_dir
-    # arg_tacc_path_type = args.tacc_path_type
-    # arg_archive_system = args.archive_system
+    arg_data_converge_dir = args.data_converge_dir
 
-    # main(arg_exp_ref, arg_out_dir, arg_tacc_path_type, arg_archive_system)
-    main(arg_exp_ref, arg_out_dir)
+    main(arg_exp_ref, arg_out_dir, arg_data_converge_dir)
