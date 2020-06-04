@@ -29,4 +29,4 @@ utc_date() {
 
 #### BEGIN SCRIPT LOGIC
 echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_id}
-container_exec ${CONTAINER_IMAGE} python3 /src/analysis.py --experiment-id ${experiment_id}
+container_exec ${CONTAINER_IMAGE} python3 /src/precomputed_data_table/run_pdt.py --experiment-id ${experiment_id}

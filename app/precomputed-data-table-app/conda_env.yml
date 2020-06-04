@@ -1,0 +1,17 @@
+name: sd2-precomputed_data_table
+channels:
+- defaults
+dependencies:
+    - python = 3.7
+    - pip
+    - pytest = 5.0.0
+    - numpy
+    - pandas
+    - pymongo
+
+    - pip:
+      - pytest-html
+      - pytest-timeout
+      - flowcytometrytools
+      - agavepy
+      - git+https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis.git@release
