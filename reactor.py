@@ -99,6 +99,7 @@ def main():
               experiment_id=experiment_ids,
               data=job_data,
               product_patterns=product_patterns,
+              archive_system = 'data-sd2e-projects.sd2e-project-48',
               archive_path=archive_path)
 
     job.setup()
