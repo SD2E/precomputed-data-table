@@ -74,38 +74,43 @@ def confirm_data_types(er_file_list):
 # def main(exp_ref, out_dir, tacc_path_type, archive_system):
 def main(exp_ref, out_dir, data_converge_dir):
     # make a new dir for output
-    now = datetime.now()
-    datetime_stamp = now.strftime('%Y%m%d%H%M%S')
-    out_dir = os.path.abspath(out_dir)
-    out_dir = os.path.join(out_dir, "pdt_{0:s}_{1:s}".format(exp_ref, datetime_stamp))
-    print("making directory... ", out_dir)
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir, exist_ok=True)
+    #now = datetime.now()
+    #datetime_stamp = now.strftime('%Y%m%d%H%M%S')
+    #out_dir = os.path.abspath(out_dir)
+    #out_dir = os.path.join(out_dir, "pdt_{0:s}_{1:s}".format(exp_ref, datetime_stamp))
+    #print("making directory... ", out_dir)
+    #if not os.path.exists(out_dir):
+    #    os.makedirs(out_dir, exist_ok=True)
 
     # get latest data converge product for ER
-    er_dir = get_latest_er(exp_ref, data_converge_dir)
-    path_to_er_dir = os.path.join(data_converge_dir, exp_ref, er_dir)
+    #er_dir = get_latest_er(exp_ref, data_converge_dir)
+    #path_to_er_dir = os.path.join(data_converge_dir, exp_ref, er_dir)
 
     # Check status of data in ER's record.json file
-    path_to_record_json = return_er_record_path(path_to_er_dir)
+    #path_to_record_json = return_er_record_path(path_to_er_dir)
+    path_to_record_json = return_er_record_path(data_converge_dir)
     check_er_status(path_to_record_json)
 
     # confirm presence of data(frame) types
-    data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
+    #data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
+    data_confirm_dict = confirm_data_types(os.listdir(data_converge_dir))
 
     if data_confirm_dict['platereader']:
-        run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict, out_dir)
+        #rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict, out_dir)
+        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict, out_dir)
+        rg_od_analysis_df.to_csv('pdt_{}__od_growth_analysis.csv'.format(exp_ref), index=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("experiment_ref", help="experimental reference from data science table")
-    parser.add_argument("output_dir", help="directory where to write the output files")
-    parser.add_argument("data_converge_dir", help="path to Data Converge directory", )
+    parser.add_argument("--experiment_ref", help="experimental reference from data science table")
+    parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
+    #parser.add_argument("output_dir", help="directory where to write the output files")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
-    arg_out_dir = args.output_dir
     arg_data_converge_dir = args.data_converge_dir
+    #arg_out_dir = args.output_dir
+    arg_out_dir = "."
 
     main(arg_exp_ref, arg_out_dir, arg_data_converge_dir)
