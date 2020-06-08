@@ -85,6 +85,7 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict, out_dir):
     #
     # elif not conf_dict['fc_raw_log10']:
     #     pass
+    return rg_od_analysis_df
 
 
 if __name__ == '__main__':
