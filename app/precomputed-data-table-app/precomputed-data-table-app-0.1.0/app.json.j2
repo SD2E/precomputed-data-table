@@ -26,7 +26,15 @@
       }
     },
     {
-      "id": "experiment_id",
+      "id": "experiment_ref",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "data_converge_dir",
       "value": {
         "type": "string",
         "visible": true,
@@ -35,19 +43,5 @@
     }
   ],
   "outputs": [
-    {
-      "id": "output",
-      "value": {
-        "default": "samples_labelled.csv"
-      },
-      "semantics": {
-        "ontology": [
-          "http://edamontology.org/format_3752"
-        ]
-      },
-      "details": {
-        "label": "Contains dataframe from the precomputed data table code"
-      }
-    }
   ]
 }
