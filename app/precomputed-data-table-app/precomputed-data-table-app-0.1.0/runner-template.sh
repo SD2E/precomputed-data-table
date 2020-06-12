@@ -2,7 +2,7 @@
 if [ -z "${CONTAINER_IMAGE}" ]
 then
     version=$(cat ./_util/VERSION)
-    CONTAINER_IMAGE="index.docker.io/sd2e/sample-qc-app:$version"
+    CONTAINER_IMAGE="index.docker.io/sd2e/precomputed-data-table-app:$version"
 fi
 . _util/container_exec.sh
 
@@ -28,5 +28,5 @@ utc_date() {
 }
 
 #### BEGIN SCRIPT LOGIC
-echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_id}
-container_exec ${CONTAINER_IMAGE} python3 /src/precomputed_data_table/run_pdt.py --experiment-id ${experiment_id}
+echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
+container_exec ${CONTAINER_IMAGE} /opt/conda/envs/sd2-precomputed_data_table/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir}

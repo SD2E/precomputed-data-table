@@ -35,7 +35,7 @@ shell:
 	bash $(SCRIPT_DIR)/run_container_process.sh bash
 
 tests-local: 
-	echo "not implemented"
+	bash scripts/run_container_message.sh tests/data/msg-test-samples.json $(ACTOR_ID)
 
 tests-pytest:
 #	bash $(SCRIPT_DIR)/run_container_process.sh $(PYTHON) -m "pytest" $(PYTEST_DIR) $(PYTEST_OPTS)

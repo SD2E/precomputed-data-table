@@ -1,0 +1,3 @@
+[submodule "app/precomputed-data-table-app/xplan-od-growth-analysis"]
+	path = app/precomputed-data-table-app/xplan-od-growth-analysis
+	url = https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis.git
