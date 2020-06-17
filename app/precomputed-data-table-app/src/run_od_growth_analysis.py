@@ -40,33 +40,29 @@ def rows_to_replicate_groups(data_df, m_type):
 
     if m_type == 'od':
         # drop duplicates and induction samples
-        # *** This will be replaced when replicate group column is added
         dup_cols = ['doubling_time', 'n0', 'inducer_type', 'well', 'experiment_id']
         data_drop_df = data_df.drop_duplicates(subset=dup_cols, keep='first')
-        data_drop_df.dropna(subset=['inducer_type', 'inducer_concentration',
-                                              'inducer_concentration_unit'], inplace=True)
+
         # drop sample-specific columns
-        drop_cols = ['_id', 'sample_id', 'replicate', 'timepoint', 'timepoint_unit', 'container_id',
-                     'aliquot_id', 'fluor_gain_0.16', 'fluor_gain_0.16/od']
+        drop_cols = ['_id', 'sample_id', 'replicate', 'replicate_group', 'replicate_group_string',
+                     'timepoint', 'timepoint_unit', 'container_id',
+                     'aliquot_id']
+        drop_cols += [col for col in data_drop_df.columns.tolist() if 'fluor_gain' in col]
+
         data_drop_df.drop(drop_cols, axis=1, inplace=True)
-        # ***
+
         return data_drop_df
 
     elif m_type == 'fc':
-        # *** This will be replaced when replicate group column is added
         # drop duplicates
-        dup_cols = ['well_id', 'experiment_id']
+        dup_cols = ['well', 'experiment_id']
         data_drop_df = data_df.drop_duplicates(subset=dup_cols, keep='first')
         # drop sample-specific columns
-        drop_cols = ['_id', 'sample_id', 'replicate', 'timepoint', 'timepoint_unit', 'TX_plate_name']
+        drop_cols = ['_id', 'sample_id', 'replicate', 'replicate_group', 'replicate_group_string',
+                     'timepoint', 'timepoint_unit', 'TX_plate_name']
         data_drop_df.drop(drop_cols, axis=1, inplace=True)
         # ***
         return data_drop_df
-
-# happen outside of this module *****
-# def merge_growth_fc(growth_df, fc_meta_df):
-#
-#     growth_fc_df = fc_meta_df.merge(growth_df, )
 
 
 def run_od_analysis(exp_ref, exp_ref_dir, conf_dict, out_dir):
@@ -78,13 +74,6 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict, out_dir):
     # make df rows = replicate groups
     rg_od_analysis_df = rows_to_replicate_groups(od_analysis_initial_df, 'od')
 
-    # move outside of this module *****
-    # if conf_dict['fc_raw_log10']:
-    #     fc_meta_df = grab_meta_dataframe(exp_ref, exp_ref_dir)
-    #     rg_fc_meta_df = rows_to_replicate_groups(fc_meta_df, 'fc')
-    #
-    # elif not conf_dict['fc_raw_log10']:
-    #     pass
     return rg_od_analysis_df
 
 
