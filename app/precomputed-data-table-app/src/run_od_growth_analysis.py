@@ -29,7 +29,7 @@ def grab_meta_dataframe(exp_ref, er_dir):
     return meta_df
 
 
-def growth_analysis(platereader_df, exp_ref, out_dir):
+def growth_analysis(platereader_df, exp_ref):
 
     od_analysis_df = analysis_frame_api.augment_dataframe(df=platereader_df, experiment_identifier=exp_ref)
 
@@ -65,10 +65,10 @@ def rows_to_replicate_groups(data_df, m_type):
         return data_drop_df
 
 
-def run_od_analysis(exp_ref, exp_ref_dir, conf_dict, out_dir):
+def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
 
     pr_df = grab_pr_dataframe(exp_ref, exp_ref_dir)
-    od_analysis_initial_df = growth_analysis(pr_df, exp_ref, out_dir)
+    od_analysis_initial_df = growth_analysis(pr_df, exp_ref)
     # od_analysis_initial_df.to_csv(os.path.join(out_dir, 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)))
 
     # make df rows = replicate groups
