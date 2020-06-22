@@ -82,10 +82,10 @@ def main():
                 experiment_ids.append(m["experiment_id"])
     
     pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
-    pr_with_absolute_path = join_posix_agave([data_converge_dir, pr_file_name])
+    pr_with_absolute_path = os.path.join(data_converge_dir, pr_file_name)
     r.logger.info("pr_with_absolute_path: {}".format(pr_with_absolute_path))
     meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
-    meta_with_absolute_path = join_posix_agave([data_converge_dir, meta_file_name])
+    meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
     if os.path.exists(meta_with_absolute_path):
         r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
         derived_using = [meta_with_absolute_path]
