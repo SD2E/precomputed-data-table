@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
-    #parser.add_argument("output_dir", help="directory where to write the output files")
+    parser.add_argument("--analysis", help="analysis to run")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
