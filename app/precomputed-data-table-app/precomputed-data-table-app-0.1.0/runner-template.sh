@@ -1,4 +1,7 @@
 # Allow over-ride
+echo "activate "${analysis}
+source activate ${analysis}
+
 if [ -z "${CONTAINER_IMAGE}" ]
 then
     version=$(cat ./_util/VERSION)
@@ -29,4 +32,4 @@ utc_date() {
 
 #### BEGIN SCRIPT LOGIC
 echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
-container_exec ${CONTAINER_IMAGE} /opt/conda/envs/sd2-precomputed_data_table/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir}
+container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis}

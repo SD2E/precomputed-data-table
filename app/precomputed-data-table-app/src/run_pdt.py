@@ -97,7 +97,7 @@ def main(exp_ref, out_dir, data_converge_dir):
 
     if data_confirm_dict['platereader']:
         #rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict, out_dir)
-        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict, out_dir)
+        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
         rg_od_analysis_df.to_csv('pdt_{}__od_growth_analysis.csv'.format(exp_ref), index=False)
 
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
-    #parser.add_argument("output_dir", help="directory where to write the output files")
+    parser.add_argument("--analysis", help="analysis to run")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref

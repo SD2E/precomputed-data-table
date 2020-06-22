@@ -47,14 +47,22 @@ def main():
         raise Exception("missing data_converge_dir")
     else:
         data_converge_dir = m.get("data_converge_dir")
+    if "datetime_stamp" not in m:
+        raise Exception("missing datetime_stamp")
+    else:
+        datetime_stamp = m.get("datetime_stamp")
+    if "analysis" not in m:
+        raise Exception("missing analysis")
+    else:
+        analysis = m.get("analysis")
 
     state = "complete" if "complete" in data_converge_dir.lower() else "preview"
     
-    r.logger.info("experiment_ref: {} data_converge_dir: {}".format(experiment_ref, data_converge_dir))
+    r.logger.info("experiment_ref: {} data_converge_dir: {} analysis: {}".format(experiment_ref, data_converge_dir, analysis))
     (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(data_converge_dir)
     root_dir = StorageSystem(storage_system, agave=r.client).root_dir
-    data_converge_dir = join_posix_agave([root_dir, dirpath, leafdir])
-    r.logger.info("data_converge_dir: {}".format(data_converge_dir))
+    data_converge_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
+    r.logger.info("data_converge_dir2: {}".format(data_converge_dir2))
     
     # Capture initial parameterization passed in as message
     job_data = copy.copy(m)
@@ -74,24 +82,26 @@ def main():
                 experiment_ids.append(m["experiment_id"])
     
     pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
-    pr_with_relative_path = join_posix_agave([data_converge_dir, pr_file_name])
-    pr_with_absolute_path = join_posix_agave([root_dir, pr_with_relative_path])
+    pr_with_absolute_path = os.path.join(data_converge_dir, pr_file_name)
     r.logger.info("pr_with_absolute_path: {}".format(pr_with_absolute_path))
     meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
-    meta_with_relative_path = join_posix_agave([data_converge_dir, meta_file_name])
-    meta_with_absolute_path = join_posix_agave([root_dir, meta_with_relative_path])
+    meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
+    if os.path.exists(meta_with_absolute_path):
+        r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
+        derived_using = [meta_with_absolute_path]
+    else:
+        derived_using = []
     r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
     product_patterns = [
         {'patterns': ['.csv$'],
          'derived_from': [pr_with_absolute_path],
-         'derived_using': [meta_with_absolute_path]
+         'derived_using': derived_using
         }] 
 
     r.logger.debug("Instantiating job with product_patterns: {}".format(product_patterns))
 
-    now = datetime.now()
-    datetime_stamp = now.strftime('%Y%m%d%H%M%S')
-    archive_path = os.path.join(state, experiment_ref, datetime_stamp)
+    #job_data["datetime_stamp"] = datetime_stamp
+    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     
     r.logger.debug("archive_path: {}".format(archive_path))
     
@@ -104,13 +114,13 @@ def main():
 
     job.setup()
 
-    token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
-    atoken = get_admin_token(token_key)
+    #token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
+    #atoken = get_admin_token(token_key)
 
-    try:
-        job.reset(token=atoken)
-    except:
-        job.ready(token=atoken)
+    #try:
+    #    job.reset(token=atoken)
+    #except:
+    #    job.ready(token=atoken)
     
     archive_path = job.archive_path
     r.logger.info("archive_path: {}".format(archive_path))
@@ -120,7 +130,7 @@ def main():
     job_def = {
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir},
+        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
         "maxRunTime": "01:00:00",
     }
 
