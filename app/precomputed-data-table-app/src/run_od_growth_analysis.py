@@ -11,6 +11,7 @@ import pandas as pd
 import argparse
 import os
 from xplan_od_growth_analysis import analysis_frame_api
+from xplan_od_growth_analysis import dc_to_notebook
 
 
 def grab_pr_dataframe(exp_ref, er_dir):
@@ -66,6 +67,8 @@ def rows_to_replicate_groups(data_df, m_type):
 
 
 def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
+
+    dc_to_notebook(exp_ref, exp_ref_dir)
 
     pr_df = grab_pr_dataframe(exp_ref, exp_ref_dir)
     od_analysis_initial_df = growth_analysis(pr_df, exp_ref)
