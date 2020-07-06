@@ -1,10 +1,12 @@
 from pandas import DataFrame
 import pandas as pd
+import numpy as np
 import pickle
 import os
 from os.path import expanduser
 import random
 from typing import Optional, List
+import pkg_resources
 
 from pysd2cat.analysis import correctness
 
@@ -42,9 +44,25 @@ def do_analysis_wrapper(df_original, experiment, controls, low_control, high_con
     (res, df) = do_analysis(df_original, experiment, controls, low_control, high_control, out_path)
     return res, df
 
+def idw_sample(distance_dict, num_samples):
+    # Compute total distance of all controls
+    total_dist = sum(list(distance_dict.values()))
+    
+    # Compute inverse distances
+    inv_dists = []
+    for d in list(distance_dict.values()):
+        inv_dists.append((1/d)/total_dist)
+    
+    # Compute inverse weights
+    total_inv_dist = sum(inv_dists)
+    inv_weights = np.asarray(inv_dists)/total_inv_dist
+    
+    # Randomly sample controls without replacement using inverse weights
+    return np.random.choice(list(distance_dict.keys()), num_samples, p=inv_weights, replace=False)
+
 def predict_signal(df_original: DataFrame,
                    experiment: str,
-                   project_id: str,
+                   project_id : str,
                    low_control : str,
                    high_control : str,
                    id_col : str,
@@ -57,22 +75,29 @@ def predict_signal(df_original: DataFrame,
     and use it as the training set for random forest classification.
     """
     
-    # Get list of all experiments in project
-    experiments = []
+    # Extract control set Wasserstein distances
+    resource_package = 'grouped_control_prediction'
+    resource_path = '/'.join(('data', 'nearest_control_distances.pkl'))
+    distances_pkl = pkg_resources.resource_filename(resource_package, resource_path)
+    distances = pickle.load(open(distances_pkl, "rb" ))
+    
+    # Randomly sample 10 control sets based using inverse distance weighting
+    sampled_controls = idw_sample(distances, 10)
+    avg_dist = 0
+    for s in sampled_controls:
+        avg_dist += distances[s]
+    print("Average control distance: " + str(avg_dist/10))
+    
+    # Set up path to control data
     XPLAN_PROJECT = project_id
     xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
     path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
-    for file in os.listdir(path):
-        if '.csv' in file:
-            experiments.append(file)
-    
-    # Group all control sets together
-    sampled_controls = random.sample(eperiments, k=10)
-    all_controls = pd.DataFrame()
-    count = 0
     
     # Iterate through sampled control set data and group them into one control/training set
+    all_controls = pd.DataFrame()
+    count = 0
     print("Grouping sampled control sets...")
+    
     for sampled_exp in sampled_controls:
         
         # Extract sampled control set data
@@ -85,7 +110,6 @@ def predict_signal(df_original: DataFrame,
         # Add sampled control experiment to all_controls DataFrame
         count += 1
         print(str(count) + '/10 (' + sampled_exp + ')')
-        all_control_names.append(sampled_exp)
         all_controls = all_controls.append(controls, ignore_index=True)
 
     # Perform classification with new grouped control set
