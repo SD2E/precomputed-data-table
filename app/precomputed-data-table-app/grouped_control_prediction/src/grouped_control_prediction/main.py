@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='Predict Signal Output for samples'
 parser.add_argument('data_converge_path', type=str,
                     help='Path to data converge results')
 parser.add_argument('project_id', type=str,
-                    help='Project Identifier')
+                    help='Path to control data')
 parser.add_argument('low_control', type=str,
                     help='Strain Name of Low Control')
 parser.add_argument('high_control', type=str,
@@ -24,7 +24,7 @@ parser.add_argument('--out_path', type=str,
 
 
 def main(data_converge_path: str,
-         project_id: str,
+         project_id : str,
          low_control : str,
          high_control : str,
          id_col : Optional[str]="sample_id",
@@ -37,6 +37,7 @@ def main(data_converge_path: str,
     """
     
     # Get the data and metadata
+    print("Loading prediction data...")
     df = du.get_data_and_metadata(data_converge_path)
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
     meta = meta.rename(columns={'well':'well_id'})
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     strain_col = args.strain_col
     out_path = args.out_path
     
-    main(data_converge_path, 
+    main(data_converge_path,
          project_id,
          low_control,
          high_control,
