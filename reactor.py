@@ -130,7 +130,7 @@ def main():
     job_def = {
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
+        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis, "datetime_stamp": datetime_stamp},
         "maxRunTime": "01:00:00",
     }
 
