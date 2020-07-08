@@ -12,10 +12,8 @@ import argparse
 import subprocess
 import sys
 import pandas as pd
-sys.path.append('../wasserstein_tenfold_comparisons/')
-
-import wasserstein_analysis as wasser
-import TenFoldComparisons as tenfoldcomp
+import wasserstein_tenfold_comparisons.wasserstein_analysis as wasser
+import wasserstein_tenfold_comparisons.TenFoldComparisons as tenfoldcomp
 
 
 def run_wasserstain_analysis(er_dir, r_dict):
@@ -88,8 +86,9 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
                  'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''}}#,
                  # 'control_diff': {'tenfold_summary': '', 'tenfold_params': ''}}
 
-    results_dict = {"fc_raw_log10_stats.csv": data_dict,
-                    "fc_etl_stats.csv": data_dict}
+    # results_dict = {"fc_raw_log10_stats.csv": data_dict,
+    #                 "fc_etl_stats.csv": data_dict}
+    results_dict = {"fc_raw_log10_stats.csv": data_dict}
 
     results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
     results_dict = run_tenfold_well_focus(exp_ref_dir, results_dict, meta_fname)
