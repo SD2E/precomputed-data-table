@@ -2,35 +2,28 @@ import pandas as pd
 import json
 from numpy import nan
 from statistics import median
-import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 18})
 
 
 def load_csv(fname):
     # for both results and combined metadata df
     return pd.read_csv(fname)
 
-
 def group_me(df,columns):
     # for metadata df
     return df.groupby(columns)
-
 
 def get_samp_id_order(df):
     # for results df
     return list(df.columns)[1:]
 
-
 def get_matrix(df):
     #for results df
     return df.values
 
-
-def get_samp_ids_per_time_point(df,col,value):
+def get_samp_ids(df,col,value):
     # for group in grouped metadata df
     df2 = df[df[col] == value]
     return df2["sample_id"].values
-
 
 def get_index_pair_value(results,samp_id_order,id1,id2):
     # for results matrix from results df
@@ -39,7 +32,7 @@ def get_index_pair_value(results,samp_id_order,id1,id2):
     return results[ind1,ind2]
 
 
-def compute_time_difference(results_df, metadata_file, columns, comparison_column, comparison_values):
+def compute_difference(results_df, metadata_file, columns, comparison_column, comparison_values):
     '''
     results_file = Wasserstein results
     metadata_file = csv with merged metadata columns
@@ -56,9 +49,10 @@ def compute_time_difference(results_df, metadata_file, columns, comparison_colum
     values = {}
     missing = []
     for name, group in meta_grouped:
-        initial_ids = get_samp_ids_per_time_point(group, comparison_column, comparison_values[0])
-        final_ids = get_samp_ids_per_time_point(group, comparison_column, comparison_values[1])
+        initial_ids = get_samp_ids(group, comparison_column, comparison_values[0])
+        final_ids = get_samp_ids(group, comparison_column, comparison_values[1])
         group_vals = []
+        pairs = []
         for samp_id_init in initial_ids:
             for samp_id_fin in final_ids:
                 try:
@@ -68,12 +62,13 @@ def compute_time_difference(results_df, metadata_file, columns, comparison_colum
                     # print("One of the two sample ids {} not found.".format([samp_id_init,samp_id_fin]))
                     val = nan
                 group_vals.append(val)
+                pairs.append((samp_id_init, samp_id_fin))
         if group_vals:
-            values[name] = [min(group_vals), median(group_vals), max(group_vals)]
+            values[name] = [min(group_vals), median(group_vals), max(group_vals), pairs]
         else:
             missing.append(name)
     summary = pd.DataFrame.from_dict(values, orient='index',
-                                     columns=['wasserstein_min', 'wasserstein_median', 'wasserstein_max'])
+                                     columns=['wasserstein_min', 'wasserstein_median', 'wasserstein_max', 'sample_ids'])
     return summary, missing
 
 

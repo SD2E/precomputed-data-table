@@ -11,10 +11,11 @@ import os
 import argparse
 import subprocess
 import sys
-sys.path.insert(1, '../wasserstein_tenfold_comparisons')
+import pandas as pd
+sys.path.append('../wasserstein_tenfold_comparisons/')
 
-from wasserstein_tenfold_comparisons import wasserstein_analysis as wasser
-from wasserstein_tenfold_comparisons import TenFoldComparisons as tenfoldcomp
+import wasserstein_analysis as wasser
+import TenFoldComparisons as tenfoldcomp
 
 
 def run_wasserstain_analysis(er_dir, r_dict):
@@ -30,57 +31,83 @@ def return_fc_meta_name(er_dir):
         if fname.endswith("_fc_meta.csv"):
             return os.path.realpath(os.path.join(er_dir, fname))
 
-# ten-fold change within a single well
-def run_tenfold_comparisons(er_dir, r_dict):
+def get_col_min_max(er_dir, column):
 
-    meta_fname = return_fc_meta_name(er_dir)
+    meta_filename = return_fc_meta_name(er_dir)
+    meta_df = pd.read_csv(meta_filename)
+    return  [meta_df[column].min(), meta_df[column].max()]
+
+
+# ten-fold change within a single well
+def run_tenfold_well_focus(er_dir, r_dict, meta_fname):
 
     groupby_columns = ["strain", "inducer_concentration", 'experiment_id', 'well']
     comparison_column = "timepoint"
-    comparison_values = [18.0, 24.0]
-    # identifier = "_time_diff_"
-    # datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
+    comparison_values = get_col_min_max(er_dir, comparison_column)
 
     for datafile, single_results_dict in r_dict.items():
         wasser_results_df = r_dict[datafile]['wasserstein_dists']
-        summary, _ = tenfoldcomp.compute_time_difference(wasser_results_df, meta_fname, groupby_columns,
-                                                         comparison_column, comparison_values)
-        r_dict[datafile]['tenfold_summary'] = summary
+        summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
+                                                    comparison_column, comparison_values)
+        r_dict[datafile]['time_diff']['tenfold_summary'] = summary
 
         params = {"results_file": datafile, "metadata_file": meta_fname,
                   "groupby_columns": groupby_columns, "comparison_column": comparison_column,
                   "comparison_values": comparison_values}
-        r_dict[datafile]['tenfold_params'] = params
+        r_dict[datafile]['time_diff']['tenfold_params'] = params
 
     return r_dict
 
 # ten-fold change across inducers
-# def
+def run_tenfold_inducer_focus(er_dir, r_dict, meta_fname):
+
+    groupby_columns = ["strain", "timepoint", "experiment_id"]
+    comparison_column = "inducer_concentration"
+    comparison_values = get_col_min_max(er_dir, comparison_column)
+
+    for datafile, single_results_dict in r_dict.items():
+        wasser_results_df = r_dict[datafile]['wasserstein_dists']
+        summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
+                                                    comparison_column, comparison_values)
+        r_dict[datafile]['inducer_diff']['tenfold_summary'] = summary
+
+        params = {"results_file": datafile, "metadata_file": meta_fname,
+                  "groupby_columns": groupby_columns, "comparison_column": comparison_column,
+                  "comparison_values": comparison_values}
+        r_dict[datafile]['inducer_diff']['tenfold_params'] = params
+
+    return r_dict
+
 
 def run_wasser_tenfold(exp_ref, exp_ref_dir):
 
-    results_dict = {"fc_raw_log10_stats.csv": {'wasserstein_dists': '',
-                                               'tenfold_summary': '',
-                                               'tenfold_params': ''},
-                    "fc_etl_stats.csv": {'wasserstein_dists': '',
-                                         'tenfold_summary': '',
-                                         'tenfold_params': ''}
-                    }
+    meta_fname = return_fc_meta_name(exp_ref_dir)
+
+    data_dict = {'wasserstein_dists': '',
+                 'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                 'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''}}#,
+                 # 'control_diff': {'tenfold_summary': '', 'tenfold_params': ''}}
+
+    results_dict = {"fc_raw_log10_stats.csv": data_dict}
+    # results_dict = {"fc_raw_log10_stats.csv": data_dict,
+    #                 "fc_etl_stats.csv": data_dict}
 
     results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
-    results_dict = run_tenfold_comparisons(exp_ref_dir, results_dict)
+    results_dict = run_tenfold_well_focus(exp_ref_dir, results_dict, meta_fname)
+    results_dict = run_tenfold_inducer_focus(exp_ref_dir, results_dict, meta_fname)
 
-    identifier = "_time_diff_"
     datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
 
     for datafile, single_results_dict in results_dict.items():
-        fname_wasser = 'pdt_{}{}wasserstein_dists_{}.csv'.format(datafile.split(".")[0], identifier, datetime)
-        fname_summary = 'pdt_{}{}summary_{}.csv'.format(datafile.split(".")[0], identifier, datetime)
-        fname_params = 'pdt_{}{}params_{}.csv'.format(datafile.split(".")[0], identifier, datetime)
-
-        results_dict[datafile]['wasserstein_dists'].to_csv(fname_wasser)
-        tenfoldcomp.save_summary(results_dict[datafile]['tenfold_summary'], fname_summary)
-        tenfoldcomp.save_params(results_dict[datafile]['tenfold_params'], fname_params)
+        for data in single_results_dict.keys():
+            if data == 'wasserstein_dists':
+                fname_wasser = 'pdt_{}_{}_wasserstein_dists_{}.csv'.format(datafile.split(".")[0], data, datetime)
+                results_dict[datafile]['wasserstein_dists'].to_csv(fname_wasser)
+            else:
+                fname_summary = 'pdt_{}_{}_summary_{}.csv'.format(datafile.split(".")[0], data, datetime)
+                fname_params = 'pdt_{}_{}_params_{}.json'.format(datafile.split(".")[0], data, datetime)
+                tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
+                tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
 
 
 if __name__ == '__main__':
