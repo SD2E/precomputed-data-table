@@ -17,7 +17,8 @@ ADD src /src
 # Comment each of the following analysis dependencies in conda_env.yml first
 COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
 
-ADD xplan-od-growth-analysis.yml /xplan-od-growth-analysis.yml
-RUN conda env create -f /xplan-od-growth-analysis.yml
+ADD analysis_envs /analysis_envs
+RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml
+RUN conda env create -f /analysis_envs/wasserstein_tenfold_comparisons.yml
 
 #RUN echo "source activate sd2-precomputed_data_table" > ~/.bashrc
