@@ -78,39 +78,3 @@ def save_summary(summary, fname):
 
 def save_params(params, fname):
     json.dump(params, open(fname, "w"))
-
-
-# def compute_summary(results_dir_contents, meta_files, groupby_columns, comparison_column, comparison_values,
-#                     identifier="_time_diff_"):
-#     all_summaries = {}
-#     for results_file, metadata_file in zip(results_dir_contents, meta_files):
-#         summary, _ = compute_time_difference(results_file, metadata_file, groupby_columns, comparison_column,
-#                                              comparison_values)
-#         # fname = results_file.split(".")[0] + identifier + "summary_" + datetime + ".csv"
-#         fname = results_file.split("/")[-1].split(".")[0] + identifier + "summary_" + datetime + ".csv"
-#         save_summary(summary, fname)
-#         params = {"results_file": results_file, "metadata_file": metadata_file, "groupby_columns": groupby_columns,
-#                   "comparison_column": comparison_column, "comparison_values": comparison_values}
-#         # fname = results_file.split(".")[0] + identifier + "params_" + datetime + ".csv"
-#         fname = results_file.split("/")[-1].split(".")[0] + identifier + "params_" + datetime + ".csv"
-#         save_params(params, fname)
-#         all_summaries[results_file] = summary
-#     return all_summaries
-
-
-# def plot_above_threshold(all_summaries, thresholds=[x / 2 for x in range(0, 21)], column="wasserstein_median"):
-#     for results_file, summary in all_summaries.items():
-#         norm_cst = len(summary.index)
-#         plt.figure()
-#         tag = " (ETL)" if "fc_etl" in results_file else " (log10)"
-#         plt.title(results_file.split("/")[-1].split(".")[0].split("20")[0][:-1] + tag, fontsize=12)
-#         y = []
-#         for t in thresholds:
-#             y.append(len(summary[summary[column] >= t].index) / norm_cst)
-#         plt.xlabel("Fold change")
-#         plt.ylabel("Percentage of samples")
-#         plt.ylim([0.0, 1.0])
-#         plt.plot(thresholds, y, linewidth=2)
-#         plt.tight_layout()
-#         plt.savefig(results_file.split("/")[-1].split(".")[0] + ".png", dpi=300)
-#         plt.show()

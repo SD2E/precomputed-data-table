@@ -65,9 +65,6 @@ def do_analysis(experiment, datafile, id_col="sample_id", channel_col="channel",
     if channel_col in df.columns:
         df = df.loc[df[channel_col] == channel_val]
 
-    #     ## Truncated for testing
-    #     df = df.iloc[:5]
-
     bins = get_bins(df)
     ids = list(df[id_col].values)
     res = np.zeros([len(ids), len(ids)])
