@@ -1,0 +1,17 @@
+name: wasserstein_tenfold_comparisons
+channels:
+- defaults
+dependencies:
+    - python = 3.6
+    - pip
+    - pytest = 5.0.0
+    - numpy
+    - pandas
+    - pymongo
+
+    - pip:
+      - pytest-html
+      - pytest-timeout
+      - agavepy
+      - statistics
+      - pyemd

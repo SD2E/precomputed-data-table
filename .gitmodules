@@ -1,8 +1,6 @@
 [submodule "app/precomputed-data-table-app/xplan-od-growth-analysis"]
 	path = app/precomputed-data-table-app/xplan-od-growth-analysis
 	url = https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis.git
-
-
-[submodule "app/precomputed-data-table-app/fcs_signal_prediction"]
-	path = app/precomputed-data-table-app/fcs_signal_prediction
-	url = https://gitlab.sd2e.org/dbryce/fcs_signal_prediction
+[submodule "app/precomputed-data-table-app/omics_tools"]
+	path = app/precomputed-data-table-app/omics_tools
+	url = https://gitlab.sd2e.org/sd2program/omics_tools.git

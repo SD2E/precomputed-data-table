@@ -13,8 +13,6 @@ python run_pdt.py "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208" ../pd
 import argparse
 import os
 import json
-from datetime import datetime
-import run_od_growth_analysis as run_growth
 
 
 def get_latest_er(exp_ref, dc_dir):
@@ -72,7 +70,7 @@ def confirm_data_types(er_file_list):
     return dtype_confirm_dict
 
 # def main(exp_ref, out_dir, tacc_path_type, archive_system):
-def main(exp_ref, out_dir, data_converge_dir):
+def main(exp_ref, analysis, out_dir, data_converge_dir):
     # make a new dir for output
     #now = datetime.now()
     #datetime_stamp = now.strftime('%Y%m%d%H%M%S')
@@ -95,22 +93,28 @@ def main(exp_ref, out_dir, data_converge_dir):
     #data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
     data_confirm_dict = confirm_data_types(os.listdir(data_converge_dir))
 
-    if data_confirm_dict['platereader']:
-        #rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, path_to_er_dir, data_confirm_dict, out_dir)
-        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict, out_dir)
+    if analysis == 'xplan-od-growth-analysis':
+        import run_od_growth_analysis as run_growth
+
+        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
         rg_od_analysis_df.to_csv('pdt_{}__od_growth_analysis.csv'.format(exp_ref), index=False)
 
+    elif analysis == 'wasserstein_tenfold_comparisons':
+        import run_wasserstein_tenfold_comparisons as wasser_analysis
+
+        wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
-    #parser.add_argument("output_dir", help="directory where to write the output files")
+    parser.add_argument("--analysis", help="analysis to run")
+    parser.add_argument("--datetime_stamp", help="parent folder") # not being used for the time being
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_data_converge_dir = args.data_converge_dir
-    #arg_out_dir = args.output_dir
+    arg_analysis = args.analysis
     arg_out_dir = "."
 
-    main(arg_exp_ref, arg_out_dir, arg_data_converge_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
