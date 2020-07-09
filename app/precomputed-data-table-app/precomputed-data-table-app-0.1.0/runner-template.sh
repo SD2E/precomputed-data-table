@@ -32,4 +32,4 @@ utc_date() {
 
 #### BEGIN SCRIPT LOGIC
 echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
-container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis} --datetime_stamp ${datetime_stamp}
+container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis}
