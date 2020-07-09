@@ -6,6 +6,7 @@
   "parallelism": "SERIAL",
   "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
+  "defaultQueue": "long",
   "label": "precomputed data table",
   "modules": [
     "load tacc-singularity"
@@ -48,7 +49,15 @@
         "visible": true,
         "required": true
       }
-    }
+    },
+    {
+      "id": "datetime_stamp",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    }   
   ],
   "outputs": [
   ]
