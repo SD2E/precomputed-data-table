@@ -44,7 +44,7 @@ def main(data_converge_path: str,
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']
     
     # Predict the output signal for each event
-    pred, test_accuracy = predict_signal(df,
+    pred, test_accuracy, all_controls = predict_signal(df,
                           data_converge_path,
                           project_id,
                           low_control,
@@ -62,15 +62,16 @@ def main(data_converge_path: str,
     mean_prediction.columns  = mean_prediction.columns.map('_'.join)
     mean_prediction = mean_prediction.rename(columns={id_col+"_": id_col})
     
-    # Attach the mean and std to the metadata
+    # Attach mean & standard deviation of sample predcitions to the metadata
     result = meta.merge(mean_prediction, on=id_col)
     
     # Create plots
     well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
     well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
-    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'BL1-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control)
+    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
     
     return result, test_accuracy, well_timeseries_fig, samples_and_controls_fig
+    
 
 
 if __name__ == '__main__':
