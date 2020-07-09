@@ -109,7 +109,6 @@ if __name__ == '__main__':
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
     parser.add_argument("--analysis", help="analysis to run")
-    parser.add_argument("--datetime_stamp", help="parent folder") # not being used for the time being
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
