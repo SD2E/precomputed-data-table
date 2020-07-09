@@ -76,10 +76,8 @@ def predict_signal(df_original: DataFrame,
     """
     
     # Extract control set Wasserstein distances
-    resource_package = 'grouped_control_prediction'
-    resource_path = '/'.join(('data', 'nearest_control_distances.pkl'))
-    distances_pkl = pkg_resources.resource_filename(resource_package, resource_path)
-    distances = pickle.load(open(distances_pkl, "rb" ))
+    distance_pkl = pkg_resources.resource_filename("grouped_control_prediction", "data/nearest_control_distances.pkl")
+    distances = pickle.load(open(distance_pkl, "rb" ))
     
     # Randomly sample 10 control sets based using inverse distance weighting
     sampled_controls = idw_sample(distances, 10)
@@ -97,7 +95,6 @@ def predict_signal(df_original: DataFrame,
     all_controls = pd.DataFrame()
     count = 0
     print("Grouping sampled control sets...")
-    
     for sampled_exp in sampled_controls:
         
         # Extract sampled control set data
@@ -111,7 +108,7 @@ def predict_signal(df_original: DataFrame,
         count += 1
         print(str(count) + '/10 (' + sampled_exp + ')')
         all_controls = all_controls.append(controls, ignore_index=True)
-
+    
     # Perform classification with new grouped control set
     res, df = do_analysis_wrapper(df_original, experiment, all_controls, low_control, high_control, out_path)
     
@@ -124,4 +121,4 @@ def predict_signal(df_original: DataFrame,
     leader_board = leader_board.sort_values(by=['Date', 'Time'], ascending=True)
     test_accuracy = leader_board.loc[:,'Accuracy'].iloc[-1]
     
-    return pred, test_accuracy
+    return pred, test_accuracy, all_controls
