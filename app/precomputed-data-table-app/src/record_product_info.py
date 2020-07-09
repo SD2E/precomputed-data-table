@@ -51,13 +51,16 @@ def make_hashes_for_files(out_dir, file_list):
     :param file_list: list of file records [{"name": x}, ...]
     :return: list of file records [{"name": str, "hash_md5": str}, ...]
     """
+    file_list_dict = []
 
     for file in file_list:
-        file_path = os.path.join(out_dir, file['name'])
+        file_path = os.path.join(out_dir, file)
         hash = make_hash(file_path)
-        file['hash_md5'] = hash
+        file_dict = {'name': file_path,
+                     'hash_md5': hash}
+        file_list_dict.append(file_dict)
 
-    return file_list
+    return file_list_dict
 
 
 def get_dev_git_version():
@@ -74,10 +77,9 @@ def get_dev_git_version():
     return version_info
 
 
-def make_product_record(exp_ref, out_dir, files):
-    datetime_stamp = datetime.now().strftime('%Y%m%d%H%M%S')
+def make_product_record(exp_ref, out_dir, dc_dir):
 
-    upstream_status = get_comparison_passed(exp_ref) ## change to show data converge info
+    datetime_stamp = datetime.now().strftime('%Y%m%d%H%M%S')
     version_info = get_dev_git_version()
 
     record = {
@@ -85,8 +87,25 @@ def make_product_record(exp_ref, out_dir, files):
         "experiment_reference": exp_ref,
         "date_run": datetime_stamp,
         "output_dir": out_dir,
-        "files": files,
-        "status_upstream": upstream_status
+        "analyses": {},
+        "status_upstream": {
+            'data-converge directory': dc_dir
+        }
     }
 
+    return record
+
+def append_record(record, files_dict, analysis, out_dir):
+
+    # TODO add md5 check of dc files
+    analysis_dict = {'files': []}
+
+    for in_file in files_dict.keys():
+        out_file_hashes = make_hashes_for_files(out_dir, files_dict[in_file])
+        analysis_dict['files'].append({
+            'data_converge input': in_file,
+            'precomputed_data_table outputs': out_file_hashes
+        })
+
+    record['analyses'][analysis] = analysis_dict
     return record

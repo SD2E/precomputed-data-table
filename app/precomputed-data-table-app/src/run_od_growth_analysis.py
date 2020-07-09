@@ -18,7 +18,7 @@ def grab_pr_dataframe(exp_ref, er_dir):
     pr_file_name = '__'.join([exp_ref, 'platereader.csv'])
     platereader_df = pd.read_csv(os.path.join(er_dir, pr_file_name))
 
-    return platereader_df
+    return platereader_df, pr_file_name
 
 
 def grab_meta_dataframe(exp_ref, er_dir):
@@ -67,14 +67,14 @@ def rows_to_replicate_groups(data_df, m_type):
 
 def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
 
-    pr_df = grab_pr_dataframe(exp_ref, exp_ref_dir)
+    pr_df, pr_fname = grab_pr_dataframe(exp_ref, exp_ref_dir)
     od_analysis_initial_df = growth_analysis(pr_df, exp_ref)
     # od_analysis_initial_df.to_csv(os.path.join(out_dir, 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)))
 
     # make df rows = replicate groups
     rg_od_analysis_df = rows_to_replicate_groups(od_analysis_initial_df, 'od')
 
-    return rg_od_analysis_df
+    return rg_od_analysis_df, pr_fname
 
 
 if __name__ == '__main__':
