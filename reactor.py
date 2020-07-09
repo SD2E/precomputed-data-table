@@ -132,6 +132,7 @@ def main():
         "name": "precomputed-data-table-app" + r.nickname,
         "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis, "datetime_stamp": datetime_stamp},
         "maxRunTime": "24:00:00",
+        "batchQueue": "long"
     }
 
     # First, set the preferred archive destination and ensure the job archives

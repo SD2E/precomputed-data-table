@@ -16,11 +16,9 @@ ADD config.yml /config.yml
 ADD src /src
 
 COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
+COPY omics_tools /src/omics_tools
 
 ADD analysis_envs /analysis_envs
 RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml
 RUN conda env create -f /analysis_envs/wasserstein_tenfold_comparisons.yml
-
-COPY omics_tools /src/omics_tools
-ADD omics_tools.yml /omics_tools.yml
-RUN conda env create -f /omics_tools.yml
+RUN conda env create -f /analysis_envs/omics_tools.yml
