@@ -121,10 +121,5 @@ if __name__ == '__main__':
     arg_analysis = args.analysis
     arg_result_parent_dir = args.result_parent_dir
     arg_out_dir = "."
-    
-    from pathlib import Path
-    record_path = os.path.join(arg_result_parent_dir, "record.json")
-    Path(record_path).touch()
-    exit(0)
 
     main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
