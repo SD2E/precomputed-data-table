@@ -13,6 +13,7 @@ python run_pdt.py "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208" ../pd
 import argparse
 import os
 import json
+import record_product_info as rpi
 
 
 def get_latest_er(exp_ref, dc_dir):
@@ -69,40 +70,43 @@ def confirm_data_types(er_file_list):
 
     return dtype_confirm_dict
 
-# def main(exp_ref, out_dir, tacc_path_type, archive_system):
-def main(exp_ref, analysis, out_dir, data_converge_dir):
-    # make a new dir for output
-    #now = datetime.now()
-    #datetime_stamp = now.strftime('%Y%m%d%H%M%S')
-    #out_dir = os.path.abspath(out_dir)
-    #out_dir = os.path.join(out_dir, "pdt_{0:s}_{1:s}".format(exp_ref, datetime_stamp))
-    #print("making directory... ", out_dir)
-    #if not os.path.exists(out_dir):
-    #    os.makedirs(out_dir, exist_ok=True)
 
-    # get latest data converge product for ER
-    #er_dir = get_latest_er(exp_ref, data_converge_dir)
-    #path_to_er_dir = os.path.join(data_converge_dir, exp_ref, er_dir)
+def main(exp_ref, analysis, out_dir, data_converge_dir):
 
     # Check status of data in ER's record.json file
-    #path_to_record_json = return_er_record_path(path_to_er_dir)
     path_to_record_json = return_er_record_path(data_converge_dir)
     check_er_status(path_to_record_json)
 
     # confirm presence of data(frame) types
-    #data_confirm_dict = confirm_data_types(os.listdir(path_to_er_dir))
     data_confirm_dict = confirm_data_types(os.listdir(data_converge_dir))
+
+    record_path = os.path.join(out_dir, "record.json")
+    # check for existing record.json
+    if 'record.json' not in os.listdir(out_dir):
+        open(record_path, 'w+')
+        record = rpi.make_product_record(exp_ref, out_dir, data_converge_dir)
+    else:
+        with open(record_path, 'r') as jfile:
+            record = json.load(jfile)
 
     if analysis == 'xplan-od-growth-analysis':
         import run_od_growth_analysis as run_growth
 
-        rg_od_analysis_df = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
-        rg_od_analysis_df.to_csv('pdt_{}__od_growth_analysis.csv'.format(exp_ref), index=False)
+        rg_od_analysis_df, pr_fname = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
+        od_growth_fname = 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)
+        rg_od_analysis_df.to_csv(od_growth_fname, index=False)
+        od_growth_fname_dict = {pr_fname: [od_growth_fname]}
+        record = rpi.append_record(record, od_growth_fname_dict, analysis, out_dir)
 
     elif analysis == 'wasserstein_tenfold_comparisons':
         import run_wasserstein_tenfold_comparisons as wasser_analysis
 
-        wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
+        wasser_fname_dict = wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
+        record = rpi.append_record(record, wasser_fname_dict, analysis, out_dir)
+
+
+    with open(record_path, 'w') as jfile:
+        json.dump(record, jfile, indent=2)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
