@@ -113,11 +113,13 @@ if __name__ == '__main__':
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
     parser.add_argument("--analysis", help="analysis to run")
+    parser.add_argument("--result_parent_dir", help="parent folder of this analysis")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_data_converge_dir = args.data_converge_dir
     arg_analysis = args.analysis
+    arg_result_parent_dir = args.result_parent_dir
     arg_out_dir = "."
 
     main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)

@@ -101,9 +101,13 @@ def main():
     r.logger.debug("Instantiating job with product_patterns: {}".format(product_patterns))
 
     #job_data["datetime_stamp"] = datetime_stamp
-    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     
-    r.logger.debug("archive_path: {}".format(archive_path))
+    result_root_dir = StorageSystem('data-sd2e-projects.sd2e-project-48', agave=r.client).root_dir
+    result_parent_dir = os.path.join(result_root_dir, state, experiment_ref, datetime_stamp)
+    r.logger.info("result_parent_dir: {}".format(result_parent_dir))
+    
+    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
+    r.logger.info("archive_path: {}".format(archive_path))
     
     job = Job(r,
               experiment_id=experiment_ids,
@@ -130,7 +134,7 @@ def main():
     job_def = {
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
+        "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis, "result_parent_dir": result_parent_dir},
         "maxRunTime": "24:00:00",
         "batchQueue": "long"
     }

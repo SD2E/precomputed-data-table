@@ -1,4 +1,7 @@
 {
-	"experiment_ref": "Microbe-LiveDeadClassification",
-	"data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20200513202952"
+	"experiment_ref": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208",
+	"data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/preview/YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208/20200627120100",
+	"state": "preview", 
+	"datetime_stamp": "20200708174458", 
+	"analysis":"wasserstein_tenfold_comparisons"
 }
