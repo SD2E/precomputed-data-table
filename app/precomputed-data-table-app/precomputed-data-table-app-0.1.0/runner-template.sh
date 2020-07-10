@@ -31,6 +31,7 @@ utc_date() {
 }
 
 #### BEGIN SCRIPT LOGIC
+<<<<<<< HEAD
 echo "launching "${analysis}
 if [ "${analysis}" = 'omics_tools' ]
 then
@@ -47,3 +48,7 @@ else
 	echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
 	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis} --result_parent_dir ${result_parent_dir}
 fi
+=======
+echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
+container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis} --result_parent_dir ${result_parent_dir}
+>>>>>>> 6a70a34bb4d559783152cc037bc4d7b31e5ee8e7
