@@ -39,6 +39,11 @@ def main():
     r.logger.info("message: {}".format(m))
     r.logger.info("raw message: {}".format(r.context.raw_message))
 
+    if "analysis" not in m:
+        raise Exception("missing analysis")
+    else:
+        analysis = m.get("analysis")
+        
     if "experiment_ref" not in m:
         raise Exception("missing experiment_ref")
     else:
@@ -51,10 +56,7 @@ def main():
         raise Exception("missing datetime_stamp")
     else:
         datetime_stamp = m.get("datetime_stamp")
-    if "analysis" not in m:
-        raise Exception("missing analysis")
-    else:
-        analysis = m.get("analysis")
+
 
     state = "complete" if "complete" in data_converge_dir.lower() else "preview"
     
