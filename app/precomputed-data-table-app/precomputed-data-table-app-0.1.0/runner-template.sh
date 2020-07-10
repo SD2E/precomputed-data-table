@@ -31,5 +31,19 @@ utc_date() {
 }
 
 #### BEGIN SCRIPT LOGIC
-echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
-container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis}
+echo "launching "${analysis}
+if [ "${analysis}" = 'omics_tools' ]
+then
+	inputCountsFile=$(basename "${inputData}")
+	
+	# Double check existence of inputTarball before undertaking
+	# expensive processing and/or analysis. Fail if not found.
+	if [ ! -f "${inputCountsFile}" ];
+	then
+	    die "inputData ${inputCountsFile} not found or was inaccessible"
+	fi
+	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/omics_tools/run_omics.py --inputCountsFile ${inputCountsFile} --output_dir .
+else
+	echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
+	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis} --result_parent_dir ${result_parent_dir}
+fi
