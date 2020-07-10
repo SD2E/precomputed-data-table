@@ -85,7 +85,7 @@ if __name__ == '__main__':
     parser.add_argument('data_confirm_dict', help='dictionary containing information on available data'
                                                   ' in experimental reference')
     parser.add_argument("output_dir", help="directory where to write the output files")
-    # parser.add_argument("output_dir", help="directory where to write the output files")
+
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_exp_ref_dir = args.exp_ref_dir
