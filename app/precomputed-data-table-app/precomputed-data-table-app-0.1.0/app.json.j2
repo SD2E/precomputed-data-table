@@ -2,11 +2,11 @@
   "name": "{{ app.name }}",
   "version": "{{ app.version }}",
   "executionType": "HPC",
-  "executionSystem": "hpc-tacc-wrangler",
+  "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
   "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
-  "defaultQueue": "long",
+  "defaultQueue": "all",
   "label": "precomputed data table",
   "modules": [
     "load tacc-singularity"

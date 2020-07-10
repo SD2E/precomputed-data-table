@@ -135,8 +135,8 @@ def main():
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
         "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis, "result_parent_dir": result_parent_dir},
-        "maxRunTime": "24:00:00",
-        "batchQueue": "long"
+        "maxRunTime": "8:00:00",
+        "batchQueue": "all"
     }
 
     # First, set the preferred archive destination and ensure the job archives
