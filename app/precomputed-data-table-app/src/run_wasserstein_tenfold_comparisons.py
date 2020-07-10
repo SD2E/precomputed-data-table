@@ -102,12 +102,12 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
         fname_dict[full_datafile_name] = []
         for data in single_results_dict.keys():
             if data == 'wasserstein_dists':
-                fname_wasser = 'pdt_{}_{}_wasserstein_dists_{}.csv'.format(datafile.split(".")[0], data, datetime)
+                fname_wasser = 'pdt_{}__{}_{}_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
                 results_dict[datafile]['wasserstein_dists'].to_csv(fname_wasser)
                 fname_dict[full_datafile_name].append(fname_wasser)
             else:
-                fname_summary = 'pdt_{}_{}_summary_{}.csv'.format(datafile.split(".")[0], data, datetime)
-                fname_params = 'pdt_{}_{}_params_{}.json'.format(datafile.split(".")[0], data, datetime)
+                fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
+                fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
                 tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
                 tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
                 fname_dict[full_datafile_name].append(fname_summary)

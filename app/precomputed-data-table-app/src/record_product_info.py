@@ -56,7 +56,7 @@ def make_hashes_for_files(out_dir, file_list):
     for file in file_list:
         file_path = os.path.join(out_dir, file)
         hash = make_hash(file_path)
-        file_dict = {'name': file_path,
+        file_dict = {'name': file,
                      'hash_md5': hash}
         file_list_dict.append(file_dict)
 
