@@ -14,7 +14,27 @@
   "shortDescription": "First level analysis post data-converge",
   "templatePath": "runner-template.sh",
   "testPath": "tester.sh",
-  "inputs": [],
+  "inputs": [
+	{
+		"id": "inputData",
+		"value": {
+			"default": "",
+			"visible": true,
+			"required": false,
+			"order": 0
+		},
+		"semantics": {
+			"minCardinality": 1,
+			"maxCardinality": 500,
+			"ontology": [
+				"http://edamontology.org/data_1049"
+			]
+		},
+		"details": {
+			"label": "input counts file"
+		}
+	}
+  ],
   "parameters": [
     {
       "id": "CONTAINER_IMAGE",
@@ -52,6 +72,14 @@
     },
     {
       "id": "result_parent_dir",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "input_counts_file",
       "value": {
         "type": "string",
         "visible": true,
