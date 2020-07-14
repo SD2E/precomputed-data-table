@@ -3,6 +3,8 @@ import copy
 import json
 import jsonschema
 
+import record_product_info as rpi
+
 from agavepy.agave import Agave
 from attrdict import AttrDict
 from datacatalog import mongo
@@ -13,7 +15,6 @@ from datacatalog.stores import StorageSystem
 from reactors.runtime import Reactor, agaveutils
 from requests.exceptions import HTTPError
 from datetime import datetime
-
 from pymongo import MongoClient
 
 def join_posix_agave(joinList):
@@ -45,6 +46,36 @@ def load_structured_request(experiment_id, r):
     else:
         return matches[0]
 
+def aggregate_records(m, r):
+    if "analysis" not in m:
+        raise Exception("missing analysis")
+    else:
+        analysis = m.get("analysis")
+    if "data_converge_dir" not in m:
+        raise Exception("missing data_converge_dir")
+    else:
+        data_converge_dir = m.get("data_converge_dir")
+    if "parent_result_dir" not in m:
+        raise Exception("missing parent_result_dir")
+    else:
+        parent_result_dir = m.get("parent_result_dir")
+        
+    record_path = os.path.join(parent_result_dir, "record.json")
+    analysis_record_path = os.path.join(parent_result_dir, analysis, "record.json")
+    with open(analysis_record_path, 'r') as analysis_json_file:
+        analysis_record_dict = json.load(analysis_json_file)
+    # check for existing record.json
+    if 'record.json' not in os.listdir(parent_result_dir):
+        open(record_path, 'w+')
+        record = rpi.make_product_record(exp_ref, parent_result_dir, data_converge_dir)
+    else:
+        with open(record_path, 'r') as jfile:
+            record = json.load(jfile)
+            record = rpi.append_record(record, analysis_record_dict, analysis, out_dir)
+            
+    with open(record_path, 'w') as jfile:
+        json.dump(record, jfile, indent=2)
+            
 def launch_omics(m, r):
     if "input_dir" not in m:
         raise Exception("missing input_dir")
@@ -89,7 +120,7 @@ def launch_omics(m, r):
     job_def = {
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"input_counts_file": input_counts_path, "experiment_ref": "na", "data_converge_dir": "na", "analysis": analysis, "result_parent_dir": "na"},
+        "parameters": {"input_counts_file": input_counts_path, "experiment_ref": "na", "data_converge_dir": "na", "analysis": analysis},
         "maxRunTime": "8:00:00",
         "batchQueue": "all"
     }
@@ -203,8 +234,6 @@ def launch_app(m, r):
     #job_data["datetime_stamp"] = datetime_stamp
     
     result_root_dir = StorageSystem('data-sd2e-projects.sd2e-project-48', agave=r.client).root_dir
-    result_parent_dir = os.path.join(result_root_dir, state, experiment_ref, datetime_stamp)
-    r.logger.info("result_parent_dir: {}".format(result_parent_dir))
     
     archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
@@ -234,7 +263,7 @@ def launch_app(m, r):
     job_def = {
         "appId": r.settings.agave_app_id,
         "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"input_counts_file": "na", "experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis, "result_parent_dir": result_parent_dir},
+        "parameters": {"input_counts_file": "na", "experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
         "maxRunTime": "8:00:00",
         "batchQueue": "all"
     }
@@ -288,16 +317,19 @@ def main():
     m = r.context.message_dict
     r.logger.info("message: {}".format(m))
     r.logger.info("raw message: {}".format(r.context.raw_message))
-
-    if "analysis" not in m:
-        raise Exception("missing analysis")
+    
+    if "aggregate_records" in m:
+        aggregate_records(m, r)
     else:
-        analysis = m.get("analysis")
-
-    if analysis == "omics_tools":
-        launch_omics(m, r)
-    else:
-        launch_app(m, r)
+        if "analysis" not in m:
+            raise Exception("missing analysis")
+        else:
+            analysis = m.get("analysis")
+    
+        if analysis == "omics_tools":
+            launch_omics(m, r)
+        else:
+            launch_app(m, r)
 
 if __name__ == '__main__':
     main()

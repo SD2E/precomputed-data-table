@@ -71,7 +71,7 @@ def confirm_data_types(er_file_list):
     return dtype_confirm_dict
 
 
-def main(exp_ref, analysis, out_dir, data_converge_dir, result_parent_dir):
+def main(exp_ref, analysis, out_dir, data_converge_dir):
 
     # Check status of data in ER's record.json file
     path_to_record_json = return_er_record_path(data_converge_dir)
@@ -80,15 +80,16 @@ def main(exp_ref, analysis, out_dir, data_converge_dir, result_parent_dir):
     # confirm presence of data(frame) types
     data_confirm_dict = confirm_data_types(os.listdir(data_converge_dir))
 
-    record_path = os.path.join(result_parent_dir, "record.json")
+    record_path = os.path.join(out_dir, "record.json")
     # check for existing record.json
-    if 'record.json' not in os.listdir(result_parent_dir):
-        open(record_path, 'w+')
-        record = rpi.make_product_record(exp_ref, out_dir, data_converge_dir)
-    else:
-        with open(record_path, 'r') as jfile:
-            record = json.load(jfile)
+    #if 'record.json' not in os.listdir(out_dir):
+    #    open(record_path, 'w+')
+    #    record = rpi.make_product_record(exp_ref, out_dir, data_converge_dir)
+    #else:
+    #    with open(record_path, 'r') as jfile:
+    #        record = json.load(jfile)
 
+    record = {}
     if analysis == 'xplan-od-growth-analysis':
         import run_od_growth_analysis as run_growth
 
@@ -113,13 +114,11 @@ if __name__ == '__main__':
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
     parser.add_argument("--analysis", help="analysis to run")
-    parser.add_argument("--result_parent_dir", help="parent folder of this analysis")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_data_converge_dir = args.data_converge_dir
     arg_analysis = args.analysis
-    arg_result_parent_dir = args.result_parent_dir
     arg_out_dir = "."
 
-    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir, arg_result_parent_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
