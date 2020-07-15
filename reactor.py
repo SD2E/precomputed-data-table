@@ -51,6 +51,10 @@ def aggregate_records(m, r):
         raise Exception("missing analysis")
     else:
         analysis = m.get("analysis")
+    if "experiment_reference" not in m:
+        raise Exception("missing experiment_reference")
+    else:
+        experiment_reference = m.get("experiment_reference")       
     if "data_converge_dir" not in m:
         raise Exception("missing data_converge_dir")
     else:
@@ -60,21 +64,39 @@ def aggregate_records(m, r):
     else:
         parent_result_dir = m.get("parent_result_dir")
         
-    record_path = os.path.join(parent_result_dir, "record.json")
-    analysis_record_path = os.path.join(parent_result_dir, analysis, "record.json")
-    with open(analysis_record_path, 'r') as analysis_json_file:
-        analysis_record = json.load(analysis_json_file)
+    (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(data_converge_dir)
+    root_dir = StorageSystem(storage_system, agave=r.client).root_dir
+    data_converge_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
+    r.logger.info("data_converge_dir2: {}".format(data_converge_dir2))
+    
+    (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(parent_result_dir)
+    root_dir = StorageSystem(storage_system, agave=r.client).root_dir
+    parent_result_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
+    r.logger.info("parent_result_dir2: {}".format(parent_result_dir2))
+
+
+    analysis_record_path = os.path.join(parent_result_dir2, analysis, "record.json")
+    analysis_record = None
+    if os.path.exists(analysis_record_path) is False:
+        r.logger.info("{} doesn't exist".format(analysis_record_path))
+    else:
+        with open(analysis_record_path, 'r') as analysis_json_file:
+            analysis_record = json.load(analysis_json_file)
+        
+    record_path = os.path.join(parent_result_dir2, "record.json")
     # check for existing record.json
-    if 'record.json' not in os.listdir(parent_result_dir):
+    if 'record.json' not in os.listdir(parent_result_dir2):
         open(record_path, 'w+')
-        record = rpi.make_product_record(exp_ref, parent_result_dir, data_converge_dir)
+        record = rpi.make_product_record(experiment_reference, parent_result_dir2, data_converge_dir2)
     else:
         with open(record_path, 'r') as jfile:
             record = json.load(jfile)
-            record["analyses"][analysis] = analysis_record["analyses"][analysis]
-            
-    with open(record_path, 'w') as jfile:
-        json.dump(record, jfile, indent=2)
+
+    if analysis_record:
+        record["analyses"][analysis] = analysis_record["analyses"][analysis]
+        r.logger.info("updating {}".format(record_path))
+        with open(record_path, 'w') as jfile:
+            json.dump(record, jfile, indent=2)
             
 def launch_omics(m, r):
     if "input_dir" not in m:
