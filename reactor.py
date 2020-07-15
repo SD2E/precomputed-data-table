@@ -63,7 +63,7 @@ def aggregate_records(m, r):
     record_path = os.path.join(parent_result_dir, "record.json")
     analysis_record_path = os.path.join(parent_result_dir, analysis, "record.json")
     with open(analysis_record_path, 'r') as analysis_json_file:
-        analysis_record_dict = json.load(analysis_json_file)
+        analysis_record = json.load(analysis_json_file)
     # check for existing record.json
     if 'record.json' not in os.listdir(parent_result_dir):
         open(record_path, 'w+')
@@ -71,7 +71,7 @@ def aggregate_records(m, r):
     else:
         with open(record_path, 'r') as jfile:
             record = json.load(jfile)
-            record = rpi.append_record(record, analysis_record_dict, analysis, out_dir)
+            record["analyses"][analysis] = analysis_record["analyses"][analysis]
             
     with open(record_path, 'w') as jfile:
         json.dump(record, jfile, indent=2)
