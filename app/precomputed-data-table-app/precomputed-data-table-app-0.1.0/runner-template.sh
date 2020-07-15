@@ -46,5 +46,5 @@ then
 	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/omics_tools/run_omics.py --input_counts_file ${inputCountsFile} --output_dir .
 else
 	echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
-	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis} --result_parent_dir ${result_parent_dir}
+	container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_pdt.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis}
 fi
