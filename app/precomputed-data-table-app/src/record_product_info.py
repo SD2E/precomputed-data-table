@@ -74,5 +74,7 @@ def append_record(record, files_dict, analysis, out_dir):
             'precomputed_data_table outputs': out_file_hashes
         })
 
+    if 'analyses' not in record:
+        record['analyses'] = {}
     record['analyses'][analysis] = analysis_dict
     return record
