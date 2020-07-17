@@ -10,5 +10,4 @@ dependencies:
       - numpy
       - pandas
       - scikit-learn
-      - git+https://gitlab.sd2e.org/sd2program/test-harness.git
 #      - /src/fcs_signal_prediction
