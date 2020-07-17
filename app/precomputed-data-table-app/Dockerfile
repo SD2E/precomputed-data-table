@@ -35,3 +35,4 @@ ADD analysis_envs /analysis_envs
 RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml
 RUN conda env create -f /analysis_envs/wasserstein_tenfold_comparisons.yml
 RUN conda env create -f /analysis_envs/omics_tools.yml
+RUN conda env create -f /analysis_envs/fcs_signal_prediction.yml
