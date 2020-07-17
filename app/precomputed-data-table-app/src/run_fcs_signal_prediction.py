@@ -3,9 +3,8 @@
 :authors: Robert C. Moseley (robert.moseley@duke.edu)
 """
 
-import os
-from fcs_signal_prediction.main import main
-from fcs_signal_prediction.utils import data_utils as du
+from fcs_signal_prediction.src.fcs_signal_prediction.main import main
+from fcs_signal_prediction.src.fcs_signal_prediction.utils import data_utils as du
 import argparse
 
 

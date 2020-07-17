@@ -1,9 +1,9 @@
 import argparse
 import numpy as np
 from typing import Optional, List
-from fcs_signal_prediction.predict import predict_signal
-from fcs_signal_prediction.utils import data_utils as du
-from fcs_signal_prediction.utils import plot
+from fcs_signal_prediction.src.fcs_signal_prediction.predict import predict_signal
+from fcs_signal_prediction.src.fcs_signal_prediction.utils import data_utils as du
+from fcs_signal_prediction.src.fcs_signal_prediction.utils import plot
 
 
 
