@@ -2,11 +2,11 @@
   "name": "{{ app.name }}",
   "version": "{{ app.version }}",
   "executionType": "HPC",
-  "executionSystem": "hpc-tacc-wrangler",
+  "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
   "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
-  "defaultQueue": "long",
+  "defaultQueue": "all",
   "label": "precomputed data table",
   "modules": [
     "load tacc-singularity"
@@ -14,7 +14,27 @@
   "shortDescription": "First level analysis post data-converge",
   "templatePath": "runner-template.sh",
   "testPath": "tester.sh",
-  "inputs": [],
+  "inputs": [
+	{
+		"id": "inputData",
+		"value": {
+			"default": "",
+			"visible": true,
+			"required": false,
+			"order": 0
+		},
+		"semantics": {
+			"minCardinality": 1,
+			"maxCardinality": 500,
+			"ontology": [
+				"http://edamontology.org/data_1049"
+			]
+		},
+		"details": {
+			"label": "input counts file"
+		}
+	}
+  ],
   "parameters": [
     {
       "id": "CONTAINER_IMAGE",
@@ -51,13 +71,13 @@
       }
     },
     {
-      "id": "datetime_stamp",
+      "id": "input_counts_file",
       "value": {
         "type": "string",
         "visible": true,
         "required": true
       }
-    }   
+    }
   ],
   "outputs": [
   ]
