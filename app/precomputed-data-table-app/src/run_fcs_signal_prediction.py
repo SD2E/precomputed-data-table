@@ -29,8 +29,8 @@ def run_fcs_signal_prediction(exp_ref, exp_dir, out_dir):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
+    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
     # parser.add_argument("output_dir", help="directory where to write the output files")
 
     args = parser.parse_args()
