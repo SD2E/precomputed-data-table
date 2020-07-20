@@ -8,7 +8,7 @@ def get_log_gfp(df):
 def plot_samples_and_controls(df, result, low_control, high_control, num=10000):
     log_df = get_log_gfp(df)
     
-    wells = df.well_id.unique()
+    wells = df.well.unique()
     wells.sort()
     num_wells = len(wells)
 
@@ -34,14 +34,14 @@ def plot_samples_and_controls(df, result, low_control, high_control, num=10000):
 
 
             for timepoint in timepoints:
-                sample_df = log_df.loc[(log_df.well_id == well) & (log_df.timepoint == timepoint) &(log_df['experiment_id'] == plate)]
+                sample_df = log_df.loc[(log_df.well == well) & (log_df.timepoint == timepoint) &(log_df['experiment_id'] == plate)]
                 if len(sample_df) > 0:
                     sample_df = sample_df.sample(n=min(num, len(sample_df)))
                     ax[i+(j*num_wells)].hist(sample_df['log BL1-A'], label="@{}".format(timepoint), alpha=0.25)
 
 
             ax[i+(j*num_wells)].set_xlim(0, 5)
-            ax[i+(j*num_wells)].text(6, 0, "\n".join(result[(result.well_id==well)&(result['experiment_id']==plate)][["timepoint", "predicted_output_mean", "predicted_output_std"]].transpose()[0:].to_string().split("\n")[1:]))
+            ax[i+(j*num_wells)].text(6, 0, "\n".join(result[(result.well==well)&(result['experiment_id']==plate)][["timepoint", "predicted_output_mean", "predicted_output_std"]].transpose()[0:].to_string().split("\n")[1:]))
             ax[i+(j*num_wells)].set_title("{} {}".format(plate, well))
             plt.legend()
     plt.subplots_adjust(hspace=0.5)
@@ -51,7 +51,7 @@ def plot_samples_and_controls(df, result, low_control, high_control, num=10000):
 
 
 def plot_well_timeseries(well_timeseries):
-    wells = well_timeseries.well_id.unique()
+    wells = well_timeseries.well.unique()
     num_wells = len(wells)
 
     plates = well_timeseries['experiment_id'].unique()
@@ -63,7 +63,7 @@ def plot_well_timeseries(well_timeseries):
     for j, plate in enumerate(plates):
         for i, well in enumerate(wells):
             #print(i)
-            sample_df = well_timeseries.loc[(well_timeseries.well_id == well) & (well_timeseries['experiment_id'] == plate)]
+            sample_df = well_timeseries.loc[(well_timeseries.well == well) & (well_timeseries['experiment_id'] == plate)]
 
             #ax[i].plot(sample_df["timepoint"], sample_df["predicted_output_mean"])
             ax[i+(j*num_wells)].errorbar(sample_df["timepoint"], sample_df["predicted_output_mean"], yerr=sample_df["predicted_output_std"])
