@@ -75,10 +75,10 @@ def main(data_converge_path: str,
     result = meta.merge(mean_prediction, on=id_col)
     
     
-    well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
+    well_timeseries = result.groupby(['timepoint', 'well', 'experiment_id']).agg(np.mean).sort_values(by=['well', 'timepoint', 'experiment_id']).reset_index()
     well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
     
-    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'BL1-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control)
+    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'BL1-A']].merge(meta[[strain_col, id_col, "well", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control)
     
     return result, well_timeseries_fig, samples_and_controls_fig
 
