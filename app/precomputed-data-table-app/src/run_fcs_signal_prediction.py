@@ -17,11 +17,13 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
                                                             exp_ref,
                                                             low_control,
                                                             high_control)
+    result = main(exp_dir, exp_ref, low_control, high_control)
 
     results_fname = 'pdt_{}__fcs_signal_prediction.csv'.format(exp_ref)
 
     record = du.get_record(exp_dir)
-    dc_input_fname = du.get_record_file(record, file_type="fc_raw_events")
+    dc_raw_events_dict = du.get_record_file(record, file_type="fc_raw_events")
+    dc_input_fname = dc_raw_events_dict['name']
 
     return result, results_fname, dc_input_fname
 
