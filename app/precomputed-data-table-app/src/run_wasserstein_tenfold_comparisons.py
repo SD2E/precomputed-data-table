@@ -19,7 +19,8 @@ import wasserstein_tenfold_comparisons.TenFoldComparisons as tenfoldcomp
 def run_wasserstain_analysis(er_dir, r_dict):
 
     for datafile in r_dict.keys():
-        r_dict[datafile]['wasserstein_dists'] = wasser.do_analysis(er_dir, datafile)
+        wasser_df = wasser.do_analysis(er_dir, datafile)
+        r_dict[datafile]['wasserstein_dists'] = wasser_df
     return r_dict
 
 
@@ -29,6 +30,7 @@ def return_fc_meta_name(er_dir):
         if fname.endswith("_fc_meta.csv"):
             return os.path.realpath(os.path.join(er_dir, fname))
 
+
 def get_col_min_max(er_dir, column):
 
     meta_filename = return_fc_meta_name(er_dir)
@@ -37,16 +39,22 @@ def get_col_min_max(er_dir, column):
 
 
 # ten-fold change within a single well
-def run_tenfold_well_focus(er_dir, r_dict, meta_fname):
+def run_tenfold_time_diff(er_dir, r_dict, meta_fname, exp_ref):
 
-    groupby_columns = ["strain", "inducer_concentration", 'experiment_id', 'well']
-    comparison_column = "timepoint"
+    groupby_columns = ['strain', 'inducer_concentration', 'experiment_id', 'well']
+    comparison_column = 'timepoint'
     comparison_values = get_col_min_max(er_dir, comparison_column)
 
     for datafile, single_results_dict in r_dict.items():
         wasser_results_df = r_dict[datafile]['wasserstein_dists']
         summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
                                                     comparison_column, comparison_values)
+
+        summary = summary.reset_index()
+        summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
+        summary = summary.drop('index', axis=1)
+        summary['experiment_reference'] = exp_ref
+
         r_dict[datafile]['time_diff']['tenfold_summary'] = summary
 
         params = {"results_file": datafile, "metadata_file": meta_fname,
@@ -56,8 +64,9 @@ def run_tenfold_well_focus(er_dir, r_dict, meta_fname):
 
     return r_dict
 
+
 # ten-fold change across inducers
-def run_tenfold_inducer_focus(er_dir, r_dict, meta_fname):
+def run_tenfold_inducer_diff(er_dir, r_dict, meta_fname, exp_ref):
 
     groupby_columns = ["strain", "timepoint", "experiment_id"]
     comparison_column = "inducer_concentration"
@@ -67,6 +76,12 @@ def run_tenfold_inducer_focus(er_dir, r_dict, meta_fname):
         wasser_results_df = r_dict[datafile]['wasserstein_dists']
         summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
                                                     comparison_column, comparison_values)
+
+        summary = summary.reset_index()
+        summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
+        summary = summary.drop('index', axis=1)
+        summary['experiment_reference'] = exp_ref
+
         r_dict[datafile]['inducer_diff']['tenfold_summary'] = summary
 
         params = {"results_file": datafile, "metadata_file": meta_fname,
@@ -88,11 +103,10 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
 
     results_dict = {"fc_raw_log10_stats.csv": data_dict,
                     "fc_etl_stats.csv": data_dict}
-    # results_dict = {"fc_raw_log10_stats.csv": data_dict}
 
     results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
-    results_dict = run_tenfold_well_focus(exp_ref_dir, results_dict, meta_fname)
-    results_dict = run_tenfold_inducer_focus(exp_ref_dir, results_dict, meta_fname)
+    results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+    results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
 
     fname_dict = {}
     datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
@@ -118,8 +132,8 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
+    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref

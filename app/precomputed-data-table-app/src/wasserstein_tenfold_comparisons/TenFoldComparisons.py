@@ -52,7 +52,9 @@ def compute_difference(results_df, metadata_file, columns, comparison_column, co
         initial_ids = get_samp_ids(group, comparison_column, comparison_values[0])
         final_ids = get_samp_ids(group, comparison_column, comparison_values[1])
         group_vals = []
-        pairs = []
+        # pairs = []
+        samp_id_init_list = []
+        samp_id_fin_list = []
         for samp_id_init in initial_ids:
             for samp_id_fin in final_ids:
                 try:
@@ -62,13 +64,21 @@ def compute_difference(results_df, metadata_file, columns, comparison_column, co
                     # print("One of the two sample ids {} not found.".format([samp_id_init,samp_id_fin]))
                     val = nan
                 group_vals.append(val)
-                pairs.append((samp_id_init, samp_id_fin))
+                # pairs.append([samp_id_init, samp_id_fin])
+                samp_id_init_list.append(samp_id_init)
+                samp_id_fin_list.append(samp_id_fin)
         if group_vals:
-            values[name] = [min(group_vals), median(group_vals), max(group_vals), pairs]
+            # values[name] = [min(group_vals), median(group_vals), max(group_vals), pairs]
+            values[name] = [min(group_vals), median(group_vals), max(group_vals), samp_id_init_list, samp_id_fin_list]
         else:
             missing.append(name)
     summary = pd.DataFrame.from_dict(values, orient='index',
-                                     columns=['wasserstein_min', 'wasserstein_median', 'wasserstein_max', 'sample_ids'])
+                                     columns=['wasserstein_min', 'wasserstein_median', 'wasserstein_max',
+                                              'sample_id-init', 'sample_id-fin'])
+
+    summary['sample_id-init'] = summary['sample_id-init'].apply(lambda x: x[0])
+    summary['sample_id-fin'] = summary['sample_id-fin'].apply(lambda x: x[0])
+
     return summary, missing
 
 
