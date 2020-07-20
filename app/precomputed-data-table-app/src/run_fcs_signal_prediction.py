@@ -3,9 +3,10 @@
 :authors: Robert C. Moseley (robert.moseley@duke.edu)
 """
 
+import argparse
+import matplotlib.pyplot as plt
 from fcs_signal_prediction.src.fcs_signal_prediction.main import main
 from fcs_signal_prediction.src.fcs_signal_prediction.utils import data_utils as du
-import argparse
 
 
 def run_fcs_signal_prediction(exp_ref, exp_dir):
@@ -13,11 +14,14 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
     high_control = 'CRISPR_CEN.PK2_positive_control_NOR_00_24864'
     low_control = 'CRISPR_CEN.PK2_negative_control_23970'
 
-    # result, timeseries_fig, samples_and_controls_fig = main(exp_dir,
-    #                                                         exp_ref,
-    #                                                         low_control,
-    #                                                         high_control)
-    result = main(exp_dir, exp_ref, low_control, high_control)
+    result, timeseries_fig, samples_and_controls_fig = main(exp_dir,
+                                                            exp_ref,
+                                                            low_control,
+                                                            high_control)
+    timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=300)
+    samples_and_controls_fig.savefig('{}__samples_and_controls_figure.png'.format(exp_ref), format='png', dpi=300)
+
+    # result = main(exp_dir, exp_ref, low_control, high_control)
 
     results_fname = 'pdt_{}__fcs_signal_prediction.csv'.format(exp_ref)
 
