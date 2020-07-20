@@ -18,8 +18,8 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
                                                             exp_ref,
                                                             low_control,
                                                             high_control)
-    timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=300)
-    samples_and_controls_fig.savefig('{}__samples_and_controls_figure.png'.format(exp_ref), format='png', dpi=300)
+    timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=100)
+    samples_and_controls_fig.savefig('{}__samples_and_controls_figure.png'.format(exp_ref), format='png', dpi=100)
 
     # result = main(exp_dir, exp_ref, low_control, high_control)
 
