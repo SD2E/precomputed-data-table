@@ -234,22 +234,41 @@ def launch_app(m, r):
             if m["derived_from"]:
                 experiment_ids.append(m["experiment_id"])
     
-    pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
-    pr_with_absolute_path = os.path.join(data_converge_dir, pr_file_name)
-    r.logger.info("pr_with_absolute_path: {}".format(pr_with_absolute_path))
-    meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
-    meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
-    if os.path.exists(meta_with_absolute_path):
-        r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
-        derived_using = [meta_with_absolute_path]
-    else:
-        derived_using = []
-    r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
-    product_patterns = [
-        {'patterns': ['.csv$'],
-         'derived_from': [pr_with_absolute_path],
-         'derived_using': derived_using
-        }] 
+
+    #meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
+    #meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
+    #if os.path.exists(meta_with_absolute_path):
+    #    r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
+    #    derived_using = [meta_with_absolute_path]
+    #else:
+    #    derived_using = []
+    #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
+    if analysis == "xplan-od-growth-analysis":
+        pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
+        pr_file_path = os.path.join(data_converge_dir, pr_file_name)
+        r.logger.info("pr_file_path: {}".format(pr_file_path))
+        product_patterns = [
+            {'patterns': ['.csv$'],
+             'derived_from': [pr_file_path],
+             'derived_using': []
+            }]
+    elif analysis == "wasserstein_tenfold_comparisons":
+        fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
+        fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
+        r.logger.info("fc_raw_log10_stats_file_path: {}".format(fc_raw_log10_stats_file_path))
+        fc_etl_stats_file_name = '__'.join([experiment_ref, 'fc_etl_stats'])
+        fc_etl_stats_file_path = os.path.join(data_converge_dir, fc_etl_stats_file_name + '.csv')
+        r.logger.info("fc_etl_stats_file_path: {}".format(fc_etl_stats_file_path))
+        product_patterns = [
+            {'patterns': [fc_raw_log10_stats_file_name + '_*.csv$'],
+             'derived_from': [fc_raw_log10_stats_file_path],
+             'derived_using': []
+            },
+            {'patterns': [fc_etl_stats_file_name + '_*.csv$'],
+             'derived_from': [fc_etl_stats_file_path],
+             'derived_using': []
+            }
+        ]        
 
     r.logger.debug("Instantiating job with product_patterns: {}".format(product_patterns))
 
