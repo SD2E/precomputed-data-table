@@ -260,11 +260,11 @@ def launch_app(m, r):
         fc_etl_stats_file_path = os.path.join(data_converge_dir, fc_etl_stats_file_name + '.csv')
         r.logger.info("fc_etl_stats_file_path: {}".format(fc_etl_stats_file_path))
         product_patterns = [
-            {'patterns': [fc_raw_log10_stats_file_name + '_*.csv$'],
+            {'patterns': ['^.*fc_raw_log10_stats.*\.(csv|json)$'],
              'derived_from': [fc_raw_log10_stats_file_path],
              'derived_using': []
             },
-            {'patterns': [fc_etl_stats_file_name + '_*.csv$'],
+            {'patterns': ['^.*fc_etl_stats.*\.(csv|json)$'],
              'derived_from': [fc_etl_stats_file_path],
              'derived_using': []
             }
