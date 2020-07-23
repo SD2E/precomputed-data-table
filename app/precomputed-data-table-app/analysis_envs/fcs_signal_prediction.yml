@@ -11,5 +11,5 @@ dependencies:
       - pandas
       - scikit-learn
       - matplotlib
-#      - git+https://gitlab.sd2e.org/sd2program/precomputed-data-table/tree/fcs_signal_prediction/app/precomputed-data-table-app/src/fcs_signal_prediction.git
-#      - /src/fcs_signal_prediction
+#      - fcs_signal_prediction
+      - /src/fcs_signal_prediction

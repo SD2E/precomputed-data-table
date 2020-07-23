@@ -4,9 +4,8 @@
 """
 
 import argparse
-import matplotlib.pyplot as plt
-from fcs_signal_prediction.src.fcs_signal_prediction.main import main
-from fcs_signal_prediction.src.fcs_signal_prediction.utils import data_utils as du
+from fcs_signal_prediction.main import main
+from fcs_signal_prediction.utils import data_utils as du
 
 
 def run_fcs_signal_prediction(exp_ref, exp_dir):

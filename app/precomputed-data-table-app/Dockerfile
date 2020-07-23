@@ -30,6 +30,7 @@ ADD src /src
 
 COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
 COPY omics_tools /src/omics_tools
+COPY fcs_signal_prediction /src/fcs_signal_prediction
 
 ADD analysis_envs /analysis_envs
 RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml

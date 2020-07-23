@@ -1,11 +1,8 @@
 import argparse
 import numpy as np
-from typing import Optional, List
-from fcs_signal_prediction.src.fcs_signal_prediction.predict import predict_signal
-from fcs_signal_prediction.src.fcs_signal_prediction.utils import data_utils as du
-from fcs_signal_prediction.src.fcs_signal_prediction.utils import plot
-
-
+from typing import Optional
+from fcs_signal_prediction.predict import predict_signal
+from fcs_signal_prediction.utils import data_utils as du
 
 parser = argparse.ArgumentParser(description='Predict Signal Output for samples')
 parser.add_argument('data_converge_path', type=str,
