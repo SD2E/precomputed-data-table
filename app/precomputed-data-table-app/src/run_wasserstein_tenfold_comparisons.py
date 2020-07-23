@@ -104,9 +104,9 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
     results_dict = {"fc_raw_log10_stats.csv": data_dict,
                     "fc_etl_stats.csv": data_dict}
 
-    results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
-    results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
-    results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+    # results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
+    # results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+    # results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
 
     fname_dict = {}
     datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
@@ -117,11 +117,33 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
         for data in single_results_dict.keys():
             if data == 'wasserstein_dists':
                 fname_wasser = 'pdt_{}__{}_{}_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
+                results_dict = run_wasserstain_analysis(exp_ref_dir, results_dict)
                 results_dict[datafile]['wasserstein_dists'].to_csv(fname_wasser)
                 fname_dict[full_datafile_name].append(fname_wasser)
-            else:
+            # else:
+            #     fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
+            #     fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
+            #     tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
+            #     tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
+            #     fname_dict[full_datafile_name].append(fname_summary)
+            #     fname_dict[full_datafile_name].append(fname_params)
+
+    for datafile, single_results_dict in results_dict.items():
+        full_datafile_name = '__'.join([exp_ref, datafile])
+        fname_dict[full_datafile_name] = []
+        for data in single_results_dict.keys():
+            if data == 'time_diff':
                 fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
                 fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
+                results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+                tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
+                tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
+                fname_dict[full_datafile_name].append(fname_summary)
+                fname_dict[full_datafile_name].append(fname_params)
+            elif data == 'inducer_diff':
+                fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
+                fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
+                results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
                 tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
                 tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
                 fname_dict[full_datafile_name].append(fname_summary)
