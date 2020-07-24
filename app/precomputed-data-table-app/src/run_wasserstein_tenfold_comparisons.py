@@ -37,55 +37,53 @@ def get_col_min_max(er_dir, column):
 
 
 # ten-fold change within a single well
-def run_tenfold_time_diff(er_dir, r_dict, meta_fname, exp_ref):
+def run_tenfold_time_diff(er_dir, r_dict, datafile, meta_fname, exp_ref):
 
     groupby_columns = ['strain', 'inducer_concentration', 'experiment_id', 'well']
     comparison_column = 'timepoint'
     comparison_values = get_col_min_max(er_dir, comparison_column)
 
-    for datafile, single_results_dict in r_dict.items():
-        wasser_results_df = r_dict[datafile]['wasserstein_dists']
-        summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
-                                                    comparison_column, comparison_values)
+    wasser_results_df = r_dict[datafile]['wasserstein_dists']
+    summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
+                                                comparison_column, comparison_values)
 
-        summary = summary.reset_index()
-        summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
-        summary = summary.drop('index', axis=1)
-        summary['experiment_reference'] = exp_ref
+    summary = summary.reset_index()
+    summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
+    summary = summary.drop('index', axis=1)
+    summary['experiment_reference'] = exp_ref
 
-        r_dict[datafile]['time_diff']['tenfold_summary'] = summary
+    r_dict[datafile]['time_diff']['tenfold_summary'] = summary
 
-        params = {"results_file": datafile, "metadata_file": meta_fname,
-                  "groupby_columns": groupby_columns, "comparison_column": comparison_column,
-                  "comparison_values": comparison_values}
-        r_dict[datafile]['time_diff']['tenfold_params'] = params
+    params = {"results_file": datafile, "metadata_file": meta_fname,
+              "groupby_columns": groupby_columns, "comparison_column": comparison_column,
+              "comparison_values": comparison_values}
+    r_dict[datafile]['time_diff']['tenfold_params'] = params
 
     return r_dict
 
 
 # ten-fold change across inducers
-def run_tenfold_inducer_diff(er_dir, r_dict, meta_fname, exp_ref):
+def run_tenfold_inducer_diff(er_dir, r_dict, datafile, meta_fname, exp_ref):
 
     groupby_columns = ["strain", "timepoint", "experiment_id"]
     comparison_column = "inducer_concentration"
     comparison_values = get_col_min_max(er_dir, comparison_column)
 
-    for datafile, single_results_dict in r_dict.items():
-        wasser_results_df = r_dict[datafile]['wasserstein_dists']
-        summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
-                                                    comparison_column, comparison_values)
+    wasser_results_df = r_dict[datafile]['wasserstein_dists']
+    summary, _ = tenfoldcomp.compute_difference(wasser_results_df, meta_fname, groupby_columns,
+                                                comparison_column, comparison_values)
 
-        summary = summary.reset_index()
-        summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
-        summary = summary.drop('index', axis=1)
-        summary['experiment_reference'] = exp_ref
+    summary = summary.reset_index()
+    summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
+    summary = summary.drop('index', axis=1)
+    summary['experiment_reference'] = exp_ref
 
-        r_dict[datafile]['inducer_diff']['tenfold_summary'] = summary
+    r_dict[datafile]['inducer_diff']['tenfold_summary'] = summary
 
-        params = {"results_file": datafile, "metadata_file": meta_fname,
-                  "groupby_columns": groupby_columns, "comparison_column": comparison_column,
-                  "comparison_values": comparison_values}
-        r_dict[datafile]['inducer_diff']['tenfold_params'] = params
+    params = {"results_file": datafile, "metadata_file": meta_fname,
+              "groupby_columns": groupby_columns, "comparison_column": comparison_column,
+              "comparison_values": comparison_values}
+    r_dict[datafile]['inducer_diff']['tenfold_params'] = params
 
     return r_dict
 
@@ -126,7 +124,8 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
             if data == 'time_diff':
                 fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
                 fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
-                results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+                results_dict = run_tenfold_time_diff(exp_ref_dir, results_dict, datafile, meta_fname, exp_ref)
+
                 tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
                 tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
                 fname_dict[full_datafile_name].append(fname_summary)
@@ -134,7 +133,8 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
             elif data == 'inducer_diff':
                 fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
                 fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], data, datetime)
-                results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, meta_fname, exp_ref)
+                results_dict = run_tenfold_inducer_diff(exp_ref_dir, results_dict, datafile, meta_fname, exp_ref)
+
                 tenfoldcomp.save_summary(results_dict[datafile][data]['tenfold_summary'], fname_summary)
                 tenfoldcomp.save_params(results_dict[datafile][data]['tenfold_params'], fname_params)
                 fname_dict[full_datafile_name].append(fname_summary)
