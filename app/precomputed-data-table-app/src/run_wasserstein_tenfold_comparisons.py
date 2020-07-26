@@ -61,6 +61,8 @@ def tenfold_comparison(er_dir, r_dict, datafile, diff_name, meta_fname, exp_ref)
     summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
     summary = summary.drop('index', axis=1)
     summary['experiment_reference'] = exp_ref
+    groupby_col = pd.Series([groupby_columns] * len(summary))
+    summary['group_name'] = groupby_col
 
     r_dict[datafile][diff_name]['tenfold_summary'] = summary
 
@@ -76,13 +78,15 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
 
     meta_fname = return_fc_meta_name(exp_ref_dir)
 
-    data_dict = {'wasserstein_dists': '',
-                 'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                 'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                 'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}}
+    results_dict = {"fc_raw_log10_stats.csv": {'wasserstein_dists': '',
+                                               'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                               'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                               'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}},
+                    "fc_etl_stats.csv": {'wasserstein_dists': '',
+                                         'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                         'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                         'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}}}
 
-    results_dict = {"fc_raw_log10_stats.csv": data_dict,
-                    "fc_etl_stats.csv": data_dict}
 
     fname_dict = {}
     datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
@@ -105,7 +109,6 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
             fname_summary = 'pdt_{}__{}_{}_summary_{}.csv'.format(exp_ref, datafile.split(".")[0], diff_name, datetime)
             fname_params = 'pdt_{}__{}_{}_params_{}.json'.format(exp_ref, datafile.split(".")[0], diff_name, datetime)
             results_dict = tenfold_comparison(exp_ref_dir, results_dict, datafile, diff_name, meta_fname, exp_ref)
-            print(datafile, diff_name, results_dict[datafile][diff_name]['tenfold_summary'])
             tenfoldcomp.save_summary(results_dict[datafile][diff_name]['tenfold_summary'], fname_summary)
             tenfoldcomp.save_params(results_dict[datafile][diff_name]['tenfold_params'], fname_params)
             fname_dict[full_datafile_name].append(fname_summary)
