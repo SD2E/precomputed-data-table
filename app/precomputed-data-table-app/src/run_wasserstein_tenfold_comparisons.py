@@ -51,6 +51,8 @@ def run_tenfold_time_diff(er_dir, r_dict, datafile, meta_fname, exp_ref):
     summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
     summary = summary.drop('index', axis=1)
     summary['experiment_reference'] = exp_ref
+    groupby_col = pd.Series([groupby_columns] * len(summary))
+    summary['group_name'] = groupby_col
 
     r_dict[datafile]['time_diff']['tenfold_summary'] = summary
 
