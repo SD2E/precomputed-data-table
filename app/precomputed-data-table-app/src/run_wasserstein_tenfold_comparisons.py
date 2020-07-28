@@ -59,10 +59,9 @@ def tenfold_comparison(er_dir, r_dict, datafile, diff_name, meta_fname, exp_ref)
 
     summary = summary.reset_index()
     summary[groupby_columns] = pd.DataFrame(summary['index'].tolist())
-    summary = summary.drop('index', axis=1)
+    summary = summary.rename(columns={'index': 'group_name'})
+    summary['group_name'] = summary['group_name'].apply(lambda x: tuple([str(s) for s in x]))
     summary['experiment_reference'] = exp_ref
-    groupby_col = pd.Series([groupby_columns] * len(summary))
-    summary['group_name'] = groupby_col
 
     r_dict[datafile][diff_name]['tenfold_summary'] = summary
 
