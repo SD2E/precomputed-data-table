@@ -41,7 +41,7 @@ def compute_difference(results_df, metadata_file, columns, comparison_column, co
     comparison_values = 2 vector with a start value and an end value
     threshold_10_fold = number above which a minimum of a 10-fold difference is detected (i.e. may want to choose 9.5 instead of 10)
     '''
-    meta_df = load_csv(metadata_file)
+    meta_df = pd.read_csv(metadata_file, dtype=object)
     meta_grouped = group_me(meta_df, columns)
     # res_df = load_csv(results_file)
     samp_id_order = get_samp_id_order(results_df)
