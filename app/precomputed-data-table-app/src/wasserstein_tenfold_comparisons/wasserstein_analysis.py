@@ -8,14 +8,16 @@ import numpy as np
 def emdist(h1, h2, bin_vals):
     '''
     Calculate earth mover's distance between 2 histograms. Histograms are normalized to mass 1.
-
     :param h1: a 1-D numpy array representing a histogram with the bin values used to make bin_dist
     :param h2: a 1-D numpy array representing a histogram with the bin values used to make bin_dist
     :param bin_vals: representative points in the bins defining the histograms in data
     :return: a scalar value that is the earth mover's distance between normalized h1 and h2
     '''
     bin_dist = np.array([[np.abs(m - n) for m in bin_vals] for n in bin_vals])
-    return pyemd.emd(np.asarray(h1)/float(sum(h1)), np.asarray(h2)/float(sum(h2)), bin_dist)
+    if float(sum(h1)) > 0 and float(sum(h2)) > 0 and not any(np.isnan(h1)) and not any(np.isnan(h1)):
+        return pyemd.emd(np.asarray(h1)/float(sum(h1)), np.asarray(h2)/float(sum(h2)), bin_dist)
+    else:
+        return np.nan
 
 
 def get_record(experiment):
