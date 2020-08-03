@@ -1,7 +1,7 @@
 from pandas import DataFrame
 from typing import Optional, List
 
-from pysd2citten import correctness
+from pysd2cat.analysis import correctness
 
 def predict_signal(df: DataFrame, 
                    experiment_identifier: str,

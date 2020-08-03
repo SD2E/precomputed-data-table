@@ -4,3 +4,6 @@
 [submodule "app/precomputed-data-table-app/omics_tools"]
 	path = app/precomputed-data-table-app/omics_tools
 	url = https://gitlab.sd2e.org/sd2program/omics_tools.git
+[submodule "app/precomputed-data-table-app/pysd2cat"]
+	path = app/precomputed-data-table-app/pysd2cat
+	url = https://gitlab.sd2e.org/dbryce/pysd2cat.git

@@ -12,4 +12,6 @@ dependencies:
       - scikit-learn
       - matplotlib
 #      - fcs_signal_prediction
+#      - pysd2cat
+      - /src/pysd2cat
       - /src/fcs_signal_prediction

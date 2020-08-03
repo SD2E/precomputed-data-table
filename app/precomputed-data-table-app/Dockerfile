@@ -28,6 +28,8 @@ RUN Rscript -e 'install.packages("BiocManager", repos="http://cran.us.r-project.
 ADD config.yml /config.yml
 ADD src /src
 
+COPY pysd2cat src/pysd2cat
+
 COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
 COPY omics_tools /src/omics_tools
 COPY fcs_signal_prediction /src/fcs_signal_prediction
