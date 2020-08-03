@@ -69,7 +69,7 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
 
     pr_df, pr_fname = grab_pr_dataframe(exp_ref, exp_ref_dir)
     od_analysis_initial_df = growth_analysis(pr_df, exp_ref)
-    # od_analysis_initial_df.to_csv(os.path.join(out_dir, 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)))
+    od_analysis_initial_df['experiment_id'] = od_analysis_initial_df['sample_id'].apply(lambda x: '.'.join(x.split('.')[-3:]))
 
     # make df rows = replicate groups
     rg_od_analysis_df = rows_to_replicate_groups(od_analysis_initial_df, 'od')
@@ -80,9 +80,9 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('exp_ref_dir', help='path to experimental reference directory')
-    parser.add_argument('data_confirm_dict', help='dictionary containing information on available data'
+    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
+    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument('--data_confirm_dict', help='dictionary containing information on available data'
                                                   ' in experimental reference')
     parser.add_argument("output_dir", help="directory where to write the output files")
     # parser.add_argument("output_dir", help="directory where to write the output files")
