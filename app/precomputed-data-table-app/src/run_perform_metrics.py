@@ -30,8 +30,8 @@ def main(out_sys, out_dir, dc_batch_path, experiment_reference):
     perform_metrics_data = '{0:s}/{1:s}__platereader.csv'.format(dc_batch_path, experiment_reference)
     perform_metrics_config_json = "/perform_metrics/src/perform_metrics/configs/metrics_y4d_ts_pr_inducer.json"
 
-    job_template = {"name": "perform-metrics-uat",
-                    "appId": "perform_metrics_uat-0.1.0",
+    job_template = {"name": "perform-metrics",
+                    "appId": "perform_metrics-0.1.0",
                     "archive": True,
                     "archiveSystem": out_sys,
                     "archivePath": pm_dir,
