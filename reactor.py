@@ -254,9 +254,11 @@ def launch_app(m, r):
             }]
     elif analysis == "fcs_signal_prediction":
         fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
+        fc_file_path = os.path.join(data_converge_dir, fc_file_name)
+        r.logger.info("fc_file_path: {}".format(fc_file_path))
         product_patterns = [
             {'patterns': ['.csv$'],
-             'derived_from': [fc_file_name],
+             'derived_from': [fc_file_path],
              'derived_using': []
             }]
     elif analysis == "wasserstein_tenfold_comparisons":
