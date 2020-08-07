@@ -40,9 +40,11 @@ def do_analysis(df, experiment, controls, low_control, high_control, out_path):
     
     return (res, df)
 
+
 def do_analysis_wrapper(df_original, experiment, controls, low_control, high_control, out_path):
     (res, df) = do_analysis(df_original, experiment, controls, low_control, high_control, out_path)
     return res, df
+
 
 def idw_sample(distance_dict, num_samples):
     # Compute total distance of all controls
@@ -60,31 +62,48 @@ def idw_sample(distance_dict, num_samples):
     # Randomly sample controls without replacement using inverse weights
     return np.random.choice(list(distance_dict.keys()), num_samples, p=inv_weights, replace=False)
 
-def predict_signal(df_original: DataFrame,
+
+def top_n(distance_dict, num_samples):
+    # Sort by dict value (Wasserstein distance) in ascending order
+    distance_dict = {k: v for k, v in sorted(distance_dict.items(), key=lambda item: item[1])}
+    # Return top n=num_samples control sets
+    return list(distance_dict.keys())[:num_samples]
+
+def predict_signal(df_original : DataFrame,
                    experiment: str,
                    project_id : str,
                    low_control : str,
                    high_control : str,
+                   weighted : bool,
+                   wass_path : str,
+                   control_size : int,
                    id_col : str,
                    channels : List[str],
-                   out_path,
+                   out_path : str,
                    strain_col : Optional[str]='strain_name') -> DataFrame:
     """
     Get predictions via grouped controls method.
-    Sample 10 control experiments, group them together into one DataFrame,
+    Sample n=control_size control experiments, group them together into one DataFrame,
     and use it as the training set for random forest classification.
     """
     
     # Extract control set Wasserstein distances
-    distance_pkl = pkg_resources.resource_filename("grouped_control_prediction", "data/nearest_control_distances.pkl")
+    distance_pkl = pkg_resources.resource_filename("grouped_control_prediction", wass_path)
     distances = pickle.load(open(distance_pkl, "rb" ))
     
-    # Randomly sample 10 control sets based using inverse distance weighting
-    sampled_controls = idw_sample(distances, 10)
+    # Randomly sample n=control_size control sets based using inverse distance weighting
+    if weighted == True:
+        print("top_n")
+        sampled_controls = top_n(distances, control_size)
+    else:
+        sampled_controls = random.sample(distances.keys(), k=control_size)
+    
+    # Compute average control distance
     avg_dist = 0
     for s in sampled_controls:
         avg_dist += distances[s]
-    print("Average control distance: " + str(avg_dist/10))
+    avg_dist /= control_size
+    print("Average control distance: " + str(avg_dist))
     
     # Set up path to control data
     XPLAN_PROJECT = project_id
@@ -106,7 +125,7 @@ def predict_signal(df_original: DataFrame,
 
         # Add sampled control experiment to all_controls DataFrame
         count += 1
-        print(str(count) + '/10 (' + sampled_exp + ')')
+        print(str(count) + '/' + str(control_size) + '(' + sampled_exp + ')')
         all_controls = all_controls.append(controls, ignore_index=True)
     
     # Perform classification with new grouped control set
@@ -121,4 +140,4 @@ def predict_signal(df_original: DataFrame,
     leader_board = leader_board.sort_values(by=['Date', 'Time'], ascending=True)
     test_accuracy = leader_board.loc[:,'Accuracy'].iloc[-1]
     
-    return pred, test_accuracy, all_controls
+    return pred, avg_dist, test_accuracy, all_controls

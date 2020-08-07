@@ -1,14 +1,20 @@
 import argparse
+import os
+from os.path import expanduser
+from pandas import DataFrame
+import pandas as pd
 import numpy as np
 from typing import Optional, List
 from grouped_control_prediction.predict import predict_signal
-from grouped_control_prediction.utils import data_utils as du
-from grouped_control_prediction.utils import plot
 
 
 parser = argparse.ArgumentParser(description='Predict Signal Output for samples')
 parser.add_argument('data_converge_path', type=str,
                     help='Path to data converge results')
+parser.add_argument('df', type=str,
+                    help='Prediction dataframe')
+parser.add_argument('meta', type=str,
+                    help='Prediction meta dataframe')
 parser.add_argument('project_id', type=str,
                     help='Path to control data')
 parser.add_argument('low_control', type=str,
@@ -29,7 +35,9 @@ parser.add_argument('--out_path', type=str,
                     help='Test Harness output location', default=".")
 
 
-def main(data_converge_path: str,
+def main(data_converge_path : str,
+         df : DataFrame,
+         meta : DataFrame,
          project_id : str,
          low_control : str,
          high_control : str,
@@ -45,27 +53,22 @@ def main(data_converge_path: str,
     the predicted signal for each sample.
     """
     
-    # Get the data and metadata
-    print("Loading prediction data...")
-    df = du.get_data_and_metadata(data_converge_path)
-    meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
-    meta = meta.rename(columns={'well':'well_id'})
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']
     
     # Predict the output signal for each event
     pred, avg_dist, test_accuracy, all_controls = predict_signal(df,
-                          data_converge_path,
-                          project_id,
-                          low_control,
-                          high_control,
-                          weighted,
-                          wass_path,
-                          control_size,
-                          id_col,
-                          channels,
-                          out_path,
-                          strain_col=strain_col)
-
+                                                                 data_converge_path,
+                                                                 project_id,
+                                                                 low_control,
+                                                                 high_control,
+                                                                 weighted,
+                                                                 wass_path,
+                                                                 control_size,
+                                                                 id_col,
+                                                                 channels,
+                                                                 out_path,
+                                                                 strain_col=strain_col)
+    
     # Attach predictions to original data
     df['predicted_output'] = pred['predicted_output']
     
@@ -77,19 +80,38 @@ def main(data_converge_path: str,
     # Attach mean & standard deviation of sample predcitions to the metadata
     result = meta.merge(mean_prediction, on=id_col)
     
-    # Create plots
-    well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
-    well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
-    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
+    # Read in optical density (OD) data
+    OD_DATA_CONVERGE_PROJECT = "sd2e-project-48"
+    od_data_converge_base = os.path.join(expanduser("~"), 'sd2e-projects', OD_DATA_CONVERGE_PROJECT)
+    od_experiment = os.path.join(od_data_converge_base, )
+    od_experiment = os.path.realpath(os.path.join(od_data_converge_base, 'complete',
+                                                  'YeastSTATES-CRISPR-Short-Duration-Time-Series-35C','20200625173644',
+                                                  'xplan-od-growth-analysis'))
+    od_df = pd.read_csv(os.path.join(od_experiment,
+                                     'pdt_YeastSTATES-CRISPR-Short-Duration-Time-Series-35C__od_growth_analysis.csv'))
     
-    return result, test_accuracy, well_timeseries_fig, samples_and_controls_fig
+    od_df = od_df[od_df['inducer_type'] == 'beta-estradiol']
+    # Store both sets of predictions as integers (0/1 -> dead/live)
+    rf_preds = result.groupby(['experiment_id','well_id']).mean().predicted_output_mean.values
+    od_preds = np.invert(od_df.dead).astype(int).values
+    num_preds = len(od_preds)
+
+    # Predictions compared to OD labels
+    od_loss = sum(abs(od_preds-rf_preds))/num_preds
+    od_accuracy = sum(np.around(rf_preds) == od_preds)/num_preds
+    print("OD loss: " + str(od_loss))
+    print("OD accuracy: " + str(od_accuracy))
+    
+    return result, avg_dist, test_accuracy, od_loss, od_accuracy
     
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-
+    
     data_converge_path = args.data_converge_path
+    df = args.df
+    meta = args.meta
     project_id = args.project_id
     low_control = args.low_control
     high_control = args.high_control
@@ -101,6 +123,8 @@ if __name__ == '__main__':
     out_path = args.out_path
     
     main(data_converge_path,
+         df,
+         meta,
          project_id,
          low_control,
          high_control,

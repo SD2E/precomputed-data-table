@@ -16,8 +16,7 @@ setup(
     license="MIT",
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    package_data={'': ['data/nearest_control_distances.pkl']},
+    package_data={'': ['data/*.pkl']},
     install_requires=install_requires,
     zip_safe=False,
-    include_package_data=True
 )
