@@ -83,4 +83,4 @@ if __name__ == '__main__':
         arg_out_dir = 'sd2e-project-48/complete/YeastSTATES-CRISPR-Growth-Curves-with-Plate-Reader-Optimization/20200722190009'
         arg_dc_batch_path = 'agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208/20200610192131'
         arg_experiment_reference = 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208'
-        my_job_template = get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference)
+        my_job_template, product_patterns = get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference)
