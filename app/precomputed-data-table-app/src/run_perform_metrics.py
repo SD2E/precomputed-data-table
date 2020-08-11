@@ -5,11 +5,6 @@ run perform metrics for PDT
 """
 
 import os
-from datetime import datetime
-import json
-from agavepy import Agave
-
-ag = Agave.restore()
 
 
 # right now perform metrics can run on these supported types
@@ -25,6 +20,8 @@ def is_supported(challenge_problem, protocol, measurement_type):
         return False
     if measurement_type not in supported_measurement_types:
         return False
+
+    return True
 
 
 def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
@@ -78,9 +75,11 @@ if __name__ == '__main__':
     arg_challenge_problem = 'YEAST_STATES'
     arg_protocol = 'TimeSeriesHTP'
     arg_measurement_type = 'PLATE_READER'
-    if is_supported(challenge_problem, protocol, measurement_type):
+    if is_supported(arg_challenge_problem, arg_protocol, arg_measurement_type):
         arg_out_sys = 'sd2e-projects'
         arg_out_dir = 'sd2e-project-48/complete/YeastSTATES-CRISPR-Growth-Curves-with-Plate-Reader-Optimization/20200722190009'
         arg_dc_batch_path = 'agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208/20200610192131'
         arg_experiment_reference = 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208'
-        my_job_template, product_patterns = get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference)
+        my_job_template, product_patterns = get_job_template(arg_out_sys, arg_out_dir, arg_dc_batch_path, arg_experiment_reference)
+
+        print('finished')
