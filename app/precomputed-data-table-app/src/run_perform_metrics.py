@@ -49,7 +49,7 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
     perform_metrics_config_json = "/perform_metrics/src/perform_metrics/configs/metrics_y4d_ts_pr_inducer.json"
 
     job_template = {"name": "perform-metrics",
-                    "appId": "perform_metrics-0.1.0",
+                    "appId": "perform_metrics_app-0.1.0",
                     "archive": True,
                     "archiveSystem": out_sys,
                     "archivePath": pm_dir,
