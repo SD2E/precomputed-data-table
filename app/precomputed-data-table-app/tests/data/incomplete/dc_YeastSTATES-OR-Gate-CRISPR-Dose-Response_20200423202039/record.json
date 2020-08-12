@@ -1,0 +1,55 @@
+{
+  "experiment_reference": "YeastSTATES-OR-Gate-CRISPR-Dose-Response",
+  "date_run": "20200423202244",
+  "output_dir": "/work/05258/adeckard/stampede2/data_converge/data_converge_output/dc_YeastSTATES-OR-Gate-CRISPR-Dose-Response_20200423202039",
+  "tacc_path_type": "hpc_path",
+  "files": [
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_meta.csv",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_meta__summary.json",
+      "unique sample ids": 248,
+      "hash_md5": "7b37bbda12badde87f752229b6c1fc01"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_log10_stats.csv",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_log10_stats__summary.json",
+      "unique sample ids": 248,
+      "hash_md5": "67790136a1748f49b139f87b17baeb07"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_events.json",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_events__summary.json",
+      "unique sample ids": 248,
+      "hash_md5": "6749eb76b014102fdbac5fdf65e9bd9f"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_log10_events.json",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_raw_log10_events__summary.json",
+      "unique sample ids": 248,
+      "hash_md5": "391849b8f47d5eede4713c05ce41dc41"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_etl_events.json",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_etl_events__summary.json",
+      "unique sample ids": 243,
+      "hash_md5": "e00944c9ebcb7a0dbfbcb22c18fe1615"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_etl_stats.csv",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__fc_etl_stats__summary.json",
+      "unique sample ids": 244,
+      "hash_md5": "d7cd0ee640aeb504af8b545c84454476"
+    },
+    {
+      "name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__platereader.csv",
+      "summary_name": "YeastSTATES-OR-Gate-CRISPR-Dose-Response__platereader__summary.json",
+      "unique sample ids": 310,
+      "hash_md5": "3e72f2b9f1748e88af88f7a1dcf80dbd"
+    }
+  ],
+  "status": {
+    "fc_raw": "Fail",
+    "fc_etl": "ok. unique sample ids: 244",
+    "pr": "ok. unique sample ids: 310"
+  }
+}

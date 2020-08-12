@@ -1,0 +1,28 @@
+{
+    "rows count": 243,
+    "columns count": 4,
+    "entries count": 972,
+    "count per column": {
+        "BL1-A_MEFL": 243,
+        "FSC-A_Eum": 243,
+        "SSC-A_a.u.": 243,
+        "sample_id": 243
+    },
+    "count unique per column (include NA)": {
+        "BL1-A_MEFL": 243,
+        "FSC-A_Eum": 243,
+        "SSC-A_a.u.": 243,
+        "sample_id": 243
+    },
+    "count unique per column (exclude NA)": {
+        "BL1-A_MEFL": 243,
+        "FSC-A_Eum": 243,
+        "SSC-A_a.u.": 243,
+        "sample_id": 243
+    },
+    "gb: experiment_id": null,
+    "gb: experiment_id,strain": null,
+    "gb: experiment_id,timepoint": null,
+    "gb: experiment_id,temperature": null,
+    "gb: experiment_id,inducer_concentration": null
+}

@@ -1,0 +1,33 @@
+container_exec reshg/data-converge-app:0.1.0 /opt/conda/envs/sd2-data_converge/bin/python /data_converge/src/data_converge/run_data_converge.py --experiment_ref YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208
+/opt/apps/tacc-singularity/2.6.0/bin/singularity
+singularity exec: reshg/data-converge-app:0.1.0 /opt/conda/envs/sd2-data_converge/bin/python /data_converge/src/data_converge/run_data_converge.py --experiment_ref YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208
+Docker image path: index.docker.io/reshg/data-converge-app:0.1.0
+Cache folder set to /work/06935/sgopal/singularity_cache/docker
+Creating container runtime...
+Exploding layer: sha256:68ced04f60ab5c7a5f1d0b0b4e7572c5a4c8cce44866513d30d9df1a15277d6b.tar.gz
+Exploding layer: sha256:9c388eb6d33c40662539172f0d9a357287bd1cd171692ca5c08db2886bc527c3.tar.gz
+Exploding layer: sha256:96cf53b3a9dd496f4c91ab86eeadca2c8a31210c2e5c2a82badbb0dcf8c8f76b.tar.gz
+Exploding layer: sha256:ff584b4ef2262162a09c97cba9b4f701610524b5c559367704cbeefccadb5f4d.tar.gz
+Exploding layer: sha256:6b2353ac163dadad9237c97d38f3b8fa996e2638559218e45b2387ed358385a0.tar.gz
+Exploding layer: sha256:af481ee41f1d7210c2602cc858fa5755a56fc16fd7fd126051ee91dd2a7f3668.tar.gz
+Exploding layer: sha256:8a300b8104af5e7359662a4ba47667162d048290650af14674a8236f4b34fae3.tar.gz
+Exploding layer: sha256:30636ab46a4f139477881465883869d34be283bf21d92dd26dbb8a78321743cf.tar.gz
+Exploding layer: sha256:71724950b62f43338a8aee21263a3ee7bde62f17b04f13ca1ba25393edd04237.tar.gz
+Exploding layer: sha256:9318fe5d63a8c51c1c9666998e60a664d588ad836407893f0834c0ada4f30b1c.tar.gz
+processing data sets...
+fc raw:  ok. unique sample ids: 1128 ['YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_meta.csv', 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_stats.csv', 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_events.json', 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_events.json']
+fc etl:  ok. unique sample ids: 1122 ['YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_events.json', 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_stats.csv']
+plate reader:  ok. unique sample ids: 1410 ['YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_events.json', 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_stats.csv']
+summarizing data sets...
+hashing data sets...
+MD5: f0b97682f2901e13316e96fdef73424a
+MD5: 5ddd9f9f9b0173c615d0617028b61059
+MD5: 9d3f36b0be13c44c27ca05f795c80897
+MD5: 22871963b831cc5d0e57690fa778fe35
+MD5: 6ab125618f694e6d9063d02cddaef44c
+MD5: cec806eb5a47416d6ce977a0d198ae53
+MD5: 3d091a72cd2bee6d242c1d4bdc3a5c77
+making experiment record...
+making product record...
+finished!
+passing archive_system step

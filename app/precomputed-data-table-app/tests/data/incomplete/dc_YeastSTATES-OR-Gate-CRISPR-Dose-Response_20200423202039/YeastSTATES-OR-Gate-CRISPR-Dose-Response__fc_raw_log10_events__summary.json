@@ -1,0 +1,40 @@
+{
+    "rows count": 248,
+    "columns count": 8,
+    "entries count": 1984,
+    "count per column": {
+        "BL1-A": 248,
+        "FSC-A": 248,
+        "FSC-H": 248,
+        "FSC-W": 248,
+        "SSC-A": 248,
+        "SSC-H": 248,
+        "SSC-W": 248,
+        "sample_id": 248
+    },
+    "count unique per column (include NA)": {
+        "BL1-A": 248,
+        "FSC-A": 248,
+        "FSC-H": 248,
+        "FSC-W": 248,
+        "SSC-A": 248,
+        "SSC-H": 248,
+        "SSC-W": 248,
+        "sample_id": 248
+    },
+    "count unique per column (exclude NA)": {
+        "BL1-A": 248,
+        "FSC-A": 248,
+        "FSC-H": 248,
+        "FSC-W": 248,
+        "SSC-A": 248,
+        "SSC-H": 248,
+        "SSC-W": 248,
+        "sample_id": 248
+    },
+    "gb: experiment_id": null,
+    "gb: experiment_id,strain": null,
+    "gb: experiment_id,timepoint": null,
+    "gb: experiment_id,temperature": null,
+    "gb: experiment_id,inducer_concentration": null
+}

@@ -1,0 +1,78 @@
+{
+  "experiment_reference": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208",
+  "date_run": "20200610194354",
+  "output_dir": ".",
+  "tacc_path_type": "hpc_path",
+  "files": [
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_meta.csv",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_meta__summary.json",
+      "unique sample ids": 1128,
+      "hash_md5": "f0b97682f2901e13316e96fdef73424a"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_stats.csv",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_stats__summary.json",
+      "unique sample ids": 1128,
+      "hash_md5": "5ddd9f9f9b0173c615d0617028b61059"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_events.json",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_events__summary.json",
+      "unique sample ids": 1128,
+      "hash_md5": "9d3f36b0be13c44c27ca05f795c80897"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_events.json",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_raw_log10_events__summary.json",
+      "unique sample ids": 1128,
+      "hash_md5": "22871963b831cc5d0e57690fa778fe35"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_events.json",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_events__summary.json",
+      "unique sample ids": 1122,
+      "hash_md5": "6ab125618f694e6d9063d02cddaef44c"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_stats.csv",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__fc_etl_stats__summary.json",
+      "unique sample ids": 1122,
+      "hash_md5": "cec806eb5a47416d6ce977a0d198ae53"
+    },
+    {
+      "name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__platereader.csv",
+      "summary_name": "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208__platereader__summary.json",
+      "unique sample ids": 1410,
+      "hash_md5": "3d091a72cd2bee6d242c1d4bdc3a5c77"
+    }
+  ],
+  "status": {
+    "fc_raw": "ok. unique sample ids: 1128",
+    "fc_etl": "ok. unique sample ids: 1122",
+    "pr": "ok. unique sample ids: 1410"
+  },
+  "status_upstream": [
+    {
+      "experiment_id": "experiment.transcriptic.2019-12-09-YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208"
+    },
+    {
+      "experiment_id": "experiment.transcriptic.r1dvbs7kdxq4md",
+      "data_types": "PF--",
+      "comparison_passed": true,
+      "etl_flow_status": "VALIDATED"
+    },
+    {
+      "experiment_id": "experiment.transcriptic.r1dvbs8vu72tbp",
+      "data_types": "PF--",
+      "comparison_passed": true,
+      "etl_flow_status": "VALIDATED"
+    },
+    {
+      "experiment_id": "experiment.transcriptic.r1dvbsa7n5qwxe",
+      "data_types": "PF--",
+      "comparison_passed": true,
+      "etl_flow_status": "VALIDATED"
+    }
+  ]
+}
