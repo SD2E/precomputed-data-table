@@ -112,4 +112,4 @@ venv.bak/
 .mypy_cache/
 
 # test data
-/tests/data/
+tests/data/
