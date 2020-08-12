@@ -28,10 +28,14 @@ RUN Rscript -e 'install.packages("BiocManager", repos="http://cran.us.r-project.
 ADD config.yml /config.yml
 ADD src /src
 
+COPY pysd2cat src/pysd2cat
+
 COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
 COPY omics_tools /src/omics_tools
+COPY fcs_signal_prediction /src/fcs_signal_prediction
 
 ADD analysis_envs /analysis_envs
 RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml
 RUN conda env create -f /analysis_envs/wasserstein_tenfold_comparisons.yml
 RUN conda env create -f /analysis_envs/omics_tools.yml
+RUN conda env create -f /analysis_envs/fcs_signal_prediction.yml

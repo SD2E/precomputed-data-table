@@ -246,11 +246,11 @@ def launch_app(m, r):
     #else:
     #    derived_using = []
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
+
     product_patterns = []
     if analysis == "perform-metrics":
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
         job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
-
     else:
         if analysis == "xplan-od-growth-analysis":
             pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
@@ -259,6 +259,15 @@ def launch_app(m, r):
             product_patterns = [
                 {'patterns': ['.csv$'],
                  'derived_from': [pr_file_path],
+                 'derived_using': []
+                }]
+        elif analysis == "fcs_signal_prediction":
+            fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
+            fc_file_path = os.path.join(data_converge_dir, fc_file_name)
+            r.logger.info("fc_file_path: {}".format(fc_file_path))
+            product_patterns = [
+                {'patterns': ['.csv$'],
+                 'derived_from': [fc_file_path],
                  'derived_using': []
                 }]
         elif analysis == "wasserstein_tenfold_comparisons":
