@@ -8,20 +8,20 @@ import os
 
 
 # right now perform metrics can run on these supported types
-supported_cps = ['YEAST_STATES']
-supported_protocols = ['TimeSeriesHTP']
-supported_measurement_types = ['PLATE_READER']
+#supported_cps = ['YEAST_STATES']
+#supported_protocols = ['TimeSeriesHTP']
+#supported_measurement_types = ['PLATE_READER']
 
 
-def is_supported(challenge_problem, protocol, measurement_type):
-    if challenge_problem not in supported_cps:
-        return False
-    if protocol not in supported_protocols:
-        return False
-    if measurement_type not in supported_measurement_types:
-        return False
-
-    return True
+#def is_supported(challenge_problem, protocol, measurement_type):
+#    if challenge_problem not in supported_cps:
+#        return False
+#    if protocol not in supported_protocols:
+#        return False
+#    if measurement_type not in supported_measurement_types:
+#        return False
+#
+#    return True
 
 
 def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
