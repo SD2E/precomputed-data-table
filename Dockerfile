@@ -5,3 +5,4 @@ RUN pip3 install --upgrade git+https://github.com/SD2E/python-datacatalog.git@2_
 RUN pip3 install --upgrade git+https://github.com/SD2E/bacanora.git@master
 
 ADD record_product_info.py /record_product_info.py
+ADD external_apps /external_apps
