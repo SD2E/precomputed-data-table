@@ -2,8 +2,10 @@ import os
 import copy
 import json
 import jsonschema
-
 import record_product_info as rpi
+
+from datetime import datetime
+from pymongo import MongoClient
 
 from agavepy.agave import Agave
 from attrdict import AttrDict
@@ -14,8 +16,7 @@ from datacatalog.tokens import get_admin_token
 from datacatalog.stores import StorageSystem
 from reactors.runtime import Reactor, agaveutils
 from requests.exceptions import HTTPError
-from datetime import datetime
-from pymongo import MongoClient
+from external_apps import perform_metrics as ea_pm
 
 def join_posix_agave(joinList):
     new_path = '/'.join(arg.strip("/") for arg in joinList)
@@ -233,8 +234,10 @@ def launch_app(m, r):
         for m in matches:
             if m["derived_from"]:
                 experiment_ids.append(m["experiment_id"])
-    
 
+    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
+    r.logger.info("archive_path: {}".format(archive_path))
+        
     #meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
     #meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
     #if os.path.exists(meta_with_absolute_path):
@@ -243,42 +246,55 @@ def launch_app(m, r):
     #else:
     #    derived_using = []
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
-    if analysis == "xplan-od-growth-analysis":
-        pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
-        pr_file_path = os.path.join(data_converge_dir, pr_file_name)
-        r.logger.info("pr_file_path: {}".format(pr_file_path))
-        product_patterns = [
-            {'patterns': ['.csv$'],
-             'derived_from': [pr_file_path],
-             'derived_using': []
-            }]
-    elif analysis == "wasserstein_tenfold_comparisons":
-        fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
-        fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
-        r.logger.info("fc_raw_log10_stats_file_path: {}".format(fc_raw_log10_stats_file_path))
-        fc_etl_stats_file_name = '__'.join([experiment_ref, 'fc_etl_stats'])
-        fc_etl_stats_file_path = os.path.join(data_converge_dir, fc_etl_stats_file_name + '.csv')
-        r.logger.info("fc_etl_stats_file_path: {}".format(fc_etl_stats_file_path))
-        product_patterns = [
-            {'patterns': ['^.*fc_raw_log10_stats.*\.(csv|json)$'],
-             'derived_from': [fc_raw_log10_stats_file_path],
-             'derived_using': []
-            },
-            {'patterns': ['^.*fc_etl_stats.*\.(csv|json)$'],
-             'derived_from': [fc_etl_stats_file_path],
-             'derived_using': []
-            }
-        ]        
+    product_patterns = []
+    if analysis == "perform-metrics":
+        output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
+        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
+
+    else:
+        if analysis == "xplan-od-growth-analysis":
+            pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
+            pr_file_path = os.path.join(data_converge_dir, pr_file_name)
+            r.logger.info("pr_file_path: {}".format(pr_file_path))
+            product_patterns = [
+                {'patterns': ['.csv$'],
+                 'derived_from': [pr_file_path],
+                 'derived_using': []
+                }]
+        elif analysis == "wasserstein_tenfold_comparisons":
+            fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
+            fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
+            r.logger.info("fc_raw_log10_stats_file_path: {}".format(fc_raw_log10_stats_file_path))
+            fc_etl_stats_file_name = '__'.join([experiment_ref, 'fc_etl_stats'])
+            fc_etl_stats_file_path = os.path.join(data_converge_dir, fc_etl_stats_file_name + '.csv')
+            r.logger.info("fc_etl_stats_file_path: {}".format(fc_etl_stats_file_path))
+            product_patterns = [
+                {'patterns': ['^.*fc_raw_log10_stats.*\.(csv|json)$'],
+                 'derived_from': [fc_raw_log10_stats_file_path],
+                 'derived_using': []
+                },
+                {'patterns': ['^.*fc_etl_stats.*\.(csv|json)$'],
+                 'derived_from': [fc_etl_stats_file_path],
+                 'derived_using': []
+                }
+            ]        
+
+        # maxRunTime should probably be determined based on experiment size        
+        job_def = {
+            "appId": r.settings.agave_app_id,
+            "name": "precomputed-data-table-app" + r.nickname,
+            "parameters": {"input_counts_file": "na", "experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
+            "maxRunTime": "8:00:00",
+            "batchQueue": "all"
+        }
+    
+        # First, set the preferred archive destination and ensure the job archives
+        job_def["archivePath"] = archive_path
+        job_def["archiveSystem"] = "data-sd2e-projects.sd2e-project-48"
+        job_def["archive"] = True
 
     r.logger.debug("Instantiating job with product_patterns: {}".format(product_patterns))
 
-    #job_data["datetime_stamp"] = datetime_stamp
-    
-    result_root_dir = StorageSystem('data-sd2e-projects.sd2e-project-48', agave=r.client).root_dir
-    
-    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
-    r.logger.info("archive_path: {}".format(archive_path))
-    
     job = Job(r,
               experiment_id=experiment_ids,
               data=job_data,
@@ -288,31 +304,18 @@ def launch_app(m, r):
 
     job.setup()
 
-    #token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
-    #atoken = get_admin_token(token_key)
+    token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
+    atoken = get_admin_token(token_key)
 
-    #try:
-    #    job.reset(token=atoken)
-    #except:
-    #    job.ready(token=atoken)
+    try:
+        job.reset(token=atoken)
+    except:
+        job.ready(token=atoken)
     
     archive_path = job.archive_path
     r.logger.info("archive_path: {}".format(archive_path))
     r.logger.info('job.uuid: {}'.format(job.uuid))
 
-    # maxRunTime should probably be determined based on experiment size        
-    job_def = {
-        "appId": r.settings.agave_app_id,
-        "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"input_counts_file": "na", "experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
-        "maxRunTime": "8:00:00",
-        "batchQueue": "all"
-    }
-
-    # First, set the preferred archive destination and ensure the job archives
-    job_def["archivePath"] = job.archive_path
-    job_def["archiveSystem"] = "data-sd2e-projects.sd2e-project-48"
-    job_def["archive"] = True
     job_def["notifications"] = [
             {
                 "event": "RUNNING",
