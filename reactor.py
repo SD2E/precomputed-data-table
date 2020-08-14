@@ -110,17 +110,23 @@ def launch_omics(m, r):
     else:
         experiment_id = m.get("experiment_id")
         
+    if "config_file" not in m:
+        raise Exception("missing config_file")
+    else:
+        config_file = m.get("config_file")        
+        
     analysis = m.get("analysis")
         
     input_counts_path = os.path.join(input_dir, experiment_id + "_ReadCountMatrix_preCAD_transposed.csv")
+
 
     sr = load_structured_request(experiment_id, r)
     experiment_ref = sr["experiment_reference"]
     state = "complete"
     
     app_job_def_inputs = {}
-    app_job_def_inputs['inputData'] = agaveutils.to_agave_uri(systemId="data-sd2e-community", dirPath=input_counts_path)
-    r.logger.info("inputData: {}".format(app_job_def_inputs['inputData']))
+    app_job_def_inputs['input_data'] = agaveutils.to_agave_uri(systemId="data-sd2e-community", dirPath=input_counts_path)
+    r.logger.info("input_data: {}".format(app_job_def_inputs['input_data']))
     
     job_data = copy.copy(m)
     archive_path = os.path.join(state, experiment_ref, analysis)
@@ -135,16 +141,24 @@ def launch_omics(m, r):
               archive_path=archive_path)    
     job.setup()
     
+    token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
+    atoken = get_admin_token(token_key)
+
+    try:
+        job.reset(token=atoken)
+    except:
+        job.ready(token=atoken)
+            
     archive_path = job.archive_path
     r.logger.info("archive_path: {}".format(archive_path))
     r.logger.info('job.uuid: {}'.format(job.uuid))
 
     # maxRunTime should probably be determined based on experiment size        
     job_def = {
-        "appId": r.settings.agave_app_id,
-        "name": "precomputed-data-table-app" + r.nickname,
-        "parameters": {"input_counts_file": input_counts_path, "experiment_ref": "na", "data_converge_dir": "na", "analysis": analysis},
-        "maxRunTime": "8:00:00",
+        "appId": r.settings.agave_aomics_tools_app_id,
+        "name": "precomputed-data-table-omics-tools" + r.nickname,
+        "parameters": {"config_file": config_file},
+        "maxRunTime": "24:00:00",
         "batchQueue": "all"
     }
     
@@ -247,8 +261,13 @@ def launch_app(m, r):
     #    derived_using = []
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
+    mtypes = None
     product_patterns = []
     if analysis == "perform-metrics":
+        if "mtypes" not in m:
+            raise Exception("missing mtypes")
+
+        mtypes = m.get("mtypes")        
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
         job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
     else:
