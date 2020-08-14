@@ -17,10 +17,8 @@ COPY config.yml /config.yml
 COPY src /src
 
 COPY pysd2cat src/pysd2cat
-COPY xplan-od-growth-analysis /src/xplan-od-growth-analysis
 COPY fcs_signal_prediction /src/fcs_signal_prediction
 
 COPY analysis_envs /analysis_envs
-RUN conda env create -f /analysis_envs/xplan-od-growth-analysis.yml
 RUN conda env create -f /analysis_envs/wasserstein_tenfold_comparisons.yml
 RUN conda env create -f /analysis_envs/fcs_signal_prediction.yml
