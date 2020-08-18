@@ -92,9 +92,8 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
         od_growth_fname_dict = {pr_fname: [od_growth_fname]}
         record = rpi.append_record(record, od_growth_fname_dict, analysis, out_dir)
 
-
-    with open(record_path, 'w') as jfile:
-        json.dump(record, jfile, indent=2)
+        with open(record_path, 'w') as jfile:
+            json.dump(record, jfile, indent=2)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
