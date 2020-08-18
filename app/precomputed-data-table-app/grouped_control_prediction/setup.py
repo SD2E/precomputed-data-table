@@ -18,5 +18,5 @@ setup(
     package_dir={'': 'src'},
     package_data={'': ['data/*.pkl']},
     install_requires=install_requires,
-    zip_safe=False,
+    zip_safe=False
 )

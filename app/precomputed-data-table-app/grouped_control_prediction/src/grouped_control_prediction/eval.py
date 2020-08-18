@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from typing import Optional, List
 from grouped_control_prediction.predict import predict_signal
+from grouped_control_prediction.utils import data_utils as du
 
 
 parser = argparse.ArgumentParser(description='Predict Signal Output for samples')
@@ -33,6 +34,46 @@ parser.add_argument('--strain_col', type=str,
                     help='Strain column name', default="strain_name")
 parser.add_argument('--out_path', type=str,
                     help='Test Harness output location', default=".")
+
+
+# Get prediction dataset name, dataframe, and metadata from experiment id
+def get_pred_df_and_meta(experiment_id):
+    
+    # Set up prediction dataset path
+    DATA_CONVERGE_PROJECT="sd2e-project-43"
+    data_converge_base = os.path.join(expanduser("~"), 'sd2e-projects', DATA_CONVERGE_PROJECT)
+    experiment_dir = os.path.realpath(os.path.join(data_converge_base, 'reactor_outputs', 'complete'))
+    experiment_dir_contents = [os.path.realpath(os.path.join(experiment_dir, x)) for x in os.listdir(experiment_dir)]
+    
+    # Get most up-to-date prediction dataset name
+    process_dir = os.path.join(experiment_dir, experiment_id)
+    experiment_id_dir_contents = [os.path.realpath(os.path.join(process_dir, x)) for x in os.listdir(process_dir)]
+    experiment_id_dir_contents.sort()
+    last_process = experiment_id_dir_contents[-1]
+    pred_df_name = last_process[last_process.find(experiment_id):]
+    pred_df_name = pred_df_name.replace("/", "_")
+    
+    # Get the dataframe and metadata
+    pred_df = du.get_data_and_metadata(last_process)
+    pred_meta = du.get_meta(last_process, du.get_record(last_process))
+    pred_meta = pred_meta.rename(columns={'well':'well_id'})
+    
+    return pred_df_name, pred_df, pred_meta
+
+
+def get_od_metrics(rf_df, od_df):
+    # Merge RF and OD data into one dataframe
+    merged = od_df.merge(rf_df, how='inner', on=['experiment_id','well_id'])
+    
+    # Store both sets of predictions as integers (0/1 -> dead/live)
+    rf_preds = np.around(merged['predicted_output_mean_mean'].values).astype(int)
+    od_preds = np.invert(merged['dead']).astype(int).values
+    
+    # Compute prediction loss and accuracy
+    od_loss = sum(abs(od_preds-merged['predicted_output_mean_mean'].values))
+    od_accuracy = sum(rf_preds == od_preds)/len(od_preds)
+    
+    return od_loss, od_accuracy
 
 
 def main(data_converge_path : str,
@@ -80,30 +121,32 @@ def main(data_converge_path : str,
     # Attach mean & standard deviation of sample predcitions to the metadata
     result = meta.merge(mean_prediction, on=id_col)
     
-    # Read in optical density (OD) data
+    # Drop Media Controls from RF data
+    rf = result[result['strain_class'] != 'Process']
+    # Trim experiment_id values
+    shift = len('experiment.transcriptic.')
+    rf.loc[:, 'experiment_id'] = rf['experiment_id'].str[shift:]
+    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well_id
+    rf_df = rf.groupby(['experiment_id','well_id']).agg({'predicted_output_mean': [np.mean, np.std]})
+    rf_df.columns = list(map('_'.join, rf_df.columns.values))
+    
+    # Read in Optical Density data
     OD_DATA_CONVERGE_PROJECT = "sd2e-project-48"
     od_data_converge_base = os.path.join(expanduser("~"), 'sd2e-projects', OD_DATA_CONVERGE_PROJECT)
-    od_experiment = os.path.join(od_data_converge_base, )
     od_experiment = os.path.realpath(os.path.join(od_data_converge_base, 'complete',
-                                                  'YeastSTATES-CRISPR-Short-Duration-Time-Series-35C','20200625173644',
-                                                  'xplan-od-growth-analysis'))
-    od_df = pd.read_csv(os.path.join(od_experiment,
-                                     'pdt_YeastSTATES-CRISPR-Short-Duration-Time-Series-35C__od_growth_analysis.csv'))
+                                                  'YeastSTATES-OR-Gate-CRISPR-Dose-Response',
+                                                  '20200608231502'))
+    od_df = pd.read_csv(os.path.join(od_experiment, 'pdt_YeastSTATES-OR-Gate-CRISPR-Dose-Response__od_growth_analysis.csv'))
+    # Drop Media Controls from OD data
+    #od_df = od_df[od_df.strain != 'MediaControl'].reset_index()
+    od_df = od_df.rename(columns={'well':'well_id'})
+    #od_df = od_df[od_df.inducer_type == 'beta-estradiol'].reset_index()
+    #od_df = od_df.drop('index', axis=1)
+    od_df = od_df.set_index(['experiment_id', 'well_id'])
     
-    od_df = od_df[od_df['inducer_type'] == 'beta-estradiol']
-    # Store both sets of predictions as integers (0/1 -> dead/live)
-    rf_preds = result.groupby(['experiment_id','well_id']).mean().predicted_output_mean.values
-    od_preds = np.invert(od_df.dead).astype(int).values
-    num_preds = len(od_preds)
-
-    # Predictions compared to OD labels
-    od_loss = sum(abs(od_preds-rf_preds))/num_preds
-    od_accuracy = sum(np.around(rf_preds) == od_preds)/num_preds
-    print("OD loss: " + str(od_loss))
-    print("OD accuracy: " + str(od_accuracy))
+    od_loss, od_accuracy = get_od_metrics(rf_df, od_df)
     
     return result, avg_dist, test_accuracy, od_loss, od_accuracy
-    
 
 
 if __name__ == '__main__':

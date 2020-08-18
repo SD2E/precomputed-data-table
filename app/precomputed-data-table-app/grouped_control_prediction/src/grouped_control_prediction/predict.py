@@ -69,6 +69,7 @@ def top_n(distance_dict, num_samples):
     # Return top n=num_samples control sets
     return list(distance_dict.keys())[:num_samples]
 
+
 def predict_signal(df_original : DataFrame,
                    experiment: str,
                    project_id : str,
@@ -92,8 +93,7 @@ def predict_signal(df_original : DataFrame,
     distances = pickle.load(open(distance_pkl, "rb" ))
     
     # Randomly sample n=control_size control sets based using inverse distance weighting
-    if weighted == True:
-        print("top_n")
+    if weighted:
         sampled_controls = top_n(distances, control_size)
     else:
         sampled_controls = random.sample(distances.keys(), k=control_size)

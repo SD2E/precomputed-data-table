@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import pandas as pd
 from typing import Optional, List
 from grouped_control_prediction.predict import predict_signal
 from grouped_control_prediction.utils import data_utils as du
@@ -77,13 +78,20 @@ def main(data_converge_path: str,
     # Attach mean & standard deviation of sample predcitions to the metadata
     result = meta.merge(mean_prediction, on=id_col)
     
+    # Drop Media Controls from RF data
+    rf = result[result['strain_class'] != 'Process']
+    # Trim experiment_id values
+    shift = len('experiment.transcriptic.')
+    rf['experiment_id'] = rf['experiment_id'].str[shift:]
+    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well_id
+    rf_df = rf.groupby(['experiment_id','well_id']).agg({'predicted_output_mean': [np.mean, np.std]})
+    
     # Create plots
     well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
     well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
     samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
     
-    return result, test_accuracy, well_timeseries_fig, samples_and_controls_fig
-    
+    return result, rf_df, test_accuracy, well_timeseries_fig, samples_and_controls_fig
 
 
 if __name__ == '__main__':
