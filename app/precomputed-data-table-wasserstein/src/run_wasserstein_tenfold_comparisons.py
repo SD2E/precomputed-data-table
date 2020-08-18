@@ -12,8 +12,8 @@ import argparse
 import subprocess
 import sys
 import pandas as pd
-import wasserstein_tenfold_comparisons.wasserstein_analysis as wasser
-import wasserstein_tenfold_comparisons.TenFoldComparisons as tenfoldcomp
+import wasserstein_analysis as wasser
+import TenFoldComparisons as tenfoldcomp
 
 
 def run_wasserstain_analysis(er_dir, datafile):
