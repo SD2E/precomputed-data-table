@@ -291,7 +291,7 @@ def launch_app(m, r):
                  'derived_from': [fc_file_path],
                  'derived_using': []
                 }]
-        elif analysis == "wasserstein_tenfold_comparisons":
+        elif analysis == "wasserstein":
             app_id = r.settings.agave_wasserstein_tenfold_comparisons_app_id
             fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
             fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
