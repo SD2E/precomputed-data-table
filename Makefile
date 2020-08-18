@@ -16,6 +16,9 @@ export APPDIR := app/precomputed-data-table-app
 export PDT_OMICS_TOOLS_INIFILE := app/precomputed-data-table-omics-tools/app.ini
 export PDT_OMICS_TOOLS_DIR := app/precomputed-data-table-omics-tools
 
+export PDT_WASSERSTEIN_INIFILE := app/precomputed-data-table-wasserstein/app.ini
+export PDT_WASSERSTEIN_DIR := app/precomputed-data-table-wasserstein
+
 export PDT_GROWTH_ANALYSIS_INIFILE := app/precomputed-data-table-growth-analysis/app.ini
 export PDT_GROWTH_ANALYSIS_DIR := app/precomputed-data-table-growth-analysis
 
@@ -49,6 +52,15 @@ omics-tools-image:
 	echo "  make tests-pytest - run Python tests in the container"
 	echo "  make tests-local - execute container (and wrapper) under emulation"
 
+wasserstein-image:
+	cd $(PDT_WASSERSTEIN_DIR); \
+	find . -name '*.pyc' -delete ; \
+	apps-build-container -V ; \
+	echo "The app container is done building."
+	echo "  make shell - explore the container interactively"
+	echo "  make tests-pytest - run Python tests in the container"
+	echo "  make tests-local - execute container (and wrapper) under emulation"
+	
 growth-analysis-image:
 	cd $(PDT_GROWTH_ANALYSIS_DIR); \
 	find . -name '*.pyc' -delete ; \
@@ -88,12 +100,15 @@ clean-reactor-image:
 clean-app-image:
 	bash scripts/remove_images.sh $(INIFILE)
 
+clean-wasserstein-image:
+	bash scripts/remove_images.sh $(PDT_WASSERSTEIN_INIFILE)
+
 clean-growth-analysis-image:
 	bash scripts/remove_images.sh $(PDT_GROWTH_ANALYSIS_INIFILE)
 
 clean-fcs-signal-prediction-image:
 	bash scripts/remove_images.sh $(PDT_FCS_SIGNAL_PREDICTION_INIFILE)
-	
+
 clean-omics-tools-image:
 	bash scripts/remove_images.sh $(PDT_OMICS_TOOLS_INIFILE)
 
@@ -107,14 +122,21 @@ deploy-app:
 	cd $(APPDIR); \
 	apps-deploy
 
+deploy-wasserstein:
+	cd $(PDT_WASSERSTEIN_DIR); \
+	apps-deploy
+
 deploy-growth-analysis:
 	cd $(PDT_GROWTH_ANALYSIS_DIR); \
 	apps-deploy
 
+<<<<<<< HEAD
 deploy-fcs-signal-prediction:
 	cd $(PDT_FCS_SIGNAL_PREDICTION_DIR); \
 	apps-deploy
 		
+=======
+>>>>>>> 8884d69c9a050931b45dda37a1af609d1faf70d3
 deploy-omics-tools:
 	cd $(PDT_OMICS_TOOLS_DIR); \
 	apps-deploy
