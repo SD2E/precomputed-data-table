@@ -158,7 +158,7 @@ def launch_omics(m, r):
         "appId": r.settings.agave_omics_tools_app_id,
         "name": "precomputed-data-table-omics-tools" + r.nickname,
         "parameters": {"config_file": config_file},
-        "maxRunTime": "24:00:00",
+        "maxRunTime": "48:00:00",
         "batchQueue": "all"
     }
     
@@ -245,9 +245,9 @@ def launch_app(m, r):
     elif matches.count() == 1:
         experiment_ids.append(matches[0]["experiment_id"])
     else:
-        for m in matches:
-            if m["derived_from"]:
-                experiment_ids.append(m["experiment_id"])
+        for match in matches:
+            if match["derived_from"]:
+                experiment_ids.append(match["experiment_id"])
 
     archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
