@@ -16,6 +16,9 @@ export APPDIR := app/precomputed-data-table-app
 export PDT_OMICS_TOOLS_INIFILE := app/precomputed-data-table-omics-tools/app.ini
 export PDT_OMICS_TOOLS_DIR := app/precomputed-data-table-omics-tools
 
+export PDT_WASSERSTEIN_INIFILE := app/precomputed-data-table-wasserstein/app.ini
+export PDT_WASSERSTEIN_DIR := app/precomputed-data-table-wasserstein
+
 .PHONY: tests app-container tests-local tests-reactor tests-deployed
 .SILENT: tests app-container tests-local tests-reactor tests-deployed
 
@@ -43,6 +46,15 @@ omics-tools-image:
 	echo "  make tests-pytest - run Python tests in the container"
 	echo "  make tests-local - execute container (and wrapper) under emulation"
 
+wasserstein-image:
+	cd $(PDT_WASSERSTEIN_DIR); \
+	find . -name '*.pyc' -delete ; \
+	apps-build-container -V ; \
+	echo "The app container is done building."
+	echo "  make shell - explore the container interactively"
+	echo "  make tests-pytest - run Python tests in the container"
+	echo "  make tests-local - execute container (and wrapper) under emulation"
+
 shell:
 	bash $(SCRIPT_DIR)/run_container_process.sh bash
 
@@ -63,7 +75,10 @@ clean-reactor-image:
 
 clean-app-image:
 	bash scripts/remove_images.sh $(INIFILE)
-	
+
+clean-wasserstein-image:
+	bash scripts/remove_images.sh $(PDT_WASSERSTEIN_INIFILE)
+
 clean-omics-tools-image:
 	bash scripts/remove_images.sh $(PDT_OMICS_TOOLS_INIFILE)
 
@@ -76,7 +91,11 @@ deploy:
 deploy-app:
 	cd $(APPDIR); \
 	apps-deploy
-	
+
+deploy-wasserstein:
+	cd $(PDT_WASSERSTEIN_DIR); \
+	apps-deploy
+
 deploy-omics-tools:
 	cd $(PDT_OMICS_TOOLS_DIR); \
 	apps-deploy

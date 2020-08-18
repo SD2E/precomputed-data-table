@@ -83,23 +83,11 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     record_path = os.path.join(out_dir, "record.json")
 
     record = {}
-    if analysis == 'xplan-od-growth-analysis':
-        import run_od_growth_analysis as run_growth
+    if analysis == 'wasserstein_tenfold_comparisons':
+        import run_wasserstein_tenfold_comparisons as wasser_analysis
 
-        rg_od_analysis_df, pr_fname = run_growth.run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
-        od_growth_fname = 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)
-        rg_od_analysis_df.to_csv(od_growth_fname, index=False)
-        od_growth_fname_dict = {pr_fname: [od_growth_fname]}
-        record = rpi.append_record(record, od_growth_fname_dict, analysis, out_dir)
-
-    elif analysis == 'fcs_signal_prediction':
-        import run_fcs_signal_prediction as fcs_signal_prediction
-
-        fcs_result_df, fcs_results_fname, raw_event_fname = fcs_signal_prediction.run_fcs_signal_prediction(exp_ref, data_converge_dir)
-        fcs_result_df.to_csv(fcs_results_fname, index=False)
-        fcs_signal_dict = {raw_event_fname: [fcs_results_fname]}
-        record = rpi.append_record(record, fcs_signal_dict, analysis, out_dir)
-
+        wasser_fname_dict = wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
+        record = rpi.append_record(record, wasser_fname_dict, analysis, out_dir)
 
     with open(record_path, 'w') as jfile:
         json.dump(record, jfile, indent=2)
