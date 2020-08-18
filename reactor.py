@@ -155,10 +155,10 @@ def launch_omics(m, r):
 
     # maxRunTime should probably be determined based on experiment size        
     job_def = {
-        "appId": r.settings.agave_aomics_tools_app_id,
+        "appId": r.settings.agave_omics_tools_app_id,
         "name": "precomputed-data-table-omics-tools" + r.nickname,
         "parameters": {"config_file": config_file},
-        "maxRunTime": "24:00:00",
+        "maxRunTime": "48:00:00",
         "batchQueue": "all"
     }
     
@@ -245,9 +245,9 @@ def launch_app(m, r):
     elif matches.count() == 1:
         experiment_ids.append(matches[0]["experiment_id"])
     else:
-        for m in matches:
-            if m["derived_from"]:
-                experiment_ids.append(m["experiment_id"])
+        for match in matches:
+            if match["derived_from"]:
+                experiment_ids.append(match["experiment_id"])
 
     archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
@@ -272,6 +272,7 @@ def launch_app(m, r):
         job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
     else:
         if analysis == "xplan-od-growth-analysis":
+            app_id = r.settings.agave_growth_analysis_app_id
             pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
             pr_file_path = os.path.join(data_converge_dir, pr_file_name)
             r.logger.info("pr_file_path: {}".format(pr_file_path))
@@ -281,6 +282,7 @@ def launch_app(m, r):
                  'derived_using': []
                 }]
         elif analysis == "fcs_signal_prediction":
+            app_id = r.settings.agave_fcs_signal_prediction_app_id
             fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
             fc_file_path = os.path.join(data_converge_dir, fc_file_name)
             r.logger.info("fc_file_path: {}".format(fc_file_path))
@@ -290,6 +292,7 @@ def launch_app(m, r):
                  'derived_using': []
                 }]
         elif analysis == "wasserstein_tenfold_comparisons":
+            app_id = r.settings.agave_wasserstein_tenfold_comparisons_app_id
             fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
             fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
             r.logger.info("fc_raw_log10_stats_file_path: {}".format(fc_raw_log10_stats_file_path))
@@ -309,9 +312,9 @@ def launch_app(m, r):
 
         # maxRunTime should probably be determined based on experiment size        
         job_def = {
-            "appId": r.settings.agave_app_id,
+            "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
-            "parameters": {"input_counts_file": "na", "experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
+            "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
             "maxRunTime": "8:00:00",
             "batchQueue": "all"
         }

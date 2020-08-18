@@ -1,10 +1,10 @@
 {
-  "name": "{{ app.name }}",
-  "version": "{{ app.version }}",
+  "name": "precomputed-data-table-growth-analysis",
+  "version": "0.1.0",
   "executionType": "HPC",
   "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/{{ app.bundle }}",
+  "deploymentPath": "apps/precomputed-data-table-growth-analysis-0.1.0",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
@@ -20,7 +20,7 @@
     {
       "id": "CONTAINER_IMAGE",
       "value": {
-        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
+        "default": "sd2e/precomputed-data-table-growth-analysis:0.1.0",
         "description": "Container Image. Do not edit.",
         "type": "string",
         "visible": false,
