@@ -1,4 +1,4 @@
-name: wasserstein_tenfold_comparisons
+name: wasserstein
 channels:
 - defaults
 dependencies:

@@ -292,7 +292,7 @@ def launch_app(m, r):
                  'derived_using': []
                 }]
         elif analysis == "wasserstein":
-            app_id = r.settings.agave_wasserstein_tenfold_comparisons_app_id
+            app_id = r.settings.agave_wasserstein_app_id
             fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
             fc_raw_log10_stats_file_path = os.path.join(data_converge_dir, fc_raw_log10_stats_file_name + '.csv')
             r.logger.info("fc_raw_log10_stats_file_path: {}".format(fc_raw_log10_stats_file_path))
