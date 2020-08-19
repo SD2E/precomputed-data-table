@@ -1,5 +1,5 @@
 {
-  "name": "precomputed-data-table-growth-analysis",
+  "name": "precomputed-data-table-wasserstein",
   "version": "0.1.0",
   "executionType": "HPC",
   "executionSystem": "hpc-tacc-wrangler-gzheng",

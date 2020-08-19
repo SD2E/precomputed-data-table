@@ -83,14 +83,14 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     record_path = os.path.join(out_dir, "record.json")
 
     record = {}
-    if analysis == 'wasserstein_tenfold_comparisons':
+    if analysis == 'wasserstein':
         import run_wasserstein_tenfold_comparisons as wasser_analysis
 
         wasser_fname_dict = wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
         record = rpi.append_record(record, wasser_fname_dict, analysis, out_dir)
 
-    with open(record_path, 'w') as jfile:
-        json.dump(record, jfile, indent=2)
+        with open(record_path, 'w') as jfile:
+            json.dump(record, jfile, indent=2)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
