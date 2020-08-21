@@ -1,4 +1,4 @@
-,experiment_id,well,mean,std
+,experiment_id,well,cells_ml_mean,cells_ml_std
 0,experiment.transcriptic.r1dvbsa7n5qwxe,a1,2119593.1818175,1258697.157401422
 1,experiment.transcriptic.r1dvbsa7n5qwxe,a10,2217532.4675325,886952.1380122969
 2,experiment.transcriptic.r1dvbsa7n5qwxe,a11,2140151.51515,968067.9972939695
