@@ -1,10 +1,10 @@
 {
   "name": "precomputed-data-table-omics-tools",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "executionType": "HPC",
   "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/precomputed-data-table-omics-tools-0.1.0",
+  "deploymentPath": "apps/precomputed-data-table-omics-tools-0.1.2",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
@@ -39,7 +39,7 @@
     {
       "id": "CONTAINER_IMAGE",
       "value": {
-        "default": "sd2e/precomputed-data-table-omics-tools:0.1.0",
+        "default": "sd2e/precomputed-data-table-omics-tools:0.1.2",
         "description": "Container Image. Do not edit.",
         "type": "string",
         "visible": false,
