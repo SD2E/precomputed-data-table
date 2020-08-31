@@ -1,0 +1,57 @@
+{
+  "name": "precomputed-data-table-live-dead-prediction",
+  "version": "0.1.0",
+  "executionType": "HPC",
+  "executionSystem": "hpc-tacc-wrangler-gzheng",
+  "parallelism": "SERIAL",
+  "deploymentPath": "apps/precomputed-data-table-live-dead-prediction-0.1.0",
+  "deploymentSystem": "data-sd2e-app-assets",
+  "defaultQueue": "all",
+  "label": "precomputed data table",
+  "modules": [
+    "load tacc-singularity"
+  ],
+  "shortDescription": "First level analysis post data-converge",
+  "templatePath": "runner-template.sh",
+  "testPath": "tester.sh",
+  "inputs": [
+  ],
+  "parameters": [
+    {
+      "id": "CONTAINER_IMAGE",
+      "value": {
+        "default": "sd2e/precomputed-data-table-live-dead-prediction:0.1.0",
+        "description": "Container Image. Do not edit.",
+        "type": "string",
+        "visible": false,
+        "required": true
+      }
+    },
+    {
+      "id": "experiment_ref",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "data_converge_dir",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "analysis",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    }
+  ],
+  "outputs": [
+  ]
+}

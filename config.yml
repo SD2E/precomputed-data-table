@@ -1,6 +1,10 @@
 ---
 debug: false
 agave_app_id: precomputed-data-table-app-0.1.0
+agave_growth_analysis_app_id: precomputed-data-table-growth-analysis-0.1.0
+agave_fcs_signal_prediction_app_id: precomputed-data-table-fcs-signal-prediction-0.1.0
+agave_wasserstein_app_id: precomputed-data-table-wasserstein-0.1.0
+agave_omics_tools_app_id: precomputed-data-table-omics-tools-0.1.0
 
 logs:
   level: DEBUG
