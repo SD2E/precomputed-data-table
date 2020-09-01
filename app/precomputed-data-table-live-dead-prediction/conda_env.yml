@@ -12,6 +12,6 @@ dependencies:
     - pip:
       - setuptools
       - -e grouped_control_prediction
-      - -e pysd2cat
+      - -e pysd2cat[harness]
 #      - -e ../src/grouped_control_prediction
 #      - -e ../src/pysd2cat
