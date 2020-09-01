@@ -5,8 +5,10 @@ import pickle
 import os
 from os.path import expanduser
 import random
-from typing import Optional, List
+from typing import Optional, List, Dict
 import pkg_resources
+
+from grouped_control_prediction.kn_controls import k_nearest_controls
 
 from pysd2cat.analysis import correctness
 
@@ -81,17 +83,22 @@ def predict_signal(df_original : DataFrame,
                    id_col : str,
                    channels : List[str],
                    out_path : str,
+                   compute_wass: Optional[bool] = False,
                    strain_col : Optional[str]='strain_name') -> DataFrame:
     """
     Get predictions via grouped controls method.
     Sample n=control_size control experiments, group them together into one DataFrame,
     and use it as the training set for random forest classification.
     """
-    
-    # Extract control set Wasserstein distances
-    distance_pkl = pkg_resources.resource_filename("grouped_control_prediction", wass_path)
-    distances = pickle.load(open(distance_pkl, "rb" ))
-    
+
+    if not compute_wass:
+        # Extract control set Wasserstein distances
+        distance_pkl = pkg_resources.resource_filename("grouped_control_prediction", wass_path)
+        distances = pickle.load(open(distance_pkl, "rb" ))
+    else:
+        # Compute control set Wasserstein distances
+        distances = k_nearest_controls(experiment)
+
     # Randomly sample n=control_size control sets based using inverse distance weighting
     if weighted:
         sampled_controls = top_n(distances, control_size)

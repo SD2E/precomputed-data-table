@@ -86,10 +86,10 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     if analysis == 'live_dead_prediction':
         import run_live_dead_prediction as live_dead_prediction
 
-        fcs_result_df, fcs_results_fname, raw_event_fname = live_dead_prediction.run_live_dead_prediction(exp_ref, data_converge_dir)
-        fcs_result_df.to_csv(fcs_results_fname, index=False)
-        fcs_signal_dict = {raw_event_fname: [fcs_results_fname]}
-        record = rpi.append_record(record, fcs_signal_dict, analysis, out_dir)
+        ld_pred_result_df, ld_pred_results_fname, raw_event_fname = live_dead_prediction.run_live_dead_prediction(exp_ref, data_converge_dir)
+        ld_pred_result_df.to_csv(ld_pred_results_fname, index=False)
+        ld_pred_signal_dict = {raw_event_fname: [ld_pred_results_fname]}
+        record = rpi.append_record(record, ld_pred_signal_dict, analysis, out_dir)
 
         with open(record_path, 'w') as jfile:
             json.dump(record, jfile, indent=2)

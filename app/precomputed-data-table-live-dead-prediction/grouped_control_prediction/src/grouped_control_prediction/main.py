@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 import pandas as pd
-from typing import Optional, List
+from typing import Optional, List, Dict
 from grouped_control_prediction.predict import predict_signal
 from grouped_control_prediction.utils import data_utils as du
 from grouped_control_prediction.utils import plot
@@ -22,12 +22,17 @@ parser.add_argument('wass_path', type=str,
                     help='Path to Wasserstein Distances')
 parser.add_argument('control_size', type=int,
                     help='Number of control experiments to group in training set')
+parser.add_argument('compute_wass', type=bool, default=False,
+                    help='Compute wasserstein distances for controls instead of using cached distances. \
+                    <wass_path> can be empty string if <compute_wass> set to True.')
 parser.add_argument('--id_col', type=str,
                     help='Sample id column name', default="sample_id")
 parser.add_argument('--strain_col', type=str,
                     help='Strain column name', default="strain_name")
 parser.add_argument('--out_path', type=str,
                     help='Test Harness output location', default=".")
+parser.add_argument('--plot', type=bool, default=True,
+                    help='Plot results')
 
 
 def main(data_converge_path: str,
@@ -37,9 +42,11 @@ def main(data_converge_path: str,
          weighted : bool,
          wass_path : str,
          control_size : int,
-         id_col : Optional[str]="sample_id",
-         strain_col : Optional[str]='strain_name',
-         out_path : Optional[str]='.'):
+         compute_wass: Optional[bool] = False,
+         id_col : Optional[str] = "sample_id",
+         strain_col : Optional[str] = 'strain_name',
+         out_path : Optional[str] = '.',
+         plot : Optional[bool] = True):
     """
     Get the raw flow cytometry data, predict the output signal for each event,
     aggregate by sample, return metadata with columns for mean and std dev. of
@@ -52,27 +59,29 @@ def main(data_converge_path: str,
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
     meta = meta.rename(columns={'well':'well_id'})
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']
-    
-    # Predict the output signal for each event
+
+    # Predict the output signal for each event from computed distances
     pred, avg_dist, test_accuracy, all_controls = predict_signal(df,
-                          data_converge_path,
-                          project_id,
-                          low_control,
-                          high_control,
-                          weighted,
-                          wass_path,
-                          control_size,
-                          id_col,
-                          channels,
-                          out_path,
-                          strain_col=strain_col)
+                                                                 data_converge_path,
+                                                                 project_id,
+                                                                 low_control,
+                                                                 high_control,
+                                                                 weighted,
+                                                                 wass_path,
+                                                                 control_size,
+                                                                 id_col,
+                                                                 channels,
+                                                                 out_path,
+                                                                 compute_wass=compute_wass,
+                                                                 strain_col=strain_col)
+
 
     # Attach predictions to original data
     df['predicted_output'] = pred['predicted_output']
     
     # Get the mean and std output signal for each sample
     mean_prediction = df.groupby([id_col]).agg({"predicted_output" : [np.mean, np.std]}).reset_index()
-    mean_prediction.columns  = mean_prediction.columns.map('_'.join)
+    mean_prediction.columns = mean_prediction.columns.map('_'.join)
     mean_prediction = mean_prediction.rename(columns={id_col+"_": id_col})
     
     # Attach mean & standard deviation of sample predcitions to the metadata
@@ -85,14 +94,15 @@ def main(data_converge_path: str,
     rf['experiment_id'] = rf['experiment_id'].str[shift:]
     # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well_id
     rf_df = rf.groupby(['experiment_id','well_id']).agg({'predicted_output_mean': [np.mean, np.std]})
-    
-    # Create plots
-    well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
-    well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
-    samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
-    
-    return result, rf_df, test_accuracy, well_timeseries_fig, samples_and_controls_fig
 
+    if plot == True:
+        # Create plots
+        well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
+        well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
+        samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
+        return result, rf_df, test_accuracy, well_timeseries_fig, samples_and_controls_fig
+    else:
+        return result, rf_df, test_accuracy
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -104,9 +114,11 @@ if __name__ == '__main__':
     weighted = args.weighted
     wass_path = args.wass_path
     control_size = args.control_size
+    compute_wass = args.compute_wass
     id_col = args.id_col
     strain_col = args.strain_col
     out_path = args.out_path
+    plot = args.plot
     
     main(data_converge_path,
          project_id,
@@ -115,6 +127,8 @@ if __name__ == '__main__':
          weighted,
          wass_path,
          control_size,
+         compute_wass=compute_wass,
          id_col=id_col,
          strain_col=strain_col,
-         out_path=out_path)
+         out_path=out_path,
+         plot=plot)
