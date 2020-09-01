@@ -14,7 +14,7 @@ from scipy.stats import wasserstein_distance as wd
 from grouped_control_prediction.utils import data_utils as du
 
 
-def k_nearest_controls(exp_dir):
+def k_nearest_controls(exp_dir, ):
 
     # Load prediction data
     experiment_df = du.get_data_and_metadata(exp_dir)
@@ -29,7 +29,8 @@ def k_nearest_controls(exp_dir):
 
     # Set path to control data
     XPLAN_PROJECT = "sd2e-project-14"
-    xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
+    xplan_base = os.path.join('/work/projects/SD2E-Community/prod/projects/sd2e-projects', XPLAN_PROJECT)
+    # xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
     path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
 
     # Initialize control distance dictionary and counter
