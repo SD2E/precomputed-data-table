@@ -57,7 +57,7 @@ def main(data_converge_path: str,
     print("Loading prediction data...")
     df = du.get_data_and_metadata(data_converge_path)
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
-    meta = meta.rename(columns={'well':'well_id'})
+    # meta = meta.rename(columns={'well':'well_id'})
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']
 
     # Predict the output signal for each event from computed distances
@@ -92,14 +92,14 @@ def main(data_converge_path: str,
     # Trim experiment_id values
     shift = len('experiment.transcriptic.')
     rf['experiment_id'] = rf['experiment_id'].str[shift:]
-    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well_id
-    rf_df = rf.groupby(['experiment_id','well_id']).agg({'predicted_output_mean': [np.mean, np.std]})
+    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well
+    rf_df = rf.groupby(['experiment_id','well']).agg({'predicted_output_mean': [np.mean, np.std]})
 
     if plot == True:
         # Create plots
-        well_timeseries = result.groupby(['timepoint', 'well_id', 'experiment_id']).agg(np.mean).sort_values(by=['well_id', 'timepoint', 'experiment_id']).reset_index()
+        well_timeseries = result.groupby(['timepoint', 'well', 'experiment_id']).agg(np.mean).sort_values(by=['well', 'timepoint', 'experiment_id']).reset_index()
         well_timeseries_fig = plot.plot_well_timeseries(well_timeseries)
-        samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well_id", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
+        samples_and_controls_fig = plot.plot_samples_and_controls(df[[id_col, 'SSC-A']].merge(meta[[strain_col, id_col, "well", "timepoint", 'experiment_id']], on=id_col), result, low_control, high_control, 'SSC-A', all_controls[['SSC-A', strain_col]], 10000)
         return result, rf_df, test_accuracy, well_timeseries_fig, samples_and_controls_fig
     else:
         return result, rf_df, test_accuracy

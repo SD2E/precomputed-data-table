@@ -56,14 +56,14 @@ def get_pred_df_and_meta(experiment_id):
     # Get the dataframe and metadata
     pred_df = du.get_data_and_metadata(last_process)
     pred_meta = du.get_meta(last_process, du.get_record(last_process))
-    pred_meta = pred_meta.rename(columns={'well':'well_id'})
+    pred_meta = pred_meta.rename(columns={'well':'well'})
     
     return pred_df_name, pred_df, pred_meta
 
 
 def get_od_metrics(rf_df, od_df):
     # Merge RF and OD data into one dataframe
-    merged = od_df.merge(rf_df, how='inner', on=['experiment_id','well_id'])
+    merged = od_df.merge(rf_df, how='inner', on=['experiment_id','well'])
     
     # Store both sets of predictions as integers (0/1 -> dead/live)
     rf_preds = np.around(merged['predicted_output_mean_mean'].values).astype(int)
@@ -126,8 +126,8 @@ def main(data_converge_path : str,
     # Trim experiment_id values
     shift = len('experiment.transcriptic.')
     rf.loc[:, 'experiment_id'] = rf['experiment_id'].str[shift:]
-    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well_id
-    rf_df = rf.groupby(['experiment_id','well_id']).agg({'predicted_output_mean': [np.mean, np.std]})
+    # Get aggregate timepoint mean/std predictions by grouping over experiment_id and well
+    rf_df = rf.groupby(['experiment_id','well']).agg({'predicted_output_mean': [np.mean, np.std]})
     rf_df.columns = list(map('_'.join, rf_df.columns.values))
     
     # Read in Optical Density data
@@ -139,10 +139,10 @@ def main(data_converge_path : str,
     od_df = pd.read_csv(os.path.join(od_experiment, 'pdt_YeastSTATES-OR-Gate-CRISPR-Dose-Response__od_growth_analysis.csv'))
     # Drop Media Controls from OD data
     #od_df = od_df[od_df.strain != 'MediaControl'].reset_index()
-    od_df = od_df.rename(columns={'well':'well_id'})
+    # od_df = od_df.rename(columns={'well':'well_id'})
     #od_df = od_df[od_df.inducer_type == 'beta-estradiol'].reset_index()
     #od_df = od_df.drop('index', axis=1)
-    od_df = od_df.set_index(['experiment_id', 'well_id'])
+    od_df = od_df.set_index(['experiment_id', 'well'])
     
     od_loss, od_accuracy = get_od_metrics(rf_df, od_df)
     

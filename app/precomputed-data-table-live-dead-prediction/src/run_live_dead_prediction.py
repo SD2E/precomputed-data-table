@@ -29,15 +29,15 @@ def run_live_dead_prediction(exp_ref, exp_dir):
     #                                                                               weighted_controls,
     #                                                                               wass_path,
     #                                                                               control_size)
-    result, rf_df, test_accuracy, = main(exp_dir,
-                                         project_id,
-                                         low_control,
-                                         high_control,
-                                         weighted_controls,
-                                         wass_path,
-                                         control_size,
-                                         compute_wass=True,
-                                         plot=False)
+    result, rf_df, test_accuracy = main(exp_dir,
+                                        project_id,
+                                        low_control,
+                                        high_control,
+                                        weighted_controls,
+                                        wass_path,
+                                        control_size,
+                                        compute_wass=True,
+                                        plot=False)
 
     print('Test accuracy: {}'.format(test_accuracy))
 
