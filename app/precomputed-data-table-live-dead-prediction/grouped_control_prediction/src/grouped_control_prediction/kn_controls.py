@@ -29,7 +29,7 @@ def k_nearest_controls(exp_dir, ):
 
     # Set path to control data
     XPLAN_PROJECT = "sd2e-project-14"
-    xplan_base = os.path.join('/work/projects/SD2E-Community/prod/projects/sd2e-projects', XPLAN_PROJECT)
+    xplan_base = os.path.join('/work/projects/SD2E-Community/prod/projects', XPLAN_PROJECT)
     # xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
     path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
 
