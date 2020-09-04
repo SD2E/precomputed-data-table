@@ -12,12 +12,11 @@ from fcs_signal_prediction.utils import data_utils as du
 def get_controls(exp_dir):
 
     meta_df = du.get_meta(exp_dir, du.get_record(exp_dir))
-    control_df = meta_df[meta_df['strain_class'] == 'Control']
 
-    high_controls_df = control_df[control_df['control_type'] == 'HIGH_FITC']
+    high_controls_df = meta_df[meta_df['control_type'] == 'HIGH_FITC']
     high_controls = list(set(high_controls_df['strain_name'].values))
 
-    low_controls_df = control_df[control_df['control_type'] == 'EMPTY_VECTOR']
+    low_controls_df = meta_df[meta_df['control_type'] == 'EMPTY_VECTOR']
     low_controls = list(set(low_controls_df['strain_name'].values))
 
     return high_controls, low_controls
@@ -28,8 +27,8 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
     # high_control = 'CRISPR_CEN.PK2_positive_control_NOR_00_24864'
     # low_control = 'CRISPR_CEN.PK2_negative_control_23970'
     high_controls_list, low_controls_list = get_controls(exp_dir)
-    # print("high: {}".format(high_controls_list))
-    # print("low: {}".format(low_controls_list))
+    print("high: {}".format(high_controls_list))
+    print("low: {}".format(low_controls_list))
 
     results_dict = {}
     hl_combinations = list(product(high_controls_list, low_controls_list))
