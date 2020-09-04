@@ -12,8 +12,10 @@ from grouped_control_prediction.main import main
 from grouped_control_prediction.utils import data_utils as du
 
 
-def run_live_dead_prediction(exp_ref, exp_dir):
+def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
 
+    # add control_set_dir as input to main
+    
     # Set model parameters
     project_id = "sd2e-project-14"
     low_control = "CRISPR_CEN.PK2_negative_control_23970"
@@ -60,9 +62,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--experiment_ref', help='experimental reference from data science table')
     parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument("--control_set_dir", help="path to data for creating control sets")
+
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_exp_ref_dir = args.exp_ref_dir
+    arg_control_set_dir = args.control_set_dir
 
-    run_live_dead_prediction(arg_exp_ref, arg_exp_ref_dir)
+    run_live_dead_prediction(arg_exp_ref, arg_exp_ref_dir, arg_control_set_dir)

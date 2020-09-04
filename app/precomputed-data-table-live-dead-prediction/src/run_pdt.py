@@ -71,7 +71,7 @@ def confirm_data_types(er_file_list):
     return dtype_confirm_dict
 
 
-def main(exp_ref, analysis, out_dir, data_converge_dir):
+def main(exp_ref, analysis, out_dir, data_converge_dir, control_set_dir):
 
     # Check status of data in ER's record.json file
     path_to_record_json = return_er_record_path(data_converge_dir)
@@ -86,7 +86,7 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     if analysis == 'live_dead_prediction':
         import run_live_dead_prediction as live_dead_prediction
 
-        ld_pred_result_df, ld_pred_results_fname, raw_event_fname = live_dead_prediction.run_live_dead_prediction(exp_ref, data_converge_dir)
+        ld_pred_result_df, ld_pred_results_fname, raw_event_fname = live_dead_prediction.run_live_dead_prediction(exp_ref, data_converge_dir, control_set_dir)
         ld_pred_result_df.to_csv(ld_pred_results_fname, index=False)
         ld_pred_signal_dict = {raw_event_fname: [ld_pred_results_fname]}
         record = rpi.append_record(record, ld_pred_signal_dict, analysis, out_dir)
@@ -98,12 +98,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment_ref", help="experimental reference from data science table")
     parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
+    parser.add_argument("--control_set_dir", help="path to data for creating control sets")
     parser.add_argument("--analysis", help="analysis to run")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
     arg_data_converge_dir = args.data_converge_dir
+    arg_control_set_dir = args.control_set_dir
     arg_analysis = args.analysis
     arg_out_dir = "."
 
-    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir, arg_control_set_dir)
