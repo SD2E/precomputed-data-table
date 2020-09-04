@@ -18,10 +18,8 @@ def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
     
     # Set model parameters
     project_id = "sd2e-project-14"
-    # low_control = "CRISPR_CEN.PK2_negative_control_23970"
-    # high_control = "CRISPR_CEN.PK2_positive_control_NOR_00_24864"
-    low_control = "blank"
-    high_control = "blank"
+    low_control = "CRISPR_CEN.PK2_negative_control_23970"
+    high_control = "CRISPR_CEN.PK2_positive_control_NOR_00_24864"
     weighted_controls = True
     wass_path = "blank"
     control_size = 10
