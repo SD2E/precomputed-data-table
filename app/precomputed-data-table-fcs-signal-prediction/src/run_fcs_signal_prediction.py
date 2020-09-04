@@ -28,6 +28,8 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
     # high_control = 'CRISPR_CEN.PK2_positive_control_NOR_00_24864'
     # low_control = 'CRISPR_CEN.PK2_negative_control_23970'
     high_controls_list, low_controls_list = get_controls(exp_dir)
+    print("high: {}".format(high_controls_list))
+    print("low: {}".format(low_controls_list))
 
     results_dict = {}
     hl_combinations = list(product(high_controls_list, low_controls_list))
