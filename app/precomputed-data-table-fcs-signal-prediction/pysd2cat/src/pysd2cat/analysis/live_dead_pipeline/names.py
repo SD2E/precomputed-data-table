@@ -6,6 +6,7 @@ class Names:
     label_preds = "label_predictions"
     cluster_preds = "cluster_predictions"
     data_file_name = "pipeline_data.csv"
+    # data_file_name = "sampled_data_for_testing.csv"
 
     # strains
     yeast = "yeast"
@@ -21,7 +22,7 @@ class Names:
                   ecoli: [0, 5, 10, 15, 40]},
         heat: [0]
     }
-    timepoints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    time_points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
     # feature columns
     morph_cols = ["FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W"]

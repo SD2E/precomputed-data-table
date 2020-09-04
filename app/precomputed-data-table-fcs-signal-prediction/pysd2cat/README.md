@@ -13,9 +13,16 @@ Currently, `pysd2cat` runs on the TACC infrastructure so that it may have fast a
 
 * Clone the repo: `https://gitlab.sd2e.org/dbryce/pysd2cat.git`
 * `cd pysd2cat`
+
+Two install options are available, with or without test-harness:
+
+Without test-harness installed:
 * `python setup.py install`
 
-To run an example analysis script, run:
+With test-harness installed:
+* `pip install -e . [harness]`
+
+To run an example analysis script (test-harness needed), run:
 * `python src/pysd2cat/analysis/live_dead_analysis.py`
 
 Environment Configuration:

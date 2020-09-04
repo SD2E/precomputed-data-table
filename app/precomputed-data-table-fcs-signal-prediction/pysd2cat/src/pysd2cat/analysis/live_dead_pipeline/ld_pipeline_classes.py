@@ -8,6 +8,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly
+# TODO: figure out orca package issues (will allow us to save plotly figures as static pngs)
+# plotly.io.orca.config.executable = 'orca.app'
+# /Users/he/anaconda3/bin/orca.app
+import plotly.express as px
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -168,17 +173,17 @@ class LiveDeadPipeline:
         #                 [1120.0, 1, 1]])
         # for i in ets:
         #     ethanol = i[0]
-        #     timepoint = i[1]
+        #     time_point = i[1]
         #     stain = i[2]
         #     df_sub = self.x_df[(self.x_df['ethanol'] == ethanol) &
-        #                     (self.x_df['time_point'] == timepoint) &
+        #                     (self.x_df['time_point'] == time_point) &
         #                     (self.x_df['stain'] == stain)]
         #     if negative_outlier_cutoff is not None:
         #         df_sub = df_sub.loc[df_sub[channel] >= negative_outlier_cutoff]
         #     print(len(df_sub))
         #
         #     sns.distplot(df_sub[channel], bins=50, color=next(palette), norm_hist=False, kde=False,
-        #                  label="Eth: {}, Time: {}, Stain: {}".format(ethanol, timepoint, stain))
+        #                  label="Eth: {}, Time: {}, Stain: {}".format(ethanol, time_point, stain))
         #
         # plt.legend()
         # if negative_outlier_cutoff is not None:
@@ -193,8 +198,8 @@ class LiveDeadPipeline:
 
     def condition_method(self, live_conditions=None, dead_conditions=None):
         """
-        Define certain tuples of (treatment, time-point) as live or dead.
-            E.g. (0-treatment, final timepoint) = live, (max-treatment, final timepoint) = dead
+        Define certain tuples of (treatment, time_point) as live or dead.
+            E.g. (0-treatment, final time_point) = live, (max-treatment, final time_point) = dead
         Train supervised model on those definitions, and predict live/dead for all points.
         Final product is dataframe with original data and predicted labels, which is set to self.predicted_data
 
@@ -208,9 +213,9 @@ class LiveDeadPipeline:
         print("Starting {} labeling".format(labeling_method_name))
 
         if live_conditions is None:
-            live_conditions = [{self.x_treatment: n.treatments_dict[self.x_treatment][self.x_strain][0], n.time: n.timepoints[-1]}]
+            live_conditions = [{self.x_treatment: n.treatments_dict[self.x_treatment][self.x_strain][0], n.time: n.time_points[-1]}]
         if dead_conditions is None:
-            dead_conditions = [{self.x_treatment: n.treatments_dict[self.x_treatment][self.x_strain][-1], n.time: n.timepoints[-1]}]
+            dead_conditions = [{self.x_treatment: n.treatments_dict[self.x_treatment][self.x_strain][-1], n.time: n.time_points[-1]}]
         print("Conditions designated as Live: {}".format(live_conditions))
         print("Conditions designated as Dead: {}".format(dead_conditions))
         print()
@@ -236,7 +241,7 @@ class LiveDeadPipeline:
         # Invoke Test Harness
         run_id = self.invoke_test_harness(train_df=train_df, test_df=test_df, pred_df=self.y_df)
         labeled_df = pd.read_csv(os.path.join(self.runs_path, "run_{}/predicted_data.csv".format(run_id)))
-        print(labeled_df.head())
+        # print(labeled_df.head())
 
         self.labeled_data_dict[labeling_method_name] = labeled_df
 
@@ -256,7 +261,7 @@ class LiveDeadPipeline:
         labeled_df = self.x_df.copy()
         labeled_df.loc[labeled_df[channel] >= threshold, n.label_preds] = 1
         labeled_df.loc[labeled_df[channel] < threshold, n.label_preds] = 0
-        print(labeled_df.head())
+        # print(labeled_df.head())
 
         self.labeled_data_dict[labeling_method_name] = labeled_df
 
@@ -313,7 +318,7 @@ class LiveDeadPipeline:
         labeled_df.loc[labeled_df[n.cluster_preds] == live_clusters, n.label_preds] = 1  # live
         print(labeled_df[n.label_preds].value_counts(dropna=False))
         print()
-        print(labeled_df.head())
+        # print(labeled_df.head())
 
         self.labeled_data_dict[labeling_method_name] = labeled_df
         # self.invoke_test_harness() ?
@@ -326,18 +331,19 @@ class LiveDeadPipeline:
         if labeling_method not in self.labeled_data_dict.keys():
             raise NotImplementedError("The labeling method you are trying to evaluate has not been run yet."
                                       "Please run the labeling method first.")
-        ratio_df = self.time_series_plot(labeling_method=labeling_method)
-        self.timeseries_scatter(labeling_method=labeling_method)
+        ratio_df = self.plot_percent_live_over_conditions(labeling_method=labeling_method)
+        self.plot_features_over_conditions(labeling_method=labeling_method)
 
-    def time_series_plot(self, labeling_method):
+    def plot_percent_live_over_conditions(self, labeling_method):
         """
-        Takes in a dataframe that has been labeled and generates a time-series plot of
-        percent alive vs. time, colored by treatment amount.
+        Plots percent live (predicted) over all of the y_experiment conditions.
+        Takes in a dataframe that has been labeled and generates a
+        plot of percent alive vs. time, colored by treatment amount.
         This serves as a qualitative metric that allows us to compare different methods of labeling live/dead.
         """
         matplotlib.use("tkagg")
         if labeling_method not in self.labeled_data_dict.keys():
-            raise NotImplementedError("The labeling method you are trying to create a time_series_plot for has not been run yet."
+            raise NotImplementedError("The labeling method you are trying to create a plot for has not been run yet."
                                       "Please run the labeling method first.")
         else:
             labeled_df = self.labeled_data_dict[labeling_method]
@@ -365,67 +371,39 @@ class LiveDeadPipeline:
 
         return ratio_df
 
-    # TODO: explore other bivariate distribution plots like hexbin plots
-    # https://seaborn.pydata.org/tutorial/distributions.html
-    def timeseries_scatter(self, labeling_method, xcol="log_SSC-A", ycol="log_RL1-A", sample_fraction=0.1, kdeplot=False):
-        matplotlib.use("tkagg")
+    def plot_features_over_conditions(self, labeling_method, axis_1="log_SSC-A", axis_2="log_RL1-A",
+                                      sample_fraction=0.1, kdeplot=False):
+        """
+        Will use self.y_df not self.x_df
+        """
+        # matplotlib.use("tkagg")
         if labeling_method not in self.labeled_data_dict.keys():
-            raise NotImplementedError("The labeling method you are trying to create a time_series_plot for has not been run yet."
+            raise NotImplementedError("The labeling method you are trying to create a plot for has not been run yet."
                                       "Please run the labeling method first.")
         else:
             labeled_df = self.labeled_data_dict[labeling_method]
 
-        if xcol not in labeled_df.columns.values:
-            labeled_df = pd.merge(labeled_df, self.y_df[[n.index, xcol]], on=n.index)
-        if ycol not in labeled_df.columns.values:
-            labeled_df = pd.merge(labeled_df, self.y_df[[n.index, ycol]], on=n.index)
+        if axis_1 not in labeled_df.columns.values:
+            labeled_df = pd.merge(labeled_df, self.y_df[[n.index, axis_1]], on=n.index)
+        if axis_2 not in labeled_df.columns.values:
+            labeled_df = pd.merge(labeled_df, self.y_df[[n.index, axis_2]], on=n.index)
 
-        fig, ax = plt.subplots(ncols=len(n.timepoints), nrows=len(n.treatments_dict[self.y_treatment][self.y_strain]),
-                               figsize=(4 * len(n.timepoints), 4 * len(n.treatments_dict[self.y_treatment][self.y_strain])), dpi=200)
-        # iterate through rows of subplots. Each row corresponds to a treatment concentration
-        for i, row in enumerate(ax):
-            curr_treatment = n.treatments_dict[self.y_treatment][self.y_strain][i]  # current treatment conc to deal with
-            # iterate through columns of subplots. Each column corresponds to a time-point
-            for j, col in enumerate(row):
-                curr_time = n.timepoints[j]  # current time-point to deal with
-                subplot_df = labeled_df.loc[(labeled_df[self.y_treatment] == curr_treatment) &
-                                            (labeled_df[n.time] == curr_time)]
-                live_df = subplot_df.loc[subplot_df[n.label_preds] == 1]
-                dead_df = subplot_df.loc[subplot_df[n.label_preds] == 0]
-                live_df = live_df.sample(frac=sample_fraction)
-                dead_df = dead_df.sample(frac=sample_fraction)
-                try:
-                    if kdeplot:
-                        sns.kdeplot(live_df[xcol], live_df[ycol], ax=col, alpha=0.5, cmap="Blues", shade=True, label="Live",
-                                    shade_lowest=False,
-                                    dropna=True)
-                    else:
-                        col.scatter(live_df[xcol], live_df[ycol], c="Blue", label="pred_{}".format("live"),
-                                    s=100, alpha=0.4, marker='o', edgecolor='black', linewidth='0')
-                except Exception as e:
-                    pass
-                try:
-                    if kdeplot:
-                        sns.kdeplot(dead_df[xcol], dead_df[ycol], ax=col, alpha=0.5, cmap="Reds", shade=True, label="Dead",
-                                    shade_lowest=False,
-                                    dropna=True)
-                    else:
-                        col.scatter(dead_df[xcol], dead_df[ycol], c="Red", label="pred_{}".format("dead"),
-                                    s=100, alpha=0.4, marker='o', edgecolor='black', linewidth='0')
-                    col.legend()
-                except Exception as e:
-                    pass
+        if set(labeled_df[n.time].unique()) != set(n.time_points):
+            raise Warning("The unique values in the {} column of labeled_df "
+                          "do not match those in n.time_points: {}".format(n.time, n.time_points))
 
-                col.set_xlabel("{}".format(xcol))
-                col.set_ylabel("{}".format(ycol))
-                col.set_xlim(0, 7)
-                col.set_ylim(0, 7)
+        plotly_fig = grid_of_distributions_over_conditions(df1=labeled_df, axis_1=axis_1, axis_2=axis_2,
+                                                           grid_rows_source=self.y_treatment,
+                                                           grid_cols_source=n.time,
+                                                           color_source=n.label_preds,
+                                                           sample_fraction=sample_fraction, df2=None, kdeplot=kdeplot)
 
-                col.set_title("Ethanol (uL): " + str(curr_treatment) + " Time (h): " + str(curr_time))
-        plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        plt.title(self.y_strain)
-        plt.savefig(os.path.join(self.output_path, "scatter_{}_{}_{}.png".format(labeling_method, xcol, ycol)))
-        plt.close(fig)
+        html_output = os.path.join(self.output_path, "scatter_{}_{}_{}.html".format(labeling_method, axis_1, axis_2))
+        png_output = os.path.join(self.output_path, "scatter_{}_{}_{}.png".format(labeling_method, axis_1, axis_2))
+
+        plotly_fig.write_html(html_output)
+        # saving as static image (png) doesn't currently work, need to figure out issues with orca package
+        # plotly_fig.write_image(png_output)
 
     def quantitative_metrics(self, labeling_method):
         """
@@ -438,4 +416,175 @@ class LiveDeadPipeline:
 
 
 class ComparePipelines:
-    pass
+    """
+    Allows for the comparison of the labeling results of two pipelines
+    """
+
+    def __init__(self, ld_pipeline_1, ld_pipeline_2):
+        self.ld_pipeline_1 = ld_pipeline_1
+        self.ld_pipeline_2 = ld_pipeline_2
+
+        # TODO update output_path to make things simpler/clearer
+        self.output_dir_name = "[{}]_vs_[{}]".format(self.ld_pipeline_1.output_dir_name, self.ld_pipeline_2.output_dir_name)
+        self.output_path = os.path.join(current_dir_path, n.pipeline_output_dir, "compare_pipelines", self.output_dir_name)
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+
+    def compare_plots_of_features_over_conditions(self, labeling_method_1, labeling_method_2,
+                                                  axis_1="log_SSC-A", axis_2="log_RL1-A",
+                                                  sample_fraction=0.1, kdeplot=False):
+        """
+        """
+        if labeling_method_1 not in self.ld_pipeline_1.labeled_data_dict.keys():
+            raise NotImplementedError("The labeling method you are trying to create a plot for has not been run yet."
+                                      "Please run the labeling method first.")
+        else:
+            labeled_df_1 = self.ld_pipeline_1.labeled_data_dict[labeling_method_1]
+
+        if labeling_method_2 not in self.ld_pipeline_2.labeled_data_dict.keys():
+            raise NotImplementedError("The labeling method you are trying to create a plot for has not been run yet."
+                                      "Please run the labeling method first.")
+        else:
+            labeled_df_2 = self.ld_pipeline_2.labeled_data_dict[labeling_method_2]
+
+        if axis_1 not in labeled_df_1.columns.values:
+            labeled_df = pd.merge(labeled_df_1, self.ld_pipeline_1.y_df[[n.index, axis_1]], on=n.index)
+        if (axis_2 is not None) & (axis_2 not in labeled_df_1.columns.values):
+            labeled_df = pd.merge(labeled_df_1, self.ld_pipeline_1.y_df[[n.index, axis_2]], on=n.index)
+
+        if axis_1 not in labeled_df_2.columns.values:
+            labeled_df = pd.merge(labeled_df_2, self.ld_pipeline_2.y_df[[n.index, axis_1]], on=n.index)
+        if (axis_2 is not None) & (axis_2 not in labeled_df_2.columns.values):
+            labeled_df = pd.merge(labeled_df_2, self.ld_pipeline_2.y_df[[n.index, axis_2]], on=n.index)
+
+        plotly_fig = grid_of_distributions_over_conditions(df1=labeled_df_1, axis_1=axis_1, axis_2=axis_2,
+                                                           grid_rows_source=self.ld_pipeline_1.y_treatment,
+                                                           grid_cols_source=n.time,
+                                                           color_source=n.label_preds,
+                                                           sample_fraction=sample_fraction,
+                                                           df2=labeled_df_2, kdeplot=kdeplot)
+
+        # TODO update this file name to include labeling_method_2 or somehow make things clearer
+        html_output = os.path.join(self.output_path, "scatter_{}_{}_{}.html".format(labeling_method_1, axis_1, axis_2))
+        png_output = os.path.join(self.output_path, "scatter_{}_{}_{}.png".format(labeling_method_1, axis_1, axis_2))
+
+        plotly_fig.write_html(html_output)
+        # saving as static image (png) doesn't currently work, need to figure out issues with orca package
+        # plotly_fig.write_image(png_output)
+
+
+def grid_of_distributions_over_conditions(df1, axis_1, axis_2,
+                                          grid_rows_source, grid_cols_source, color_source,
+                                          sample_fraction=0.1, df2=None, kdeplot=False):
+    """
+    I put this into it's own function because it can be used by both LiveDeadPipeline and ComparePipelines.
+    Returns a seaborn FacetGrid.
+    If axis_2 = None, will create histograms of the distribution of the axis_1 feature.
+    If both df1 and df2 are provided, then both datasets will be plotted and the legend will differentiate.
+        - if using both df1 and df2, then their treatment type and concentrations should be the same
+        - same goes for time_points
+    """
+    matplotlib.use("tkagg")
+
+    assert isinstance(df1, pd.DataFrame), "df1 must be a Pandas DataFrame."
+    assert isinstance(axis_1, str), "axis_1 must be a string."
+    assert (isinstance(axis_2, str)) or (axis_2 is None), "axis_2 must be a string or None."
+
+    if axis_2 is None:
+        relevant_columns = [axis_1, grid_rows_source, grid_cols_source, color_source]
+    else:
+        relevant_columns = [axis_1, axis_2, grid_rows_source, grid_cols_source, color_source]
+    df1 = df1[relevant_columns].copy()
+
+    if df2 is not None:
+        df2 = df2[relevant_columns].copy()
+
+        df1_grid_cols = set(df1[grid_cols_source].unique())
+        df1_grid_rows = set(df1[grid_rows_source].unique())
+        df2_grid_cols = set(df2[grid_cols_source].unique())
+        df2_grid_rows = set(df2[grid_rows_source].unique())
+        if df1_grid_cols != df2_grid_cols:
+            raise Warning("The unique values in the {} column "
+                          "do not match between df1 and df2".format(grid_cols_source))
+        if df1_grid_rows != df2_grid_rows:
+            raise Warning("The unique values in the {} column "
+                          "do not match between df1 and df2".format(grid_rows_source))
+
+    if sample_fraction < 1.0:
+        # using train_test_split to get a stratified sample of the data
+        df1, _ = train_test_split(df1, train_size=sample_fraction, random_state=5,
+                                  stratify=df1[[grid_rows_source, grid_cols_source, color_source]])
+        if df2 is not None:
+            df2, _ = train_test_split(df2, train_size=sample_fraction, random_state=5,
+                                      stratify=df2[[grid_rows_source, grid_cols_source, color_source]])
+
+    df1[color_source] = df1[color_source].astype(int)
+    if df2 is None:
+        df1[color_source] = df1[color_source].astype(str)
+        df_plot = df1.copy()
+    else:
+        df2[color_source] = df2[color_source].astype(int)
+        df1[color_source] = 'df1_' + df1[color_source].astype(str)
+        df2[color_source] = 'df2_' + df2[color_source].astype(str)
+        df_plot = pd.concat([df1, df2])
+
+    grid_col_order = list(df_plot[grid_cols_source].unique())
+    grid_row_order = list(df_plot[grid_rows_source].unique())
+    grid_hue_order = list(df_plot[color_source].unique())
+    grid_col_order.sort()
+    grid_row_order.sort()
+    grid_hue_order.sort()
+
+    # Plotting code is below here
+    if axis_2 is not None:
+        plotly_fig = px.scatter(df_plot, x=axis_1, y=axis_2, color=color_source, size=None,
+                                facet_col=grid_cols_source, facet_row=grid_rows_source,
+                                category_orders={grid_cols_source: grid_col_order,
+                                                 grid_rows_source: grid_row_order,
+                                                 color_source: grid_hue_order},
+                                opacity=0.5)
+    else:
+        raise NotImplementedError("single axis distplots have not been implemented yet")
+
+    return plotly_fig
+
+
+"""
+Archived code, will use or delete later, didn't want to delete for now
+
+Scatterplot grid code:
+
+        # relplot way:
+        with sns.plotting_context(rc={"legend.fontsize": 60}):
+            grid = sns.relplot(x=axis_1, y=axis_2, alpha=0.5, data=df_plot, col=grid_cols_source, row=grid_rows_source, hue=color_source,
+                               col_order=grid_col_order, row_order=grid_row_order, hue_order=grid_hue_order, legend="full")
+                                       
+
+        # FacetGrid way:
+        grid = sns.FacetGrid(data=df_plot, col=grid_cols_source, row=grid_rows_source, hue=color_source,
+                             col_order=grid_col_order, row_order=grid_row_order, hue_order=grid_hue_order)
+        grid.map(sns.scatterplot, axis_1, axis_2)
+        # plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+        grid.fig.subplots_adjust(top=0.8)
+        grid.fig.suptitle("BOOGALOO", size=20, horizontalalignment="center")
+        grid.add_legend(title="LEGEND", bbox_to_anchor=(0.5, 0.85), ncol=len(grid_col_order), fontsize=14, title_fontsize=100)
+        grid.savefig("asdf.png")
+        sys.exit(0)
+        
+        
+        # Updating legend
+        legend = grid._legend
+        legend.set_bbox_to_anchor([0.5, 0.95])  # legend coordinates
+        legend._loc = 9  # says which part of the bbox to put at the coordinates above (9 stands for upper center)
+        legend._fancybox = True
+        legend._title = "LEGEND"
+        legend._fontsize = 25
+        legend._title_fontsize = 50
+        legend._ncol = 1
+        
+
+Distplot code:
+        grid = sns.FacetGrid(data=df_plot, col=grid_cols_source, row=grid_rows_source, hue=color_source,
+                             col_order=grid_col_order, row_order=grid_row_order, hue_order=grid_hue_order)
+        grid.map(sns.distplot, axis_1, bins=100, label="testing123", norm_hist=False, kde=False)
+"""
