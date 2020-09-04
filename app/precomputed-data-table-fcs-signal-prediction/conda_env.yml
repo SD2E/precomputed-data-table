@@ -11,7 +11,7 @@ dependencies:
       - numpy
       - pandas
       - scikit-learn
-#      - -e ../fcs_signal_prediction
-#      - -e ../pysd2cat
-      - -e ../src/fcs_signal_prediction
-      - -e ../src/pysd2cat
+#      - -e cs_signal_prediction
+#      - -e pysd2cat
+      - -e src/fcs_signal_prediction
+      - -e src/pysd2cat

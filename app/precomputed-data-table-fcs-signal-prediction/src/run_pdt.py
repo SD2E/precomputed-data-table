@@ -86,9 +86,11 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     if analysis == 'fcs_signal_prediction':
         import run_fcs_signal_prediction as fcs_signal_prediction
 
-        fcs_result_df, fcs_results_fname, raw_event_fname = fcs_signal_prediction.run_fcs_signal_prediction(exp_ref, data_converge_dir)
-        fcs_result_df.to_csv(fcs_results_fname, index=False)
-        fcs_signal_dict = {raw_event_fname: [fcs_results_fname]}
+        fcs_result_dict, raw_event_fname = fcs_signal_prediction.run_fcs_signal_prediction(exp_ref, data_converge_dir)
+        for results_name, results_df in fcs_result_dict.items():
+            results_df.to_csv(results_name, index=False)
+
+        fcs_signal_dict = {raw_event_fname: list(fcs_result_dict.keys())}
         record = rpi.append_record(record, fcs_signal_dict, analysis, out_dir)
 
         with open(record_path, 'w') as jfile:
