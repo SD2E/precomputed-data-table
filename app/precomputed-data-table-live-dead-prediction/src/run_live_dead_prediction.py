@@ -18,19 +18,14 @@ def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
     
     # Set model parameters
     project_id = "sd2e-project-14"
-    low_control = "CRISPR_CEN.PK2_negative_control_23970"
-    high_control = "CRISPR_CEN.PK2_positive_control_NOR_00_24864"
+    # low_control = "CRISPR_CEN.PK2_negative_control_23970"
+    # high_control = "CRISPR_CEN.PK2_positive_control_NOR_00_24864"
+    low_control = "blank"
+    high_control = "blank"
     weighted_controls = True
     wass_path = "blank"
     control_size = 10
 
-    # result, rf_df, test_accuracy, timeseries_fig, samples_and_controls_fig = main(exp_dir,
-    #                                                                               project_id,
-    #                                                                               low_control,
-    #                                                                               high_control,
-    #                                                                               weighted_controls,
-    #                                                                               wass_path,
-    #                                                                               control_size)
     result, rf_df, test_accuracy = main(exp_dir,
                                         project_id,
                                         low_control,
@@ -38,7 +33,7 @@ def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
                                         weighted_controls,
                                         wass_path,
                                         control_size,
-                                        compute_wass=True,
+                                        control_set_dir=control_set_dir,
                                         plot=False)
 
     print('Test accuracy: {}'.format(test_accuracy))

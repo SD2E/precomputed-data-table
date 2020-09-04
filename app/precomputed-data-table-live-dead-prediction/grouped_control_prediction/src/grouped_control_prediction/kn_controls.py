@@ -14,7 +14,7 @@ from scipy.stats import wasserstein_distance as wd
 from grouped_control_prediction.utils import data_utils as du
 
 
-def k_nearest_controls(exp_dir, ):
+def k_nearest_controls(exp_dir, control_set_dir):
 
     # Load prediction data
     experiment_df = du.get_data_and_metadata(exp_dir)
@@ -28,10 +28,10 @@ def k_nearest_controls(exp_dir, ):
     exp_grouped = experiment_df.groupby(['strain_name', 'timepoint', 'inducer_concentration', 'replicate'])
 
     # Set path to control data
-    XPLAN_PROJECT = "sd2e-project-14"
-    xplan_base = os.path.join('/work/projects/SD2E-Community/prod/projects', XPLAN_PROJECT)
-    # xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
-    path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
+    # XPLAN_PROJECT = "sd2e-project-14"
+    # xplan_base = os.path.join('/work/projects/SD2E-Community/prod/projects', XPLAN_PROJECT)
+    # # xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
+    # path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
 
     # Initialize control distance dictionary and counter
     distances = dict()
@@ -41,14 +41,14 @@ def k_nearest_controls(exp_dir, ):
     k = 10
 
     # Loop through control data files and get k-nearest using Wasserstein distance as 'closeness' metric
-    for exp in os.listdir(path):
+    for exp in os.listdir(control_set_dir):
         if ".csv" in exp:
             # Print counter
             count += 1
             print(str(count) + "/109 (" + exp + ")")
 
             # Extract current control data and rename channel columns
-            exp_flow = pd.read_csv(os.path.join(path, exp), index_col=0)
+            exp_flow = pd.read_csv(os.path.join(control_set_dir, exp), index_col=0)
             controls = exp_flow.loc[
                 (exp_flow.strain_name == "WT-Live-Control") | (exp_flow.strain_name == "WT-Dead-Control")]
             controls = controls.rename(columns=renaming)

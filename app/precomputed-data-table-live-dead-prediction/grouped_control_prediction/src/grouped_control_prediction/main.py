@@ -22,9 +22,9 @@ parser.add_argument('wass_path', type=str,
                     help='Path to Wasserstein Distances')
 parser.add_argument('control_size', type=int,
                     help='Number of control experiments to group in training set')
-parser.add_argument('compute_wass', type=bool, default=False,
-                    help='Compute wasserstein distances for controls instead of using cached distances. \
-                    <wass_path> can be empty string if <compute_wass> set to True.')
+parser.add_argument('control_set_dir', type=str, default='',
+                    help='Path to control experiments for computing wasserstein distances \
+                     instead of using cached distances.')
 parser.add_argument('--id_col', type=str,
                     help='Sample id column name', default="sample_id")
 parser.add_argument('--strain_col', type=str,
@@ -42,7 +42,7 @@ def main(data_converge_path: str,
          weighted : bool,
          wass_path : str,
          control_size : int,
-         compute_wass: Optional[bool] = False,
+         control_set_dir: Optional[str] = '',
          id_col : Optional[str] = "sample_id",
          strain_col : Optional[str] = 'strain_name',
          out_path : Optional[str] = '.',
@@ -72,7 +72,7 @@ def main(data_converge_path: str,
                                                                  id_col,
                                                                  channels,
                                                                  out_path,
-                                                                 compute_wass=compute_wass,
+                                                                 control_set_dir=control_set_dir,
                                                                  strain_col=strain_col)
 
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     weighted = args.weighted
     wass_path = args.wass_path
     control_size = args.control_size
-    compute_wass = args.compute_wass
+    control_set_dir = args.control_set_dir
     id_col = args.id_col
     strain_col = args.strain_col
     out_path = args.out_path
@@ -127,7 +127,7 @@ if __name__ == '__main__':
          weighted,
          wass_path,
          control_size,
-         compute_wass=compute_wass,
+         control_set_dir=control_set_dir,
          id_col=id_col,
          strain_col=strain_col,
          out_path=out_path,
