@@ -10,7 +10,10 @@ python run_od_growth_analysis.py "YeastSTATES-CRISPR-Short-Duration-Time-Series-
 import pandas as pd
 import argparse
 import os
+import json
 from xplan_od_growth_analysis import analysis_frame_api
+from common import record_product_info as rpi
+from common import preproc
 
 
 def grab_pr_dataframe(exp_ref, er_dir):
@@ -77,19 +80,37 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
     return rg_od_analysis_df, pr_fname
 
 
-if __name__ == '__main__':
+def main(exp_ref, analysis, out_dir, data_converge_dir):
 
+    # Check status of data in ER's record.json file
+    path_to_record_json = preproc.return_er_record_path(data_converge_dir)
+    preproc.check_er_status(path_to_record_json)
+
+    # confirm presence of data(frame) types
+    data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
+
+    record_path = os.path.join(out_dir, "record.json")
+
+    rg_od_analysis_df, pr_fname = run_od_analysis(exp_ref, data_converge_dir, data_confirm_dict)
+    od_growth_fname = 'pdt_{}__od_growth_analysis.csv'.format(exp_ref)
+    rg_od_analysis_df.to_csv(od_growth_fname, index=False)
+    od_growth_fname_dict = {pr_fname: [od_growth_fname]}
+    record = {}
+    record = rpi.append_record(record, od_growth_fname_dict, analysis, out_dir)
+
+    with open(record_path, 'w') as jfile:
+        json.dump(record, jfile, indent=2)
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
-    parser.add_argument('--data_confirm_dict', help='dictionary containing information on available data'
-                                                  ' in experimental reference')
-    parser.add_argument("output_dir", help="directory where to write the output files")
-    # parser.add_argument("output_dir", help="directory where to write the output files")
+    parser.add_argument("--experiment_ref", help="experimental reference from data science table")
+    parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
+    parser.add_argument("--analysis", help="analysis to run")
+
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
-    arg_exp_ref_dir = args.exp_ref_dir
-    arg_conf_dict = args.data_confirm_dict
-    arg_out_dir = args.output_dir
+    arg_data_converge_dir = args.data_converge_dir
+    arg_analysis = args.analysis
+    arg_out_dir = "."
 
-    run_od_analysis(arg_exp_ref, arg_exp_ref_dir, arg_conf_dict, arg_out_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
