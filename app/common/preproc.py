@@ -1,21 +1,10 @@
 """
-run all parts of the Precomputed Data Table pipeline to gather, analyze, save data;
-make summaries of the data, and make a record of the data product.
-
-to see arguments and descriptions:
-python run_pdt.py --help
-example command:
-python run_pdt.py "YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208" ../pdt_output/ hpc_path
-
-:authors: Robert C. Moseley (robert.moseley@duke.edu)
+Extracted from run_pdt.py
 """
-
-import argparse
 import os
 import json
-import record_product_info as rpi
 
-
+# Note from George: This function is not used anywhere
 def get_latest_er(exp_ref, dc_dir):
     # must be looking in sd2e-projects/sd2e-project-43/reactor_outputs/complete
     all_er_dirs = os.listdir(dc_dir)
@@ -69,39 +58,3 @@ def confirm_data_types(er_file_list):
                 dtype_confirm_dict[dtype] = True
 
     return dtype_confirm_dict
-
-
-def main(exp_ref, analysis, out_dir, data_converge_dir):
-
-    # Check status of data in ER's record.json file
-    path_to_record_json = return_er_record_path(data_converge_dir)
-    check_er_status(path_to_record_json)
-
-    # confirm presence of data(frame) types
-    data_confirm_dict = confirm_data_types(os.listdir(data_converge_dir))
-
-    record_path = os.path.join(out_dir, "record.json")
-
-    record = {}
-    if analysis == 'wasserstein':
-        import run_wasserstein_tenfold_comparisons as wasser_analysis
-
-        wasser_fname_dict = wasser_analysis.run_wasser_tenfold(exp_ref, data_converge_dir)
-        record = rpi.append_record(record, wasser_fname_dict, analysis, out_dir)
-
-        with open(record_path, 'w') as jfile:
-            json.dump(record, jfile, indent=2)
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--experiment_ref", help="experimental reference from data science table")
-    parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
-    parser.add_argument("--analysis", help="analysis to run")
-
-    args = parser.parse_args()
-    arg_exp_ref = args.experiment_ref
-    arg_data_converge_dir = args.data_converge_dir
-    arg_analysis = args.analysis
-    arg_out_dir = "."
-
-    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
