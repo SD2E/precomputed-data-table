@@ -32,7 +32,7 @@ def get_index_pair_value(results,samp_id_order,id1,id2):
     return results[ind1,ind2]
 
 
-def compute_difference(results_df, metadata_file, columns, comparison_column, comparison_values):
+def wasserstein_lookup(results_df, metadata_file, columns, comparison_column, comparison_values):
     '''
     results_file = Wasserstein results
     metadata_file = csv with merged metadata columns
