@@ -7,14 +7,16 @@ python run_wasserstein_tenfold_comparisons.py "YeastSTATES-CRISPR-Short-Duration
 :authors: Bree Cummins & Robert C. Moseley (robert.moseley@duke.edu)
 """
 
-import os
 import argparse
+import os
+import json
 import subprocess
 import sys
 import pandas as pd
 import wasserstein_analysis as wasser
 import TenFoldComparisons as tenfoldcomp
-
+from common import record_product_info as rpi
+from common import preproc
 
 def run_wasserstain_analysis(er_dir, datafile):
 
@@ -130,14 +132,35 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
 
     return fname_dict
 
-if __name__ == '__main__':
+def main(exp_ref, analysis, out_dir, data_converge_dir):
 
+    # Check status of data in ER's record.json file
+    path_to_record_json = preproc.return_er_record_path(data_converge_dir)
+    preproc.check_er_status(path_to_record_json)
+
+    # confirm presence of data(frame) types
+    data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
+
+    record_path = os.path.join(out_dir, "record.json")
+
+    record = {}
+
+    wasser_fname_dict = run_wasser_tenfold(exp_ref, data_converge_dir)
+    record = rpi.append_record(record, wasser_fname_dict, analysis, out_dir)
+
+    with open(record_path, 'w') as jfile:
+        json.dump(record, jfile, indent=2)
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument("--experiment_ref", help="experimental reference from data science table")
+    parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
+    parser.add_argument("--analysis", help="analysis to run")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
-    arg_exp_ref_dir = args.exp_ref_dir
+    arg_data_converge_dir = args.data_converge_dir
+    arg_analysis = args.analysis
+    arg_out_dir = "."
 
-    run_wasser_tenfold(arg_exp_ref, arg_exp_ref_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir)
