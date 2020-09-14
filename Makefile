@@ -31,6 +31,7 @@ export PDT_LIVE_DEAD_PREDICTION_DIR := app/precomputed-data-table-live-dead-pred
 all: reactor-image app-image
 
 reactor-image:
+	python record_product_info.py > version.txt; \
 	abaco deploy -R -F Dockerfile -k -B reactor.rc -R -t $(GITREF) $(ABACO_DEPLOY_OPTS)
 
 # Apparently apps-build-container ignores the -f flag, thus we have to move the two Dockerfiles around below
