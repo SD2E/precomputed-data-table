@@ -8,9 +8,10 @@ import argparse
 import numpy as np
 import pandas as pd
 from os.path import expanduser
-from grouped_control_prediction.main import main
+from grouped_control_prediction.main import gcpm
 from grouped_control_prediction.utils import data_utils as du
-
+from common import record_product_info as rpi
+from common import preproc
 
 def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
 
@@ -24,7 +25,7 @@ def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
     wass_path = "blank"
     control_size = 10
 
-    result, rf_df, test_accuracy = main(exp_dir,
+    result, rf_df, test_accuracy = gcpm(exp_dir,
                                         project_id,
                                         low_control,
                                         high_control,
@@ -50,17 +51,39 @@ def run_live_dead_prediction(exp_ref, exp_dir, control_set_dir):
     return rf_df, results_fname, dc_input_fname
 
 
-if __name__ == "__main__":
+def main(exp_ref, analysis, out_dir, data_converge_dir, control_set_dir):
 
+    # Check status of data in ER's record.json file
+    path_to_record_json = preproc.return_er_record_path(data_converge_dir)
+    preproc.check_er_status(path_to_record_json)
+
+    # confirm presence of data(frame) types
+    data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
+
+    record_path = os.path.join(out_dir, "record.json")
+
+    record = {}
+
+    ld_pred_result_df, ld_pred_results_fname, raw_event_fname = run_live_dead_prediction(exp_ref, data_converge_dir, control_set_dir)
+    ld_pred_result_df.to_csv(ld_pred_results_fname, index=False)
+    ld_pred_signal_dict = {raw_event_fname: [ld_pred_results_fname]}
+    record = rpi.append_record(record, ld_pred_signal_dict, analysis, out_dir)
+
+    with open(record_path, 'w') as jfile:
+        json.dump(record, jfile, indent=2)
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--experiment_ref', help='experimental reference from data science table')
-    parser.add_argument('--exp_ref_dir', help='path to experimental reference directory')
+    parser.add_argument("--experiment_ref", help="experimental reference from data science table")
+    parser.add_argument("--data_converge_dir", help="path to Data Converge directory")
     parser.add_argument("--control_set_dir", help="path to data for creating control sets")
-
+    parser.add_argument("--analysis", help="analysis to run")
 
     args = parser.parse_args()
     arg_exp_ref = args.experiment_ref
-    arg_exp_ref_dir = args.exp_ref_dir
+    arg_data_converge_dir = args.data_converge_dir
     arg_control_set_dir = args.control_set_dir
+    arg_analysis = args.analysis
+    arg_out_dir = "."
 
-    run_live_dead_prediction(arg_exp_ref, arg_exp_ref_dir, arg_control_set_dir)
+    main(arg_exp_ref, arg_analysis, arg_out_dir, arg_data_converge_dir, arg_control_set_dir)

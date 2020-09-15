@@ -22,12 +22,16 @@ export PDT_GROWTH_ANALYSIS_DIR := app/precomputed-data-table-growth-analysis
 export PDT_FCS_SIGNAL_PREDICTION_INIFILE := app/precomputed-data-table-fcs-signal-prediction/app.ini
 export PDT_FCS_SIGNAL_PREDICTION_DIR := app/precomputed-data-table-fcs-signal-prediction
 
+export PDT_LIVE_DEAD_PREDICTION_INIFILE := app/precomputed-data-table-live-dead-prediction/app.ini
+export PDT_LIVE_DEAD_PREDICTION_DIR := app/precomputed-data-table-live-dead-prediction
+
 .PHONY: tests app-container tests-local tests-reactor tests-deployed
 .SILENT: tests app-container tests-local tests-reactor tests-deployed
 
 all: reactor-image app-image
 
 reactor-image:
+	python record_product_info.py > version.txt; \
 	abaco deploy -R -F Dockerfile -k -B reactor.rc -R -t $(GITREF) $(ABACO_DEPLOY_OPTS)
 
 # Apparently apps-build-container ignores the -f flag, thus we have to move the two Dockerfiles around below
@@ -43,8 +47,10 @@ omics-tools-image:
 
 wasserstein-image:
 	cd $(PDT_WASSERSTEIN_DIR); \
+	cp -r ../common src; \
 	find . -name '*.pyc' -delete ; \
 	apps-build-container -V ; \
+	rm -r src/common; \
 	echo "The app container is done building."
 	echo "  make shell - explore the container interactively"
 	echo "  make tests-pytest - run Python tests in the container"
@@ -52,8 +58,10 @@ wasserstein-image:
 	
 growth-analysis-image:
 	cd $(PDT_GROWTH_ANALYSIS_DIR); \
+	cp -r ../common src; \
 	find . -name '*.pyc' -delete ; \
 	apps-build-container -V ; \
+	rm -r src/common; \
 	echo "The app container is done building."
 	echo "  make shell - explore the container interactively"
 	echo "  make tests-pytest - run Python tests in the container"
@@ -61,8 +69,21 @@ growth-analysis-image:
 
 fcs-signal-prediction-image:
 	cd $(PDT_FCS_SIGNAL_PREDICTION_DIR); \
+	cp -r ../common src; \
 	find . -name '*.pyc' -delete ; \
 	apps-build-container -V ; \
+	rm -r src/common; \
+	echo "The app container is done building."
+	echo "  make shell - explore the container interactively"
+	echo "  make tests-pytest - run Python tests in the container"
+	echo "  make tests-local - execute container (and wrapper) under emulation"	
+
+live-dead-prediction-image:
+	cd $(PDT_LIVE_DEAD_PREDICTION_DIR); \
+	cp -r ../common src; \
+	find . -name '*.pyc' -delete ; \
+	apps-build-container -V ; \
+	rm -r src/common; \
 	echo "The app container is done building."
 	echo "  make shell - explore the container interactively"
 	echo "  make tests-pytest - run Python tests in the container"
@@ -106,16 +127,29 @@ deploy:
 
 deploy-wasserstein:
 	cd $(PDT_WASSERSTEIN_DIR); \
-	apps-deploy
+	cp -r ../common src; \
+	apps-deploy; \
+	rm -r src/common
 
 deploy-growth-analysis:
 	cd $(PDT_GROWTH_ANALYSIS_DIR); \
-	apps-deploy
+	cp -r ../common src; \
+	apps-deploy; \
+	rm -r src/common
 
 deploy-fcs-signal-prediction:
 	cd $(PDT_FCS_SIGNAL_PREDICTION_DIR); \
+	cp -r ../common src; \
+	apps-deploy; \
+	rm -r src/common
+
+deploy-live-dead-prediction:
+	cd $(PDT_LIVE_DEAD_PREDICTION_DIR); \
+	cp -r ../common src; \
+	apps-deploy; \
+	rm -r src/common
 	apps-deploy
-		
+
 deploy-omics-tools:
 	cd $(PDT_OMICS_TOOLS_DIR); \
 	apps-deploy

@@ -3,42 +3,16 @@ gather record product info and make data files summaries for this run of precomp
 
 :authors: robert c. moseley (robert.moseley@duke.edu) and  anastasia deckard (anastasia.deckard@geomdata.com)
 """
-
-import hashlib
 import os
-import json
-import pandas as pd
-
 from datetime import datetime
-# import pymongo
-#
-#
-# def get_db_conn():
-#     dbURI = 'mongodb://readonly:WNCPXXd8ccpjs73zxyBV@catalog.sd2e.org:27020/admin?readPreference=primary'
-#     client = pymongo.MongoClient(dbURI)
-#     db = client.catalog_staging
-#
-#     return db
 
-
-def get_dev_git_version():
-    import os
-    stream = os.popen('git show -s --format="gitinfo: %h %ci"')
-    output = stream.read().strip()
-    if output.startswith('gitinfo:'):
-        output = output.replace('gitinfo: ', '')
-    else:
-        output = "NA"
-
-    version_info = output
-
-    return version_info
-
-
+# At runtime the version info can be retrieved from version.txt
 def make_product_record(exp_ref, out_dir, dc_dir):
 
     datetime_stamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    version_info = get_dev_git_version()
+    version_file = open("/version.txt", "r")
+    version_info = version_file.read().rstrip()
+    print("version_info: {}".format(version_info))
 
     record = {
         "precomputed_data_table version": version_info,
@@ -52,3 +26,20 @@ def make_product_record(exp_ref, out_dir, dc_dir):
     }
 
     return record
+
+# File version.txt can be created during make using the main function
+def main():
+
+    stream = os.popen('git show -s --format="gitinfo: %h %ci"')
+    output = stream.read().strip()
+    if output.startswith('gitinfo:'):
+        output = output.replace('gitinfo: ', '')
+    else:
+        output = "NA"
+
+    version_info = output
+
+    print(version_info)
+    
+if __name__ == '__main__':
+    main()
