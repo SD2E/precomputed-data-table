@@ -5,7 +5,7 @@ source activate ${analysis}
 if [ -z "${CONTAINER_IMAGE}" ]
 then
     version=$(cat ./_util/VERSION)
-    CONTAINER_IMAGE="index.docker.io/sd2e/precomputed-data-table-grouped-control-predictions:$version"
+    CONTAINER_IMAGE="index.docker.io/sd2e/precomputed-data-table-live-dead-predictions:$version"
 fi
 . _util/container_exec.sh
 
