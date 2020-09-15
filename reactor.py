@@ -260,6 +260,7 @@ def launch_app(m, r):
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
     mtypes = None
+    control_dir = None
     product_patterns = []
     if analysis == "perform-metrics":
         if "mtypes" not in m:
@@ -289,6 +290,25 @@ def launch_app(m, r):
                  'derived_from': [fc_file_path],
                  'derived_using': []
                 }]
+        elif analysis == "live_dead_prediction":
+            if "control_dir" not in m:
+                raise Exception("missing control_dir")
+
+            control_dir0 = m.get("control_dir")
+            (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_dir0)
+            root_dir = StorageSystem(storage_system, agave=r.client).root_dir
+            control_dir = join_posix_agave([root_dir, dirpath, leafdir])
+            r.logger.info("control_dir: {}".format(control_dir))
+              
+            app_id = r.settings.agave_live_dead_prediction_app_id
+            fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
+            fc_file_path = os.path.join(data_converge_dir, fc_file_name)
+            r.logger.info("fc_file_path: {}".format(fc_file_path))
+            product_patterns = [
+                {'patterns': ['.csv$'],
+                 'derived_from': [fc_file_path],
+                 'derived_using': []
+                }]
         elif analysis == "wasserstein":
             app_id = r.settings.agave_wasserstein_app_id
             fc_raw_log10_stats_file_name = '__'.join([experiment_ref, 'fc_raw_log10_stats'])
@@ -306,13 +326,16 @@ def launch_app(m, r):
                  'derived_from': [fc_etl_stats_file_path],
                  'derived_using': []
                 }
-            ]        
+            ]
 
-        # maxRunTime should probably be determined based on experiment size        
+        # maxRunTime should probably be determined based on experiment size  
+        parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
+        if control_dir:
+            parameter_dir['control_dir'] = control_dir
         job_def = {
             "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
-            "parameters": {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis},
+            "parameters": parameter_dict,
             "maxRunTime": "8:00:00",
             "batchQueue": "all"
         }
