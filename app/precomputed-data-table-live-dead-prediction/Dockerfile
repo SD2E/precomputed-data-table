@@ -17,7 +17,7 @@ COPY config.yml /config.yml
 COPY src /src
 
 COPY pysd2cat src/pysd2cat
-COPY grouped_control_prediction /src/grouped_control_predictions
+COPY grouped_control_prediction /src/grouped_control_prediction
 
 COPY conda_env.yml /conda_env.yml
 RUN conda env create -f /conda_env.yml
