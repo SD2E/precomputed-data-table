@@ -4,7 +4,7 @@
   "executionType": "HPC",
   "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/precomputed-data-table-live-dead-prediction-0.1.0",
+  "deploymentPath": "apps/precomputed-data-table-live-dead-predictions-0.1.0",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
