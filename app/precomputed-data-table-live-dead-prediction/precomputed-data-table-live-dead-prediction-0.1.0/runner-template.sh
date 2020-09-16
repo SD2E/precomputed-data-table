@@ -34,4 +34,4 @@ utc_date() {
 
 echo "launching "${analysis}
 echo "invoking container_exec" ${CONTAINER_IMAGE} ${experiment_ref}
-container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_live_dead_prediction.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --analysis ${analysis}
+container_exec ${CONTAINER_IMAGE} /opt/conda/envs/${analysis}/bin/python3 /src/run_live_dead_prediction.py --experiment_ref ${experiment_ref} --data_converge_dir ${data_converge_dir} --control_set_dir ${control_set_dir} --analysis ${analysis}
