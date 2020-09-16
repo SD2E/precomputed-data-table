@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from os.path import expanduser
-from grouped_control_prediction.main import gcpm
+from grouped_control_prediction.main import main as gcpm
 from grouped_control_prediction.utils import data_utils as du
 from common import record_product_info as rpi
 from common import preproc
