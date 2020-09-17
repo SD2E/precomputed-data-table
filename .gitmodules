@@ -7,6 +7,3 @@
 [submodule "app/precomputed-data-table-fcs-signal-prediction/pysd2cat"]
 	path = app/precomputed-data-table-fcs-signal-prediction/pysd2cat
 	url = https://gitlab.sd2e.org/dbryce/pysd2cat.git
-[submodule "app/precomputed-data-table-live-dead-prediction/pysd2cat"]
-	path = app/precomputed-data-table-live-dead-prediction/pysd2cat
-	url = https://gitlab.sd2e.org/dbryce/pysd2cat.git
