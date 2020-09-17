@@ -260,7 +260,7 @@ def launch_app(m, r):
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
     mtypes = None
-    control_dir = None
+    control_set_dir = None
     product_patterns = []
     if analysis == "perform-metrics":
         if "mtypes" not in m:
@@ -290,15 +290,15 @@ def launch_app(m, r):
                  'derived_from': [fc_file_path],
                  'derived_using': []
                 }]
-        elif analysis == "live_dead_prediction":
-            if "control_dir" not in m:
-                raise Exception("missing control_dir")
+        elif analysis == "live-dead-prediction":
+            if "control_set_dir" not in m:
+                raise Exception("missing control_set_dir")
 
-            control_dir0 = m.get("control_dir")
-            (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_dir0)
+            control_set_dir0 = m.get("control_set_dir")
+            (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_set_dir0)
             root_dir = StorageSystem(storage_system, agave=r.client).root_dir
-            control_dir = join_posix_agave([root_dir, dirpath, leafdir])
-            r.logger.info("control_dir: {}".format(control_dir))
+            control_set_dir = join_posix_agave([root_dir, dirpath, leafdir])
+            r.logger.info("control_set_dir: {}".format(control_set_dir))
               
             app_id = r.settings.agave_live_dead_prediction_app_id
             fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
@@ -330,8 +330,8 @@ def launch_app(m, r):
 
         # maxRunTime should probably be determined based on experiment size  
         parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
-        if control_dir:
-            parameter_dir['control_dir'] = control_dir
+        if control_set_dir:
+            parameter_dict['control_set_dir'] = control_set_dir
         job_def = {
             "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
@@ -380,8 +380,9 @@ def launch_app(m, r):
 
     ag_job_id = None
     try:
+        r.logger.info("submit Tapis job")
         resp = r.client.jobs.submit(body=job_def)
-        r.logger.debug("resp: {}".format(resp))
+        r.logger.info("resp: {}".format(resp))
         if "id" in resp:
             ag_job_id = resp["id"]
             # Now, send a "run" event to the Job, including for the sake of
