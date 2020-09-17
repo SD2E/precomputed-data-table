@@ -116,6 +116,9 @@ clean-growth-analysis-image:
 clean-fcs-signal-prediction-image:
 	bash scripts/remove_images.sh $(PDT_FCS_SIGNAL_PREDICTION_INIFILE)
 
+clean-live-dead-prediction-image:
+	bash scripts/remove_images.sh $(PDT_LIVE_DEAD_PREDICTION_INIFILE)
+	
 clean-omics-tools-image:
 	bash scripts/remove_images.sh $(PDT_OMICS_TOOLS_INIFILE)
 
@@ -148,7 +151,6 @@ deploy-live-dead-prediction:
 	cp -r ../common src; \
 	apps-deploy; \
 	rm -r src/common
-	apps-deploy
 
 deploy-omics-tools:
 	cd $(PDT_OMICS_TOOLS_DIR); \
