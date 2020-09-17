@@ -115,7 +115,7 @@ def predict_signal(df_original : DataFrame,
     # Set up path to control data
     XPLAN_PROJECT = project_id
     xplan_base = os.path.join(expanduser("~"), 'sd2e-projects', XPLAN_PROJECT)
-    path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic')
+    path = os.path.join(xplan_base, 'xplan-reactor', 'data', 'transcriptic') if not control_set_dir else control_set_dir
     
     # Iterate through sampled control set data and group them into one control/training set
     all_controls = pd.DataFrame()
