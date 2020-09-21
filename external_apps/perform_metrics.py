@@ -24,7 +24,7 @@ import os
 #    return True
 
 
-def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
+def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtype):
     """
     create a job template with info needed to run the perform metrics-app
     currently just supporting one config to test it
