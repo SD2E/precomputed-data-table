@@ -92,7 +92,16 @@ def aggregate_records(m, r):
     with open(analysis_record_path, 'r') as analysis_json_file:
         analysis_record = json.load(analysis_json_file)
         if analysis_record:
-            record["analyses"][analysis] = analysis_record["analyses"][analysis]
+            if analysis == "perform-metrics":
+                record["analyses"][analysis] = {}
+                record["analyses"][analysis]["perform_metrics version"] = analysis_record["perform_metrics version"]
+                record["analyses"][analysis]["files"] = []
+                pm_record = {}
+                pm_record["data_converge input"] = analysis_record["data_path"]
+                pm_record["precomputed_data_table outputs"] = analysis_record["files"]
+                record["analyses"][analysis]["files"].append(pm_record)
+            else:
+                record["analyses"][analysis] = analysis_record["analyses"][analysis]
             r.logger.info("updating {}".format(record_path))
             with open(record_path, 'w') as jfile:
                 json.dump(record, jfile, indent=2)
@@ -259,16 +268,16 @@ def launch_app(m, r):
     #    derived_using = []
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
-    mtypes = None
-    control_dir = None
+    mtype = None
+    control_set_dir = None
     product_patterns = []
     if analysis == "perform-metrics":
-        if "mtypes" not in m:
-            raise Exception("missing mtypes")
+        if "mtype" not in m:
+            raise Exception("missing mtype")
 
-        mtypes = m.get("mtypes")        
+        mtype = m.get("mtype")        
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
-        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
+        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
     else:
         if analysis == "xplan-od-growth-analysis":
             app_id = r.settings.agave_growth_analysis_app_id
@@ -290,15 +299,15 @@ def launch_app(m, r):
                  'derived_from': [fc_file_path],
                  'derived_using': []
                 }]
-        elif analysis == "live_dead_prediction":
-            if "control_dir" not in m:
-                raise Exception("missing control_dir")
+        elif analysis == "live-dead-prediction":
+            if "control_set_dir" not in m:
+                raise Exception("missing control_set_dir")
 
-            control_dir0 = m.get("control_dir")
-            (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_dir0)
+            control_set_dir0 = m.get("control_set_dir")
+            (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_set_dir0)
             root_dir = StorageSystem(storage_system, agave=r.client).root_dir
-            control_dir = join_posix_agave([root_dir, dirpath, leafdir])
-            r.logger.info("control_dir: {}".format(control_dir))
+            control_set_dir = join_posix_agave([root_dir, dirpath, leafdir])
+            r.logger.info("control_set_dir: {}".format(control_set_dir))
               
             app_id = r.settings.agave_live_dead_prediction_app_id
             fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
@@ -330,8 +339,8 @@ def launch_app(m, r):
 
         # maxRunTime should probably be determined based on experiment size  
         parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
-        if control_dir:
-            parameter_dir['control_dir'] = control_dir
+        if control_set_dir:
+            parameter_dict['control_set_dir'] = control_set_dir
         job_def = {
             "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
@@ -380,6 +389,7 @@ def launch_app(m, r):
 
     ag_job_id = None
     try:
+        r.logger.info("submit Tapis job")
         resp = r.client.jobs.submit(body=job_def)
         r.logger.debug("resp: {}".format(resp))
         if "id" in resp:
