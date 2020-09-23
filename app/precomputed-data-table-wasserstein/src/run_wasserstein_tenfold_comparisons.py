@@ -87,19 +87,37 @@ def tenfold_lookup(er_dir, r_dict, datafile, diff_name, meta_fname, exp_ref):
     return r_dict
 
 
+def flow_file_check(er_dir):
+    raw_log10_file = False
+    etl_stats_file = False
+
+    for fname in os.listdir(er_dir):
+        if fname.endswith("_fc_raw_log10_stats.csv"):
+            raw_log10_file = True
+        if fname.endswith("_fc_etl_stats.csv"):
+            etl_stats_file = True
+
+    return raw_log10_file, etl_stats_file
+
+
 def run_wasser_tenfold(exp_ref, exp_ref_dir):
 
     meta_fname = return_fc_meta_name(exp_ref_dir)
 
-    results_dict = {"fc_raw_log10_stats.csv": {'wasserstein_dists': '',
-                                               'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                                               'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                                               'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}},
-                    "fc_etl_stats.csv": {'wasserstein_dists': '',
-                                         'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                                         'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
-                                         'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}}}
+    raw_log10_file_exist, etl_stats_file_exist = flow_file_check(exp_ref_dir)
 
+    results_dict = {}
+
+    if raw_log10_file_exist:
+        results_dict["fc_raw_log10_stats.csv"] = {'wasserstein_dists': '',
+                                                  'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                                  'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                                  'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}}
+    if etl_stats_file_exist:
+        results_dict["fc_etl_stats.csv"] = {'wasserstein_dists': '',
+                                            'time_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                            'inducer_diff': {'tenfold_summary': '', 'tenfold_params': ''},
+                                            'time_reps_diff': {'tenfold_summary': '', 'tenfold_params': ''}}
 
     fname_dict = {}
     datetime = subprocess.check_output(['date +%Y_%m_%d_%H_%M_%S'], shell=True).decode(sys.stdout.encoding).strip()
