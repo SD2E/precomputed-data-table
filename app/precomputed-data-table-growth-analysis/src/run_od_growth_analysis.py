@@ -33,8 +33,9 @@ def grab_meta_dataframe(exp_ref, er_dir):
 
 
 def growth_analysis(platereader_df, exp_ref):
-
-    od_analysis_df = analysis_frame_api.augment_dataframe(df=platereader_df, experiment_identifier=exp_ref)
+    return_dict: analysis_frame_api.AdReturn = analysis_frame_api.augment_dataframe(df=platereader_df, experiment_identifier=exp_ref)
+    od_analysis_df = return_dict['od_df']
+    assert isinstance(od_analysis_df, pd.DataFrame)
 
     return od_analysis_df
 
