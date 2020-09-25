@@ -33,8 +33,9 @@ def grab_meta_dataframe(exp_ref, er_dir):
 
 
 def growth_analysis(platereader_df, exp_ref):
-
-    od_analysis_df = analysis_frame_api.augment_dataframe(df=platereader_df, experiment_identifier=exp_ref)
+    return_dict: analysis_frame_api.AdReturn = analysis_frame_api.augment_dataframe(od_df=platereader_df, experiment_identifier=exp_ref)
+    od_analysis_df = return_dict['od_df']
+    assert isinstance(od_analysis_df, pd.DataFrame)
 
     return od_analysis_df
 
@@ -72,7 +73,7 @@ def run_od_analysis(exp_ref, exp_ref_dir, conf_dict):
 
     pr_df, pr_fname = grab_pr_dataframe(exp_ref, exp_ref_dir)
     od_analysis_initial_df = growth_analysis(pr_df, exp_ref)
-    od_analysis_initial_df['experiment_id'] = od_analysis_initial_df['sample_id'].apply(lambda x: '.'.join(x.split('.')[-3:]))
+    #od_analysis_initial_df['experiment_id'] = od_analysis_initial_df['sample_id'].apply(lambda x: '.'.join(x.split('.')[-3:]))
 
     # make df rows = replicate groups
     rg_od_analysis_df = rows_to_replicate_groups(od_analysis_initial_df, 'od')
