@@ -130,7 +130,7 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
 
     if data_confirm_dict['fc_raw_log10']:
         fcs_analysis_df.to_csv(fcs_growth_fname, index=False)
-        od_growth_fname_dict[fcs_growth_fname:] = [fcs_analysis_df]
+        od_growth_fname_dict[fcs_growth_fname] = [fcs_analysis_df]
 
     record = {}
     record = rpi.append_record(record, od_growth_fname_dict, analysis, out_dir)
