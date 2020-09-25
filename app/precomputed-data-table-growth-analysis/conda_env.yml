@@ -15,5 +15,5 @@ dependencies:
       - pytest-timeout
       - flowcytometrytools
       - agavepy
-      - xplan-od-growth-analysis
-#      - /src/xplan-od-growth-analysis
+#      - xplan-od-growth-analysis
+      - /src/xplan-od-growth-analysis
