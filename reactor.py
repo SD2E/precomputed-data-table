@@ -92,7 +92,16 @@ def aggregate_records(m, r):
     with open(analysis_record_path, 'r') as analysis_json_file:
         analysis_record = json.load(analysis_json_file)
         if analysis_record:
-            record["analyses"][analysis] = analysis_record["analyses"][analysis]
+            if analysis == "perform-metrics":
+                record["analyses"][analysis] = {}
+                record["analyses"][analysis]["perform_metrics version"] = analysis_record["perform_metrics version"]
+                record["analyses"][analysis]["files"] = []
+                pm_record = {}
+                pm_record["data_converge input"] = analysis_record["data_path"]
+                pm_record["precomputed_data_table outputs"] = analysis_record["files"]
+                record["analyses"][analysis]["files"].append(pm_record)
+            else:
+                record["analyses"][analysis] = analysis_record["analyses"][analysis]
             r.logger.info("updating {}".format(record_path))
             with open(record_path, 'w') as jfile:
                 json.dump(record, jfile, indent=2)
@@ -259,16 +268,16 @@ def launch_app(m, r):
     #    derived_using = []
     #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
-    mtypes = None
+    mtype = None
     control_set_dir = None
     product_patterns = []
     if analysis == "perform-metrics":
-        if "mtypes" not in m:
-            raise Exception("missing mtypes")
+        if "mtype" not in m:
+            raise Exception("missing mtype")
 
-        mtypes = m.get("mtypes")        
+        mtype = m.get("mtype")        
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
-        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref)
+        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
     else:
         if analysis == "xplan-od-growth-analysis":
             app_id = r.settings.agave_growth_analysis_app_id
