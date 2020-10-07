@@ -67,14 +67,14 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
         # figure out input files
         data_files = list()
         if mtype == 'FLOW':
-            perform_metrics_data = '{0:s}/{1:s}/{1:s}__fc_etl_stats.csv'.format(dc_batch_path, experiment_reference)
-            perform_metrics_optional_data = '{0:s}/{1:s}/{1:s}__fc_meta.csv'.format(dc_batch_path, experiment_reference)
+            perform_metrics_data = '{0:s}/{1:s}__fc_etl_stats.csv'.format(dc_batch_path, experiment_reference)
+            perform_metrics_optional_data = '{0:s}/{1:s}__fc_meta.csv'.format(dc_batch_path, experiment_reference)
             job_template['inputs']['perform_metrics_data'] = perform_metrics_data
             job_template['inputs']['perform_metrics_optional_data'] = perform_metrics_optional_data
             data_files = [perform_metrics_data, perform_metrics_optional_data]
 
         elif mtype == 'PLATE_READER':
-            perform_metrics_data = '{0:s}/{1:s}/{1:s}__platereader.csv'.format(dc_batch_path, experiment_reference)
+            perform_metrics_data = '{0:s}/{1:s}__platereader.csv'.format(dc_batch_path, experiment_reference)
             job_template['inputs']['perform_metrics_data'] = perform_metrics_data
             data_files = [perform_metrics_data]
 
