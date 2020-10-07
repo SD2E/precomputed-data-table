@@ -11,6 +11,8 @@ app_id = "perform_metrics_app-0.1.0"
 
 map_config_type = {
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
     'YeastSTATES-Beta-Estradiol-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
     'YeastSTATES-CRISPR-Dose-Response': 'ys_ind',
     'YeastSTATES-CRISPR-Long-Duration-Time-Series-20191208': 'ys_ind',
