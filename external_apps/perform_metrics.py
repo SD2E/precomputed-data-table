@@ -6,28 +6,33 @@ run perform metrics for PDT
 
 import os
 
+app_name = "perform-metrics-app"
+app_id = "perform_metrics_app-0.1.0"
 
-# right now perform metrics can run on these supported types
-#supported_cps = ['YEAST_STATES']
-#supported_protocols = ['TimeSeriesHTP']
-#supported_measurement_types = ['PLATE_READER']
+map_config_type = {
+    'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
+    'YeastSTATES-Beta-Estradiol-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
+    'YeastSTATES-CRISPR-Dose-Response': 'ys_ind',
+    'YeastSTATES-CRISPR-Long-Duration-Time-Series-20191208': 'ys_ind',
+    'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208': 'ys_ind',
+    'YeastSTATES-CRISPR-Short-Duration-Time-Series-35C': 'ys_ind',
+    'YeastSTATES-Doxycycline-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
+    'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_ind',
+}
+
+map_config_file = {
+    'ys_1.0': {'FLOW': 'ys1_fc_etl.json',
+               'PLATE_READER': 'ys1_pr.json'},
+    'ys_ind': {'FLOW': 'general_ts_fc_etl_inducer.json',
+               'PLATE_READER': 'general_ts_pr_inducer.json'},
+}
 
 
-#def is_supported(challenge_problem, protocol, measurement_type):
-#    if challenge_problem not in supported_cps:
-#        return False
-#    if protocol not in supported_protocols:
-#        return False
-#    if measurement_type not in supported_measurement_types:
-#        return False
-#
-#    return True
-
-
-def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
+def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtype):
     """
     create a job template with info needed to run the perform metrics-app
-    currently just supporting one config to test it
 
     :param out_sys: 'sd2e-projects'
     :param out_dir: 'sd2e-project-48/complete/<exp_ref>/<datetime>'
@@ -36,50 +41,56 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference):
     :return:
     """
 
-    # directory for perform_metrics output out_sys/out_dir/perform-metrics
-    pm_dir = os.path.join(out_dir, 'perform-metrics')
-    print("batch dir: ", pm_dir)
+    job_template = None
+    config_type = None
+    config_file = None
+    product_patterns = None
+    
+    if experiment_reference in map_config_type.keys():
+        config_type = map_config_type[experiment_reference]
+        if config_type in map_config_file.keys() and mtype in map_config_file[config_type].keys():
+            config_file = map_config_file[config_type][mtype]
 
-    # build a path to the file we want from the DC output; here we will use plate reader
-    # use a config file for platereader from configs folder that is deployed with the code
-    perform_metrics_data = '{0:s}/{1:s}__platereader.csv'.format(dc_batch_path, experiment_reference)
-    perform_metrics_config_json = "/perform_metrics/src/perform_metrics/configs/metrics_y4d_ts_pr_inducer.json"
+    if config_file:
 
-    job_template = {"name": "perform-metrics",
-                    "appId": "perform_metrics_app-0.1.0",
-                    "archive": True,
-                    "archiveSystem": out_sys,
-                    "archivePath": pm_dir,
-                    "archiveOnAppError": True,
-                    "maxRunTime": "2:00:00",
-                    "inputs": {
+        out_dir = os.path.join(out_dir, 'perform-metrics__' + mtype)
 
-                        "perform_metrics_data": perform_metrics_data
-                    },
-                    "parameters": {
-                        "perform_metrics_config_json": perform_metrics_config_json
-                    }
-                    }
+        job_template = {"name": app_name,
+                        "appId": app_id,
+                        "archive": True,
+                        "archiveSystem": out_sys,
+                        "archivePath": out_dir,
+                        "archiveOnAppError": True,
+                        "maxRunTime": "5:00:00",
+                        "inputs": {},
+                        "parameters": {}
+                        }
 
-    product_patterns = [
-        {'patterns': ['^.*(tsv)$'],
-         'derived_from': [perform_metrics_data],
-         'derived_using': []
-         }]
+        # figure out input files
+        data_files = list()
+        if mtype == 'FLOW':
+            perform_metrics_data = '{0:s}/{1:s}__fc_etl_stats.csv'.format(dc_batch_path, experiment_reference)
+            perform_metrics_optional_data = '{0:s}/{1:s}__fc_meta.csv'.format(dc_batch_path, experiment_reference)
+            job_template['inputs']['perform_metrics_data'] = perform_metrics_data
+            job_template['inputs']['perform_metrics_optional_data'] = perform_metrics_optional_data
+            data_files = [perform_metrics_data, perform_metrics_optional_data]
+
+        elif mtype == 'PLATE_READER':
+            perform_metrics_data = '{0:s}/{1:s}__platereader.csv'.format(dc_batch_path, experiment_reference)
+            job_template['inputs']['perform_metrics_data'] = perform_metrics_data
+            data_files = [perform_metrics_data]
+
+        # figure out configuration files
+        perform_metrics_config_path = "/perform_metrics/src/perform_metrics/configs/"
+        job_template['parameters']['perform_metrics_config_json'] = os.path.join(perform_metrics_config_path,
+                                                                                 config_file)
+
+        product_patterns = [
+            {'patterns': ['^.*(tsv)$'],
+             'derived_from': data_files,
+             'derived_using': []
+             }]
 
     return job_template, product_patterns
 
 
-if __name__ == '__main__':
-    # an example of how to call this code:
-    arg_challenge_problem = 'YEAST_STATES'
-    arg_protocol = 'TimeSeriesHTP'
-    arg_measurement_type = 'PLATE_READER'
-    if is_supported(arg_challenge_problem, arg_protocol, arg_measurement_type):
-        arg_out_sys = 'sd2e-projects'
-        arg_out_dir = 'sd2e-project-48/complete/YeastSTATES-CRISPR-Growth-Curves-with-Plate-Reader-Optimization/20200722190009'
-        arg_dc_batch_path = 'agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208/20200610192131'
-        arg_experiment_reference = 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208'
-        my_job_template, product_patterns = get_job_template(arg_out_sys, arg_out_dir, arg_dc_batch_path, arg_experiment_reference)
-
-        print('finished')

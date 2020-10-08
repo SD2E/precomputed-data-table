@@ -52,6 +52,10 @@ def aggregate_records(m, r):
         raise Exception("missing analysis")
     else:
         analysis = m.get("analysis")
+    if "mtype" not in m:
+        raise Exception("missing mtype")
+    else:
+        mtype = m.get("mtype")
     if "experiment_reference" not in m:
         raise Exception("missing experiment_reference")
     else:
@@ -75,7 +79,9 @@ def aggregate_records(m, r):
     parent_result_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
     r.logger.info("parent_result_dir2: {}".format(parent_result_dir2))
 
-    analysis_record_path = os.path.join(parent_result_dir2, analysis, "record.json")
+    analysis_dir = analysis + "__" + mtype if analysis == "perform-metrics" else analysis
+    r.logger.info("analysis_dir: {}".format(analysis_dir))
+    analysis_record_path = os.path.join(parent_result_dir2, analysis_dir, "record.json")
     if os.path.exists(analysis_record_path) is False:
         r.logger.info("{} doesn't exist".format(analysis_record_path))
         exit(2)
@@ -93,13 +99,14 @@ def aggregate_records(m, r):
         analysis_record = json.load(analysis_json_file)
         if analysis_record:
             if analysis == "perform-metrics":
-                record["analyses"][analysis] = {}
-                record["analyses"][analysis]["perform_metrics version"] = analysis_record["perform_metrics version"]
-                record["analyses"][analysis]["files"] = []
+                analysis_label = analysis + "__" + mtype
+                record["analyses"][analysis_label] = {}
+                record["analyses"][analysis_label]["perform_metrics version"] = analysis_record["perform_metrics version"]
+                record["analyses"][analysis_label]["files"] = []
                 pm_record = {}
                 pm_record["data_converge input"] = analysis_record["data_path"]
                 pm_record["precomputed_data_table outputs"] = analysis_record["files"]
-                record["analyses"][analysis]["files"].append(pm_record)
+                record["analyses"][analysis_label]["files"].append(pm_record)
             else:
                 record["analyses"][analysis] = analysis_record["analyses"][analysis]
             r.logger.info("updating {}".format(record_path))
@@ -360,8 +367,8 @@ def launch_app(m, r):
               experiment_id=experiment_ids,
               data=job_data,
               product_patterns=product_patterns,
-              archive_system = 'data-sd2e-projects.sd2e-project-48',
-              archive_path=archive_path)
+              archive_system = job_def["archiveSystem"],
+              archive_path=job_def["archivePath"])
 
     job.setup()
 
@@ -391,7 +398,7 @@ def launch_app(m, r):
     try:
         r.logger.info("submit Tapis job")
         resp = r.client.jobs.submit(body=job_def)
-        r.logger.debug("resp: {}".format(resp))
+        r.logger.info("resp: {}".format(resp))
         if "id" in resp:
             ag_job_id = resp["id"]
             # Now, send a "run" event to the Job, including for the sake of
