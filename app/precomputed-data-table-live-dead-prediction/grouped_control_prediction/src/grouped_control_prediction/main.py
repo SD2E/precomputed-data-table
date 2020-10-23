@@ -88,7 +88,7 @@ def main(data_converge_path: str,
     result = meta.merge(mean_prediction, on=id_col)
     
     # Drop Media Controls from RF data
-    rf = result[result['strain_class'] != 'Process']
+    rf = result[~result['standard_type'].str.contains('BEAD')]
     # Trim experiment_id values
     shift = len('experiment.transcriptic.')
     rf['experiment_id'] = rf['experiment_id'].str[shift:]
