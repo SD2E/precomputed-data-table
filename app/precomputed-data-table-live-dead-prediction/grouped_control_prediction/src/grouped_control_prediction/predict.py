@@ -124,10 +124,11 @@ def predict_signal(df_original : DataFrame,
     for sampled_exp in sampled_controls:
         
         # Extract sampled control set data
-        experiment_flow = pd.read_csv(os.path.join(path, sampled_exp), index_col=0)
-        controls = experiment_flow.loc[(experiment_flow.strain_name == "WT-Live-Control") | (experiment_flow.strain_name == "WT-Dead-Control")]
         channels_under = [x.replace('-', '_') for x in channels]
         renaming = dict(zip(channels_under, channels))
+        experiment_flow = pd.read_csv(os.path.join(path, sampled_exp), index_col=0, dtype=str)
+        experiment_flow = experiment_flow.astype({x:float for x in channels_under})
+        controls = experiment_flow.loc[(experiment_flow.strain_name == "WT-Live-Control") | (experiment_flow.strain_name == "WT-Dead-Control")]
         controls = controls.rename(columns=renaming)
 
         # Add sampled control experiment to all_controls DataFrame
