@@ -84,11 +84,11 @@ def main(data_converge_path: str,
     mean_prediction.columns = mean_prediction.columns.map('_'.join)
     mean_prediction = mean_prediction.rename(columns={id_col+"_": id_col})
     
-    # Attach mean & standard deviation of sample predcitions to the metadata
+    # Attach mean & standard deviation of sample predictions to the metadata
     result = meta.merge(mean_prediction, on=id_col)
     
     # Drop Media Controls from RF data
-    rf = result[~result['standard_type'].str.contains('BEAD')]
+    rf = result[~result['standard_type'].str.contains('BEAD', na=False)]
     # Trim experiment_id values
     shift = len('experiment.transcriptic.')
     rf['experiment_id'] = rf['experiment_id'].str[shift:]

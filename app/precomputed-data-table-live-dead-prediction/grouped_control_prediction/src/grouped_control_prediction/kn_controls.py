@@ -48,7 +48,8 @@ def k_nearest_controls(exp_dir, control_set_dir):
             print(str(count) + "/109 (" + exp + ")")
 
             # Extract current control data and rename channel columns
-            exp_flow = pd.read_csv(os.path.join(control_set_dir, exp), index_col=0)
+            exp_flow = pd.read_csv(os.path.join(control_set_dir, exp), index_col=0, dtype=str)
+            exp_flow = exp_flow.astype({x:float for x in channels_under})
             controls = exp_flow.loc[
                 (exp_flow.strain_name == "WT-Live-Control") | (exp_flow.strain_name == "WT-Dead-Control")]
             controls = controls.rename(columns=renaming)
