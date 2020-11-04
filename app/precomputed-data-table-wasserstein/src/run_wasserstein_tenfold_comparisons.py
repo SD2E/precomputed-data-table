@@ -18,7 +18,7 @@ import TenFoldComparisons as tenfoldcomp
 from common import record_product_info as rpi
 from common import preproc
 
-def run_wasserstain_analysis(er_dir, datafile):
+def run_wasserstein_analysis(er_dir, datafile):
 
     wasser_df = wasser.do_analysis(er_dir, datafile)
     return wasser_df
@@ -130,7 +130,7 @@ def run_wasser_tenfold(exp_ref, exp_ref_dir):
         for data in single_results_dict.keys():
             if data == 'wasserstein_dists':
                 fname_wasser = 'pdt_{}__{}_{}_{}.csv'.format(exp_ref, datafile.split(".")[0], data, datetime)
-                results_dict[datafile]['wasserstein_dists'] = run_wasserstain_analysis(exp_ref_dir, datafile)
+                results_dict[datafile]['wasserstein_dists'] = run_wasserstein_analysis(exp_ref_dir, datafile)
                 results_dict[datafile]['wasserstein_dists'].to_csv(fname_wasser)
                 fname_dict[full_datafile_name].append(fname_wasser)
 
