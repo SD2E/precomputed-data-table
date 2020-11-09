@@ -13,6 +13,7 @@ map_config_type = {
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-3-0': 'ys_1.0',
     'YeastSTATES-Beta-Estradiol-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
     'YeastSTATES-CRISPR-Dose-Response': 'ys_ind',
     'YeastSTATES-CRISPR-Long-Duration-Time-Series-20191208': 'ys_ind',
@@ -45,7 +46,7 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
     config_type = None
     config_file = None
     product_patterns = None
-    
+
     if experiment_reference in map_config_type.keys():
         config_type = map_config_type[experiment_reference]
         if config_type in map_config_file.keys() and mtype in map_config_file[config_type].keys():
@@ -92,5 +93,3 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
              }]
 
     return job_template, product_patterns
-
-
