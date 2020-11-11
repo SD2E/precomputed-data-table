@@ -67,16 +67,21 @@ def k_nearest_controls(exp_dir, control_set_dir):
 
             # Loop through samples
             for sample_name, sample_data in exp_grouped:
+                print("sample_name: {} sample_data.columns: {}".format(sample_name, sample_data.columns))
                 if len(distances) == k and wass_dist >= max(distances.values()):
                     break
 
                 # Apply log-10 transform to channel columns
+                sample_data = sample_data.astype({x:float for x in channels})
                 s_d = sample_data[channels].apply(np.log10).replace([np.inf, -np.inf], 0.0)
 
                 # Get Wasserstein distance between each channel of sample to both live/dead controls
                 dw = pd.Series()
                 lw = pd.Series()
+                print("channels: {}".format(channels))
                 for channel in channels:
+                    print("channel: {}".format(channel))
+                    print("dc_d[channel].dropna().size: {} lw[channel].dropna().size: {} s_d[channel].dropna().size: {}".format(dc_d[channel].dropna().size, lc_d[channel].dropna().size, s_d[channel].dropna().size))
                     dw[channel] = wd(dc_d[channel].dropna(), s_d[channel].dropna())
                     lw[channel] = wd(lc_d[channel].dropna(), s_d[channel].dropna())
 
