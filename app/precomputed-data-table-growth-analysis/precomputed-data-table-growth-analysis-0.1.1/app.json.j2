@@ -1,10 +1,10 @@
 {
-  "name": "precomputed-data-table-growth-analysis",
-  "version": "0.1.0",
+  "name": "{{ app.name }}",
+  "version": "{{ app.version }}",
   "executionType": "HPC",
   "executionSystem": "hpc-tacc-wrangler-gzheng",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/precomputed-data-table-growth-analysis-0.1.0",
+  "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
@@ -20,13 +20,49 @@
     {
       "id": "CONTAINER_IMAGE",
       "value": {
-        "default": "sd2e/precomputed-data-table-growth-analysis:0.1.0",
+        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
         "description": "Container Image. Do not edit.",
         "type": "string",
         "visible": false,
         "required": true
       }
     },
+	{
+		"id": "sift_ga_sbh_url",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_sbh_user",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_sbh_password",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_mongo_user",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
     {
       "id": "experiment_ref",
       "value": {
