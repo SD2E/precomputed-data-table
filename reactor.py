@@ -286,8 +286,17 @@ def launch_app(m, r):
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
         job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
     else:
+        # maxRunTime should probably be determined based on experiment size  
+        parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
+        if control_set_dir:
+            parameter_dict['control_set_dir'] = control_set_dir
+
         if analysis == "xplan-od-growth-analysis":
             app_id = r.settings.agave_growth_analysis_app_id
+            parameter_dict["sift_ga_sbh_url"] = r.context["_REACTOR_SBH_URL"]
+            parameter_dict["sift_ga_sbh_user"] = r.context["_REACTOR_SBH_USER"]
+            parameter_dict["sift_ga_sbh_password"] = r.context["_REACTOR_SBH_PASSWORD"]
+            parameter_dict["sift_ga_mongo_user"] = r.context["_REACTOR_CAT_DB_USER"]
             pr_file_name = '__'.join([experiment_ref, 'platereader.csv'])
             pr_file_path = os.path.join(data_converge_dir, pr_file_name)
             r.logger.info("pr_file_path: {}".format(pr_file_path))
@@ -344,10 +353,6 @@ def launch_app(m, r):
                 }
             ]
 
-        # maxRunTime should probably be determined based on experiment size  
-        parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
-        if control_set_dir:
-            parameter_dict['control_set_dir'] = control_set_dir
         job_def = {
             "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
