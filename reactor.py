@@ -2,6 +2,7 @@ import os
 import copy
 import json
 import jsonschema
+import requests
 import record_product_info as rpi
 
 from datetime import datetime
@@ -14,7 +15,7 @@ from datacatalog import linkedstores
 from datacatalog.managers.pipelinejobs import ReactorManagedPipelineJob as Job
 from datacatalog.tokens import get_admin_token
 from datacatalog.stores import StorageSystem
-from reactors.runtime import Reactor, agaveutils
+from reactors.runtime import Reactor, agaveutils, utcnow
 from requests.exceptions import HTTPError
 from external_apps import perform_metrics as ea_pm
 
@@ -47,27 +48,84 @@ def load_structured_request(experiment_id, r):
     else:
         return matches[0]
 
+def send_email_notification(m, recipient_key, r):
+    key = r.settings.get('api_key', None)
+    if key is None:
+        r.on_failure("No Mailgun API key was provided.")
+        
+    mailgun_api_url = r.settings.get('mailgun_api_url', None)
+    if mailgun_api_url is None:
+        r.on_failure("No Mailgun API URL was specified.")
+        
+    sender = r.settings.get('from', 'reactors-noreply@sd2e.org')
+    
+    recipients = r.settings.get(recipient_key + '_recipients')
+    if recipients is None:
+        r.logger.info("Can't find recipients for {}".format(recipient_key))
+        return
+    else:
+        r.logger.info("recipients: {}".format(recipients))
+
+    try:
+        # Message subject line
+        subject = m.get('subject', r.settings.get(
+            'subject', 'Automated email notification'))
+        # Message body
+        ts = utcnow()
+        body = "Message sent at {} by actors/{}/executions/{}".format(ts, r.uid, r.execid)
+        body = m.get('body', body)
+    except Exception as e:
+        r.on_failure("Error setting up message: {}".format(e))
+
+    mailgunmessage = {'from': sender,
+                      'to': recipients,
+                      'subject': subject,
+                      'text': body}
+
+    if r.local is False:
+        try:
+            request = requests.post(
+                mailgun_api_url,
+                auth=('api', key),
+                data=mailgunmessage)
+        except Exception as e:
+            r.on_failure("Error posting message: {}".format(e))
+
+        r.logger.info("Status: {} | Message: {} | Recipients: {}".format(request.status_code, request.text, recipients))
+    else:
+        r.logger.info("Skipped Mailgun API call since this is a test.")
+
 def aggregate_records(m, r):
+    err_msg = None
     if "analysis" not in m:
-        raise Exception("missing analysis")
+        err_msg = "aggregate_records: missing analysis"
     else:
         analysis = m.get("analysis")
     if "mtype" not in m:
-        raise Exception("missing mtype")
+        err_msg = "aggregate_records: missing mtype"
     else:
         mtype = m.get("mtype")
     if "experiment_reference" not in m:
-        raise Exception("missing experiment_reference")
+        err_msg = "aggregate_records: missing experiment_reference"
     else:
         experiment_reference = m.get("experiment_reference")       
     if "data_converge_dir" not in m:
-        raise Exception("missing data_converge_dir")
+        err_msg = "aggregate_records: missing data_converge_dir"
     else:
         data_converge_dir = m.get("data_converge_dir")
     if "parent_result_dir" not in m:
-        raise Exception("missing parent_result_dir")
+        err_msg = "aggregate_records: missing parent_result_dir"
     else:
         parent_result_dir = m.get("parent_result_dir")
+    
+    if err_msg is not None:
+        key = "abaco_message"
+        message = {
+            "subject": key + " received is invalid", 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_msg)
         
     (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(data_converge_dir)
     root_dir = StorageSystem(storage_system, agave=r.client).root_dir
@@ -83,8 +141,14 @@ def aggregate_records(m, r):
     r.logger.info("analysis_dir: {}".format(analysis_dir))
     analysis_record_path = os.path.join(parent_result_dir2, analysis_dir, "record.json")
     if os.path.exists(analysis_record_path) is False:
-        r.logger.info("{} doesn't exist".format(analysis_record_path))
-        exit(2)
+        err_msg = "aggregate_records: path doesn't exist"
+        key = "file_access"
+        message = {
+            "subject": key + " for " + analysis_record_path, 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_msg)
 
     record_path = os.path.join(parent_result_dir2, "record.json")
     # check for existing record.json
@@ -114,25 +178,34 @@ def aggregate_records(m, r):
                 json.dump(record, jfile, indent=2)
             
 def launch_omics(m, r):
+    err_msg = None
     if "input_dir" not in m:
-        raise Exception("missing input_dir")
+        err_msg = "launch_omics: missing input_dir"
     else:
         input_dir = m.get("input_dir")
             
     if "experiment_id" not in m:
-        raise Exception("missing experiment_id")
+        err_msg = "launch_omics: missing experiment_id"
     else:
         experiment_id = m.get("experiment_id")
         
     if "config_file" not in m:
-        raise Exception("missing config_file")
+        err_msg = "launch_omics: missing config_file"
     else:
         config_file = m.get("config_file")        
-        
+    
+    if err_msg is not None:
+        key = "abaco_message"
+        message = {
+            "subject": key + " received is invalid", 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_msg)
+    
     analysis = m.get("analysis")
         
     input_counts_path = os.path.join(input_dir, experiment_id + "_ReadCountMatrix_preCAD_transposed.csv")
-
 
     sr = load_structured_request(experiment_id, r)
     experiment_ref = sr["experiment_reference"]
@@ -204,12 +277,26 @@ def launch_omics(m, r):
 
     except HTTPError as h:
         # Report what is likely to be an Agave-specific error
-        raise Exception("Failed to submit job", h)
+        err_message = "Failed to submit job for " + experiment_id
+        key = "tacc_error"
+        message = {
+            "subject": key + " for running omics_tools", 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_message, h)
 
     except Exception as exc:
         # Report what is likely to be an error with this Reactor, the Data
         # Catalog, or the PipelineJobs system components
-        raise Exception("Failed to launch {}".format(job.uuid), exc)
+        err_message = "Failed to launch {}".format(job.uuid)
+        key = "tacc_error"
+        message = {
+            "subject": key + " for running omics_tools", 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_msg, exc)
 
     # Optional: Send an 'update' event to the PipelineJob's
     # history commemorating a successful run for this Reactor.
@@ -225,19 +312,29 @@ def launch_app(m, r):
     
     analysis = m.get("analysis")
     
+    err_msg = None
     if "experiment_ref" not in m:
-        raise Exception("missing experiment_ref")
+        err_msg = "launch_app: missing experiment_ref"
     else:
         experiment_ref = m.get("experiment_ref")
     if "data_converge_dir" not in m:
-        raise Exception("missing data_converge_dir")
+        err_msg = "launch_app: missing data_converge_dir"
     else:
         data_converge_dir = m.get("data_converge_dir")
     if "datetime_stamp" not in m:
-        raise Exception("missing datetime_stamp")
+        err_msg = "launch_app: missing datetime_stamp"
     else:
         datetime_stamp = m.get("datetime_stamp")
 
+    if err_msg is not None:
+        key = "abaco_message"
+        message = {
+            "subject": key + " received is invalid", 
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_msg)
+    
     state = "complete" if "complete" in data_converge_dir.lower() else "preview"
     
     r.logger.info("experiment_ref: {} data_converge_dir: {} analysis: {}".format(experiment_ref, data_converge_dir, analysis))
@@ -280,7 +377,14 @@ def launch_app(m, r):
     product_patterns = []
     if analysis == "perform-metrics":
         if "mtype" not in m:
-            raise Exception("missing mtype")
+            err_msg = "launch_app for perform-metrics: missing mtype"
+            key = "abaco_message"
+            message = {
+                "subject": key + " received is invalid", 
+                "body": err_message
+            }
+            send_email_notification(message, key, r)
+            raise Exception(err_msg)
 
         mtype = m.get("mtype")        
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
@@ -412,12 +516,26 @@ def launch_app(m, r):
 
     except HTTPError as h:
         # Report what is likely to be an Agave-specific error
-        raise Exception("Failed to submit job", h)
+        err_message = "Failed to submit job for " + experiment_ref
+        key = "tacc_error"
+        message = {
+            "subject": key + " for running " + analysis,
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_message, h)
 
     except Exception as exc:
         # Report what is likely to be an error with this Reactor, the Data
         # Catalog, or the PipelineJobs system components
-        raise Exception("Failed to launch {}".format(job.uuid), exc)
+        err_msg = "Failed to launch {}".format(job.uuid)
+        key = "tacc_error"
+        message = {
+            "subject": key + " for running " + analysis,
+            "body": err_message
+        }
+        send_email_notification(message, key, r)
+        raise Exception(err_message, exc)
 
     # Optional: Send an 'update' event to the PipelineJob's
     # history commemorating a successful run for this Reactor.
