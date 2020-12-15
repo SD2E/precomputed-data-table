@@ -106,6 +106,17 @@ def get_data(experiment, record):
         return None
 
 
+def get_data_and_metadata_mem(experiment):
+    record = get_record(experiment)
+    data = get_data_mem(experiment, record)
+    meta = get_meta(experiment, record)
+    if data is not None and meta is not None:
+        df = meta.merge(data, on="sample_id", how="inner")
+        return df
+    else:
+        return None
+
+
 def get_data_and_metadata(experiment):
     record = get_record(experiment)
     data = get_data(experiment, record)
