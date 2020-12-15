@@ -55,7 +55,8 @@ def main(data_converge_path: str,
     
     # Get the data and metadata
     print("Loading prediction data...")
-    df = du.get_data_and_metadata(data_converge_path)
+    # df = du.get_data_and_metadata(data_converge_path)
+    df = du.get_data_and_metadata_mem(data_converge_path)
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
     # meta = meta.rename(columns={'well':'well_id'})
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']

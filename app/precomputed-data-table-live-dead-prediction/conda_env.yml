@@ -14,4 +14,4 @@ dependencies:
 #      - -e grouped_control_prediction
 #      - -e pysd2cat[harness]
       - -e src/grouped_control_prediction
-      - -e src/pysd2cat[harness]
+      - -e src/pysd2cat[harness] # branch == 'development'

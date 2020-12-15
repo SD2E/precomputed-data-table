@@ -14,4 +14,4 @@ dependencies:
 #      - -e ../fcs_signal_prediction
 #      - -e ../pysd2cat
       - -e ../src/fcs_signal_prediction
-      - -e ../src/pysd2cat
+      - -e ../src/pysd2cat  # branch == 'development'
