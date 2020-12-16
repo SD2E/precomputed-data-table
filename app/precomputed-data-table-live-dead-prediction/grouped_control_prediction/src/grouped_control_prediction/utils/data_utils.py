@@ -82,7 +82,7 @@ def get_data_mem(experiment, record):
             fc_raw_df_list = []
             # iterate over chunk dataframes and transform dataframes
             for cidx, chunck_df in enumerate(fc_raw_reader):
-                print(f'chunk # {cidx + 1}')
+                # print(f'chunk # {cidx + 1}')
                 cols_to_explode = [col for col in chunck_df.columns if col != 'sample_id']
                 chunck_df = explode(chunck_df, cols_to_explode)
                 fc_raw_df_list.append(chunck_df)
