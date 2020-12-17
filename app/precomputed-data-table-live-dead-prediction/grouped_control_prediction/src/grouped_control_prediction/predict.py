@@ -97,7 +97,7 @@ def predict_signal(df_original : DataFrame,
         distances = pickle.load(open(distance_pkl, "rb"))
     else:
         # Compute control set Wasserstein distances
-        distances = k_nearest_controls(experiment, control_set_dir)
+        distances = k_nearest_controls(df_original, control_set_dir)
 
     # Randomly sample n=control_size control sets based using inverse distance weighting
     if weighted:
