@@ -37,7 +37,8 @@ def main(data_converge_path: str,
     
     ## Get the data and metadata
     
-    df = du.get_data(data_converge_path, du.get_record(data_converge_path))
+    # df = du.get_data(data_converge_path, du.get_record(data_converge_path))
+    df = du.get_data_mem(data_converge_path, du.get_record(data_converge_path))
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
     df = df.merge(meta[[id_col, strain_col]])
     

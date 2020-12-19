@@ -392,8 +392,6 @@ def launch_app(m, r):
     else:
         # maxRunTime should probably be determined based on experiment size  
         parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
-        if control_set_dir:
-            parameter_dict['control_set_dir'] = control_set_dir
 
         if analysis == "xplan-od-growth-analysis":
             app_id = r.settings.agave_growth_analysis_app_id
@@ -421,13 +419,22 @@ def launch_app(m, r):
                 }]
         elif analysis == "live-dead-prediction":
             if "control_set_dir" not in m:
-                raise Exception("missing control_set_dir")
+                err_msg = "missing control_set_dir"
+                key = "abaco_message"
+                message = {
+                    "subject": key + " for " + analysis, 
+                    "body": err_message
+                }
+                send_email_notification(message, key, r)
+                raise Exception(err_msg)
 
             control_set_dir0 = m.get("control_set_dir")
             (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_set_dir0)
             root_dir = StorageSystem(storage_system, agave=r.client).root_dir
             control_set_dir = join_posix_agave([root_dir, dirpath, leafdir])
             r.logger.info("control_set_dir: {}".format(control_set_dir))
+            if control_set_dir:
+                parameter_dict['control_set_dir'] = control_set_dir
               
             app_id = r.settings.agave_live_dead_prediction_app_id
             fc_file_name = '__'.join([experiment_ref, 'fc_raw_events.json'])
