@@ -14,10 +14,12 @@ from scipy.stats import wasserstein_distance as wd
 from grouped_control_prediction.utils import data_utils as du
 
 
-def k_nearest_controls(exp_dir, control_set_dir):
+def k_nearest_controls(experiment_df, control_set_dir):
 
     # Load prediction data
-    experiment_df = du.get_data_and_metadata(exp_dir)
+    # experiment_df = du.get_data_and_metadata(exp_dir)
+    # experiment_df = du.get_data_and_metadata_mem(exp_dir)
+    # code above ^^ was for loading the experiment data in. However, this function now takes in a pandas dataframe
 
     # Create renaming dict for channel columns
     channels = ['FSC-A', 'SSC-A', 'BL1-A', 'FSC-W', 'FSC-H', 'SSC-W', 'SSC-H']
