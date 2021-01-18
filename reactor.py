@@ -72,8 +72,8 @@ def send_email_notification(m, recipient_key, r):
             'subject', 'Automated email notification'))
         # Message body
         ts = utcnow()
-        body = "Message sent at {} by actors/{}/executions/{}".format(ts, r.uid, r.execid)
-        body = m.get('body', body)
+        body = "Message sent at {} by actors/{}/executions/{}\n".format(ts, r.uid, r.execid)
+        body = body + m.get('body')
     except Exception as e:
         r.on_failure("Error setting up message: {}".format(e))
 
