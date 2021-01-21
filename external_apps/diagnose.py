@@ -1,7 +1,7 @@
 """
-run perform metrics for PDT
+run diagnose for PDT
 
-:authors: anastasia deckard (anastasia.deckard@geomdata.com)
+:authors: anastasia deckard (anastasia.deckard@geomdata.com), tessa johnson (tessa.johnson@geomdata.com)
 """
 
 import os
@@ -12,7 +12,7 @@ app_id = "diagnose_app-0.1.0"
 
 def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtype):
     """
-    create a job template with info needed to run the perform metrics-app
+    create a job template with info needed to run the diagnose-app
 
     :param out_sys: 'sd2e-projects'
     :param out_dir: 'sd2e-project-48/complete/<exp_ref>/<datetime>'
