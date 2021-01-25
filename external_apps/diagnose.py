@@ -29,7 +29,7 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
     config_file = 'pm_ys1_fc_etl.json'
 
     if config_file:
-        out_dir = os.path.join(batch_dir, exp_ref)
+        out_dir = os.path.join(out_dir, 'diagnose__' + mtype)
 
         job_template = {"name": app_name,
                         "appId": app_id,
@@ -43,30 +43,19 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
                         }
 
         # figure out input files
-
-        # figure out input files
         data_files = list()
         if mtype == 'FLOW':
-            diagnose_exp_file = '{0:s}/per_sample_metric_circuit_media.tsv'.format(dc_batch_path)
-            diagnose_optional_data = '{0:s}/{1:s}__fc_meta.csv'.format(dc_batch_path, experiment_reference)
+            base_in_dir = '{0:s}/perform-metrics__{1:s}/'.format(dc_batch_path, mtype)
+            diagnose_exp_file = base_in_dir + 'per_sample_metric_circuit_media.tsv'.format(dc_batch_path, mtype)
+            diagnose_optional_data = base_in_dir + '{0:s}__fc_meta.csv'.format(experiment_reference)
             job_template['inputs']['exp_file'] = diagnose_exp_file
             job_template['inputs']['diagnose_optional_metadata'] = diagnose_optional_data
             data_files = [diagnose_exp_file, diagnose_optional_data]
 
-        elif mtype == 'PLATE_READER':
-            diagnose_exp_file = '{0:s}/per_sample_metric_circuit_media.tsv'.format(dc_batch_path)
-            job_template['inputs']['exp_file'] = diagnose_exp_file
-            data_files = [diagnose_exp_file]
-
-            # figure out configuration files
-            diagnose_config_path = "/diagnose/src/diagnose/configs/"
-            job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
-
-
     product_patterns = [
-            {'patterns': ['^.*(tsv)$'],
-             'derived_from': data_files,
-             'derived_using': []
-             }]
+        {'patterns': ['^.*(tsv)$'],
+         'derived_from': data_files,
+         'derived_using': []
+         }]
 
     return job_template, product_patterns
