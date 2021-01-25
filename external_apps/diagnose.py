@@ -43,16 +43,24 @@ def get_job_template(out_sys, out_dir, dc_batch_path, experiment_reference, mtyp
                         }
 
         # figure out input files
-        job_template['inputs']['exp_file'] = '{0:s}/{1:s}__{2:s}/per_sample_metric_circuit_media.tsv'.format(
-            dc_batch_path,
-            exp_ref, m_type)
-        job_template['inputs']['diagnose_optional_metadata'] = '{0:s}/{1:s}__{2:s}/{1:s}__fc_meta.csv'.format(
-            dc_batch_path,
-            exp_ref, m_type)
 
-        # figure out configuration files
-        perform_metrics_config_path = "/diagnose/src/diagnose/configs/"
-        job_template['parameters']['diagnose_config_json'] = os.path.join(perform_metrics_config_path, config_file)
+        # figure out input files
+        data_files = list()
+        if mtype == 'FLOW':
+            diagnose_exp_file = '{0:s}/per_sample_metric_circuit_media.tsv'.format(dc_batch_path)
+            diagnose_optional_data = '{0:s}/{1:s}__fc_meta.csv'.format(dc_batch_path, experiment_reference)
+            job_template['inputs']['exp_file'] = diagnose_exp_file
+            job_template['inputs']['diagnose_optional_metadata'] = diagnose_optional_data
+            data_files = [diagnose_exp_file, diagnose_optional_data]
+
+        elif mtype == 'PLATE_READER':
+            diagnose_exp_file = '{0:s}/per_sample_metric_circuit_media.tsv'.format(dc_batch_path)
+            job_template['inputs']['exp_file'] = diagnose_exp_file
+            data_files = [diagnose_exp_file]
+
+            # figure out configuration files
+            diagnose_config_path = "/diagnose/src/diagnose/configs/"
+            job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
 
 
     product_patterns = [
