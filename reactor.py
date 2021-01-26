@@ -18,6 +18,7 @@ from datacatalog.stores import StorageSystem
 from reactors.runtime import Reactor, agaveutils, utcnow
 from requests.exceptions import HTTPError
 from external_apps import perform_metrics as ea_pm
+from external_apps import diagnose
 
 def join_posix_agave(joinList):
     new_path = '/'.join(arg.strip("/") for arg in joinList)
@@ -375,9 +376,9 @@ def launch_app(m, r):
     mtype = None
     control_set_dir = None
     product_patterns = []
-    if analysis == "perform-metrics":
+    if analysis in ["perform-metrics", "diagnose"]:
         if "mtype" not in m:
-            err_msg = "launch_app for perform-metrics: missing mtype"
+            err_msg = f"launch_app for {analysis}: missing mtype"
             key = "abaco_message"
             message = {
                 "subject": key + " received is invalid", 
@@ -388,7 +389,10 @@ def launch_app(m, r):
 
         mtype = m.get("mtype")        
         output_path_parent = os.path.join(state, experiment_ref, datetime_stamp)
-        job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
+        if analysis == "perform-metrics":
+            job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
+        elif analysis == "diagnose":
+            job_def, product_patterns = diagnose.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
     else:
         # maxRunTime should probably be determined based on experiment size  
         parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
