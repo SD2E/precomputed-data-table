@@ -10,13 +10,15 @@ app_name = "diagnose_app"
 app_id = "diagnose_app-0.1.0"
 
 
-def get_job_template(out_sys, pdt_path, experiment_reference, mtype):
+def get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtype):
     """
     create a job template with info needed to run the diagnose-app
 
     :param out_sys: 'sd2e-projects'
-    :param pdt_path: 'sd2e-project-48/complete/<exp_ref>/<datetime>'
+    :param out_dir: 'sd2e-project-48/complete/<exp_ref>/<datetime>'
+    :param pm_batch_path: 'agave://data-sd2e-projects.sd2e-project-48/complete/<exp_ref>/<datetime>'
     :param experiment_reference: 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208'
+    :param mtype: 'FLOW', 'PLATE_READER'
     :return:
     """
 
@@ -27,7 +29,7 @@ def get_job_template(out_sys, pdt_path, experiment_reference, mtype):
 
     # currently only supporting flow etl; will add check for all data types here
     if mtype == 'FLOW':
-        out_dir = os.path.join(pdt_path, 'diagnose__' + mtype)
+        out_dir = os.path.join(out_dir, 'diagnose__' + mtype)
 
         job_template = {"name": app_name,
                         "appId": app_id,
@@ -42,11 +44,10 @@ def get_job_template(out_sys, pdt_path, experiment_reference, mtype):
 
         # figure out input files
         data_files = list()
-        base_in_dir = os.path.join(pdt_path, '{perform-metrics__{0:s}'.format(mtype))
+        base_in_dir = os.path.join(pm_batch_path, 'perform-metrics__{0:s}'.format(mtype))
         diagnose_config_path = "/diagnose/src/diagnose/configs/"
         if mtype == 'FLOW':
-            diagnose_exp_file = os.path.join(base_in_dir,
-                                             'per_sample_metric_circuit_media.tsv'.format(pdt_path, mtype))
+            diagnose_exp_file = os.path.join(base_in_dir, 'per_sample_metric_circuit_media.tsv')
             diagnose_optional_data = os.path.join(base_in_dir,
                                                   '{0:s}__fc_meta.csv'.format(experiment_reference))
             job_template['inputs']['exp_file'] = diagnose_exp_file
@@ -64,3 +65,15 @@ def get_job_template(out_sys, pdt_path, experiment_reference, mtype):
              }]
 
     return job_template, product_patterns
+
+
+if __name__ == '__main__':
+    out_sys = 'sd2e-projects'
+    out_dir = 'sd2e-project-48/complete/<exp_ref>/<datetime>'
+    pm_batch_path = 'agave://data-sd2e-projects.sd2e-project-48/complete/<exp_ref>/<datetime>'
+    experiment_reference = 'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208'
+    mtype = 'FLOW'
+
+    job = get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtype)
+
+    print(job)
