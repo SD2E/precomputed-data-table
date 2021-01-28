@@ -32,10 +32,10 @@ def return_fc_meta_name(er_dir):
 
 
 def get_col_min_max(er_dir, column):
-
     meta_filename = return_fc_meta_name(er_dir)
     meta_df = pd.read_csv(meta_filename, dtype=object)
-    return [meta_df[column].min(), meta_df[column].max()]
+    meta_df_column = meta_df[column].dropna()
+    return [meta_df_column.min(), meta_df_column.max()]
 
 
 diff_dict = {'inducer_diff':
