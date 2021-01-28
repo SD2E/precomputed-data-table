@@ -318,10 +318,20 @@ def launch_app(m, r):
         err_msg = "launch_app: missing experiment_ref"
     else:
         experiment_ref = m.get("experiment_ref")
-    if "data_converge_dir" not in m:
-        err_msg = "launch_app: missing data_converge_dir"
+    if analysis != "diagnose":
+        if "data_converge_dir" not in m:
+            err_msg = "launch_app: missing data_converge_dir"
+        else:
+            data_converge_dir = m.get("data_converge_dir")
+        state = "complete" if "complete" in data_converge_dir.lower() else "preview"
+        r.logger.info("experiment_ref: {} data_converge_dir: {} analysis: {}".format(experiment_ref, data_converge_dir, analysis))
+        (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(data_converge_dir)
     else:
-        data_converge_dir = m.get("data_converge_dir")
+        pm_batch_path = m.get("pm_batch_path")
+        state = "complete" if "complete" in pm_batch_path.lower() else "preview"
+        r.logger.info("experiment_ref: {} pm_batch_path: {} analysis: {}".format(experiment_ref, pm_batch_path, analysis))
+        (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(pm_batch_path)
+        
     if "datetime_stamp" not in m:
         err_msg = "launch_app: missing datetime_stamp"
     else:
@@ -331,19 +341,11 @@ def launch_app(m, r):
         key = "abaco_message"
         message = {
             "subject": key + " received is invalid", 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
         raise Exception(err_msg)
-    
-    state = "complete" if "complete" in data_converge_dir.lower() else "preview"
-    
-    r.logger.info("experiment_ref: {} data_converge_dir: {} analysis: {}".format(experiment_ref, data_converge_dir, analysis))
-    (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(data_converge_dir)
-    root_dir = StorageSystem(storage_system, agave=r.client).root_dir
-    data_converge_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
-    r.logger.info("data_converge_dir2: {}".format(data_converge_dir2))
-    
+  
     # Capture initial parameterization passed in as message
     job_data = copy.copy(m)
 
@@ -363,15 +365,6 @@ def launch_app(m, r):
 
     archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
-        
-    #meta_file_name = '__'.join([experiment_ref, 'fc_meta.csv'])
-    #meta_with_absolute_path = os.path.join(data_converge_dir, meta_file_name)
-    #if os.path.exists(meta_with_absolute_path):
-    #    r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
-    #    derived_using = [meta_with_absolute_path]
-    #else:
-    #    derived_using = []
-    #r.logger.info("meta_with_absolute_path: {}".format(meta_with_absolute_path))
 
     mtype = None
     control_set_dir = None
@@ -392,8 +385,12 @@ def launch_app(m, r):
         if analysis == "perform-metrics":
             job_def, product_patterns = ea_pm.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
         elif analysis == "diagnose":
-            job_def, product_patterns = diagnose.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, data_converge_dir, experiment_ref, mtype)
+            job_def, product_patterns = diagnose.get_job_template("data-sd2e-projects.sd2e-project-48", output_path_parent, pm_batch_path, experiment_ref, mtype)
     else:
+        root_dir = StorageSystem(storage_system, agave=r.client).root_dir
+        data_converge_dir2 = join_posix_agave([root_dir, dirpath, leafdir])
+        r.logger.info("data_converge_dir2: {}".format(data_converge_dir2))
+  
         # maxRunTime should probably be determined based on experiment size  
         parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
 
@@ -511,6 +508,9 @@ def launch_app(m, r):
                 "url": job.callback + "&status=${JOB_STATUS}"
             }
         ]
+    
+    # Make sure that the logs will be available even if the app fails
+    #job_def["archiveOnAppError"] = "true"
 
     r.logger.info('Job Def: {}'.format(job_def))
 
