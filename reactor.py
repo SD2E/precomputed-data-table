@@ -123,7 +123,7 @@ def aggregate_records(m, r):
         key = "abaco_message"
         message = {
             "subject": key + " received is invalid", 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
         raise Exception(err_msg)
@@ -146,7 +146,7 @@ def aggregate_records(m, r):
         key = "file_access"
         message = {
             "subject": key + " for " + analysis_record_path, 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
         raise Exception(err_msg)
@@ -199,7 +199,7 @@ def launch_omics(m, r):
         key = "abaco_message"
         message = {
             "subject": key + " received is invalid", 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
         raise Exception(err_msg)
@@ -278,23 +278,23 @@ def launch_omics(m, r):
 
     except HTTPError as h:
         # Report what is likely to be an Agave-specific error
-        err_message = "Failed to submit job for " + experiment_id
+        err_msg = "Failed to submit job for " + experiment_id
         key = "tacc_error"
         message = {
             "subject": key + " for running omics_tools", 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
-        raise Exception(err_message, h)
+        raise Exception(err_msg, h)
 
     except Exception as exc:
         # Report what is likely to be an error with this Reactor, the Data
         # Catalog, or the PipelineJobs system components
-        err_message = "Failed to launch {}".format(job.uuid)
+        err_msg = "Failed to launch {}".format(job.uuid)
         key = "tacc_error"
         message = {
             "subject": key + " for running omics_tools", 
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
         raise Exception(err_msg, exc)
@@ -424,7 +424,7 @@ def launch_app(m, r):
                 key = "abaco_message"
                 message = {
                     "subject": key + " for " + analysis, 
-                    "body": err_message
+                    "body": err_msg
                 }
                 send_email_notification(message, key, r)
                 raise Exception(err_msg)
@@ -527,14 +527,14 @@ def launch_app(m, r):
 
     except HTTPError as h:
         # Report what is likely to be an Agave-specific error
-        err_message = "Failed to submit job for " + experiment_ref
+        err_msg = "Failed to submit job for " + experiment_ref
         key = "tacc_error"
         message = {
             "subject": key + " for running " + analysis,
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
-        raise Exception(err_message, h)
+        raise Exception(err_msg, h)
 
     except Exception as exc:
         # Report what is likely to be an error with this Reactor, the Data
@@ -543,10 +543,10 @@ def launch_app(m, r):
         key = "tacc_error"
         message = {
             "subject": key + " for running " + analysis,
-            "body": err_message
+            "body": err_msg
         }
         send_email_notification(message, key, r)
-        raise Exception(err_message, exc)
+        raise Exception(err_msg, exc)
 
     # Optional: Send an 'update' event to the PipelineJob's
     # history commemorating a successful run for this Reactor.
