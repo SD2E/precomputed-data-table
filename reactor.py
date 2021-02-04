@@ -375,7 +375,7 @@ def launch_app(m, r):
             key = "abaco_message"
             message = {
                 "subject": key + " received is invalid", 
-                "body": err_message
+                "body": err_msg
             }
             send_email_notification(message, key, r)
             raise Exception(err_msg)
