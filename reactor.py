@@ -210,14 +210,22 @@ def launch_omics(m, r):
 
     sr = load_structured_request(experiment_id, r)
     experiment_ref = sr["experiment_reference"]
-    state = "complete"
+
+    if "precomputed_data_table" not in sr["status"]:
+        state = "complete"
+        now = datetime.datetime.now()
+        datetime_stamp = now.strftime('%Y%m%d%H%M%S')
+    else:
+        # This could happen if other PDT analyses have already run via the automated pipeline
+        state = sr["status"]["precomputed_data_table"]["state"]
+        datetime_stamp = os.path.basename(sr["status"]["precomputed_data_table"]["path"])
     
     app_job_def_inputs = {}
     app_job_def_inputs['input_data'] = agaveutils.to_agave_uri(systemId="data-sd2e-community", dirPath=input_counts_path)
     r.logger.info("input_data: {}".format(app_job_def_inputs['input_data']))
     
     job_data = copy.copy(m)
-    archive_path = os.path.join(state, experiment_ref, analysis)
+    archive_path = os.path.join(state, experiment_ref, analysis, datetime_stamp)
     r.logger.info("archive_path: {}".format(archive_path))
     product_patterns = []     
 
@@ -264,6 +272,7 @@ def launch_omics(m, r):
             }
         ]
 
+    job_def["archiveOnAppError"] = True
     r.logger.info('Job Def: {}'.format(job_def))
 
     ag_job_id = None
@@ -510,7 +519,7 @@ def launch_app(m, r):
         ]
     
     # Make sure that the logs will be available even if the app fails
-    #job_def["archiveOnAppError"] = "true"
+    job_def["archiveOnAppError"] = True
 
     r.logger.info('Job Def: {}'.format(job_def))
 
