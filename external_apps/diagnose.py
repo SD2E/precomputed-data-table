@@ -14,6 +14,7 @@ map_data_type = {
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-3-0': 'ys_1.0',
+    'YeastSTATES-1-0-Time-Series-Round-4-0': 'ys_1.0'
 }
 
 map_data_file = {
