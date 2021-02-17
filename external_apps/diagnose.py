@@ -74,7 +74,7 @@ def get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtyp
             data_files = [diagnose_exp_file, diagnose_optional_data]
 
             # figure out configuration files
-            config_file = 'pm_ys1_fc_etl.json'
+            config_file = 'diagnose_pm_general.json'
             job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
 
         product_patterns = [
