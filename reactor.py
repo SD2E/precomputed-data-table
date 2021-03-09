@@ -225,7 +225,7 @@ def launch_omics(m, r):
     r.logger.info("input_data: {}".format(app_job_def_inputs['input_data']))
     
     job_data = copy.copy(m)
-    archive_path = os.path.join(state, experiment_ref, analysis, datetime_stamp)
+    archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
     product_patterns = []     
 
@@ -234,7 +234,7 @@ def launch_omics(m, r):
               data=job_data,
               product_patterns=product_patterns,
               archive_system = 'data-sd2e-projects.sd2e-project-48',
-              archive_path=archive_path)    
+              archive_path=archive_path)
     job.setup()
     
     token_key = r.context["CATALOG_ADMIN_TOKEN_KEY"]
