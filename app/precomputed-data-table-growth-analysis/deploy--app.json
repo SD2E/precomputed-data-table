@@ -15,6 +15,25 @@
   "templatePath": "runner-template.sh",
   "testPath": "tester.sh",
   "inputs": [
+	{
+		"id": "inputData",
+		"value": {
+			"default": "",
+			"visible": true,
+			"required": true,
+			"order": 0
+		},
+		"semantics": {
+			"minCardinality": 1,
+			"maxCardinality": 500,
+			"ontology": [
+				"http://edamontology.org/data_1049"
+			]
+		},
+		"details": {
+			"label": "Data Converge Directory"
+		}
+	}
   ],
   "parameters": [
     {
