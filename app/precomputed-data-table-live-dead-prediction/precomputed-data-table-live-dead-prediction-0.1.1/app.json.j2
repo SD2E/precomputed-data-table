@@ -1,10 +1,10 @@
 {
-  "name": "precomputed-data-table-live-dead-prediction",
-  "version": "0.1.1",
+  "name": "{{ app.name }}",
+  "version": "{{ app.version }}",
   "executionType": "CLI",
   "executionSystem": "hpc-tacc-jetstream-public",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/precomputed-data-table-live-dead-prediction-0.1.1",
+  "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
@@ -58,7 +58,7 @@
     {
       "id": "CONTAINER_IMAGE",
       "value": {
-        "default": "sd2e/precomputed-data-table-live-dead-prediction:0.1.1",
+        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
         "description": "Container Image. Do not edit.",
         "type": "string",
         "visible": false,

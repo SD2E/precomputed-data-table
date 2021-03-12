@@ -152,6 +152,7 @@ def aggregate_records(m, r):
         raise Exception(err_msg)
 
     record_path = os.path.join(parent_result_dir2, "record.json")
+    r.logger.info(f"record_path: {record_path}")
     # check for existing record.json
     if 'record.json' not in os.listdir(parent_result_dir2):
         record = rpi.make_product_record(experiment_reference, parent_result_dir2, data_converge_dir2)
@@ -159,9 +160,11 @@ def aggregate_records(m, r):
     else:
         with open(record_path, 'r') as jfile:
             record = json.load(jfile)
+    r.logger.info(f'record["analyses"]: {record["analyses"]}')
 
     with open(analysis_record_path, 'r') as analysis_json_file:
         analysis_record = json.load(analysis_json_file)
+        r.logger.info(f'analysis_record["analyses"][analysis]: {analysis_record["analyses"][analysis]}')
         if analysis_record:
             if analysis == "perform-metrics":
                 analysis_label = analysis + "__" + mtype
@@ -401,8 +404,9 @@ def launch_app(m, r):
         r.logger.info("data_converge_dir2: {}".format(data_converge_dir2))
   
         # maxRunTime should probably be determined based on experiment size  
-        parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir2, "analysis": analysis}
+        parameter_dict = {"experiment_ref": experiment_ref, "data_converge_dir": data_converge_dir, "analysis": analysis}
 
+        app_job_def_inputs = {}
         if analysis == "xplan-od-growth-analysis":
             app_id = r.settings.agave_growth_analysis_app_id
             parameter_dict["sift_ga_sbh_url"] = r.context["_REACTOR_SBH_URL"]
@@ -439,6 +443,8 @@ def launch_app(m, r):
                 raise Exception(err_msg)
 
             control_set_dir0 = m.get("control_set_dir")
+            control_set_file = os.path.join(control_set_dir0, "control_set.tgz")
+            app_job_def_inputs['controlData'] = control_set_file
             (storage_system, dirpath, leafdir) = agaveutils.from_agave_uri(control_set_dir0)
             root_dir = StorageSystem(storage_system, agave=r.client).root_dir
             control_set_dir = join_posix_agave([root_dir, dirpath, leafdir])
@@ -474,6 +480,7 @@ def launch_app(m, r):
                 }
             ]
 
+
         job_def = {
             "appId": app_id,
             "name": "precomputed-data-table-app" + r.nickname,
@@ -486,6 +493,12 @@ def launch_app(m, r):
         job_def["archivePath"] = archive_path
         job_def["archiveSystem"] = "data-sd2e-projects.sd2e-project-48"
         job_def["archive"] = True
+
+
+        input_data_file = os.path.join(data_converge_dir, "data_converge.tgz")
+        app_job_def_inputs['inputData'] = input_data_file
+        r.logger.info(f"app_job_def_inputs: {app_job_def_inputs}")
+        job_def["inputs"] = app_job_def_inputs
 
     r.logger.debug("Instantiating job with product_patterns: {}".format(product_patterns))
 

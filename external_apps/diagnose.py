@@ -7,7 +7,7 @@ run diagnose for PDT
 import os
 
 app_name = "diagnose_app"
-app_id = "diagnose_app-0.1.0"
+app_id = "diagnose_app-0.1.1"
 
 
 def get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtype):

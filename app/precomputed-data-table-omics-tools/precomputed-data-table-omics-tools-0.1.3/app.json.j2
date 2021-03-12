@@ -1,10 +1,10 @@
 {
-  "name": "precomputed-data-table-fcs-signal-prediction",
-  "version": "0.1.1",
+  "name": "{{ app.name }}",
+  "version": "{{ app.version }}",
   "executionType": "CLI",
   "executionSystem": "hpc-tacc-jetstream-public",
   "parallelism": "SERIAL",
-  "deploymentPath": "apps/precomputed-data-table-fcs-signal-prediction-0.1.1",
+  "deploymentPath": "apps/{{ app.bundle }}",
   "deploymentSystem": "data-sd2e-app-assets",
   "defaultQueue": "all",
   "label": "precomputed data table",
@@ -16,11 +16,11 @@
   "testPath": "tester.sh",
   "inputs": [
 	{
-		"id": "inputData",
+		"id": "input_data",
 		"value": {
 			"default": "",
 			"visible": true,
-			"required": true,
+			"required": false,
 			"order": 0
 		},
 		"semantics": {
@@ -31,7 +31,7 @@
 			]
 		},
 		"details": {
-			"label": "Data Converge Directory"
+			"label": "input counts file"
 		}
 	}
   ],
@@ -39,7 +39,7 @@
     {
       "id": "CONTAINER_IMAGE",
       "value": {
-        "default": "sd2e/precomputed-data-table-fcs-signal-prediction:0.1.1",
+        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
         "description": "Container Image. Do not edit.",
         "type": "string",
         "visible": false,
@@ -47,23 +47,7 @@
       }
     },
     {
-      "id": "experiment_ref",
-      "value": {
-        "type": "string",
-        "visible": true,
-        "required": true
-      }
-    },
-    {
-      "id": "data_converge_dir",
-      "value": {
-        "type": "string",
-        "visible": true,
-        "required": true
-      }
-    },
-    {
-      "id": "analysis",
+      "id": "config_file",
       "value": {
         "type": "string",
         "visible": true,
