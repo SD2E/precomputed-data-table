@@ -1,10 +1,10 @@
 ---
 debug: false
-agave_growth_analysis_app_id: precomputed-data-table-growth-analysis-0.1.1
-agave_fcs_signal_prediction_app_id: precomputed-data-table-fcs-signal-prediction-0.1.0
-agave_live_dead_prediction_app_id: precomputed-data-table-live-dead-prediction-0.1.0
-agave_wasserstein_app_id: precomputed-data-table-wasserstein-0.1.0
-agave_omics_tools_app_id: precomputed-data-table-omics-tools-0.1.2
+agave_growth_analysis_app_id: precomputed-data-table-growth-analysis-0.1.2
+agave_fcs_signal_prediction_app_id: precomputed-data-table-fcs-signal-prediction-0.1.1
+agave_live_dead_prediction_app_id: precomputed-data-table-live-dead-prediction-0.1.1
+agave_wasserstein_app_id: precomputed-data-table-wasserstein-0.1.1
+agave_omics_tools_app_id: precomputed-data-table-omics-tools-0.1.3
 
 logs:
   level: DEBUG
