@@ -7,7 +7,7 @@ run perform metrics for PDT
 import os
 
 app_name = "perform-metrics-app"
-app_id = "perform_metrics_app-0.1.0"
+app_id = "perform_metrics_app-0.1.1"
 
 map_config_type = {
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
