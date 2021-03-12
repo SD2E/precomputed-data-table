@@ -58,13 +58,14 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
 
 
 def main(exp_ref, analysis, out_dir, data_converge_dir):
+    print(f"out_dir: f{out_dir} data_converge_dir: {data_converge_dir}")
 
     # Check status of data in ER's record.json file
     path_to_record_json = preproc.return_er_record_path(data_converge_dir)
     preproc.check_er_status(path_to_record_json)
 
     # confirm presence of data(frame) types
-    data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
+    #data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
 
     record_path = os.path.join(out_dir, "record.json")
 

@@ -157,7 +157,7 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     preproc.check_er_status(path_to_record_json)
 
     # confirm presence of data(frame) types
-    data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
+    #data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
 
     record_path = os.path.join(out_dir, "record.json")
 
