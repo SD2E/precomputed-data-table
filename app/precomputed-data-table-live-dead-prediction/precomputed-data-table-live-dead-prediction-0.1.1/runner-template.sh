@@ -60,7 +60,7 @@ rm ${inputTarball}
 
 echo "controlTarball: " ${controlTarball}
 mkdir control_set_dir
-tar zxvf ${controlTarball} --directory control_set_dir
+tar zxvf ${controlTarball} --directory control_set_dir && echo "Finished unpacking ${controlTarball}"
 echo "control_set_dir" >> .agave.archive
 
 # No need to archive the tarball and its content since they exists elsewhere
