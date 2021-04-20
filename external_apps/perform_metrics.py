@@ -10,21 +10,33 @@ app_name = "perform-metrics-app"
 app_id = "perform_metrics_app-0.1.1"
 
 map_config_type = {
+    'YeastSTATES-Activator-Circuit-BE-Short-Duration-Time-Series-30C': 'ys_annot',
+    'YeastSTATES-Activator-Circuit-Dox-Short-Duration-Time-Series-30C': 'ys_annot',
+    'YeastSTATES-Beta-Estradiol-OR-Gate-Plant-TF-Dose-Response': 'ys_annot',
+    'YeastSTATES-Doxycycline-OR-Gate-Plant-TF-Dose-Response': 'ys_annot',
+    'YeastSTATES-Dual-Response-CRISPR-Short-Duration-Time-Series-30C': 'ys_annot',
+    'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_annot',
+
+    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32-B-3-Nov-2020': 'rs_B',
+    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32': 'rs_A',
+
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-3-0': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-4-0': 'ys_1.0',
-    'YeastSTATES-Beta-Estradiol-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
+
     'YeastSTATES-CRISPR-Dose-Response': 'ys_ind',
     'YeastSTATES-CRISPR-Long-Duration-Time-Series-20191208': 'ys_ind',
     'YeastSTATES-CRISPR-Short-Duration-Time-Series-20191208': 'ys_ind',
     'YeastSTATES-CRISPR-Short-Duration-Time-Series-35C': 'ys_ind',
-    'YeastSTATES-Doxycycline-OR-Gate-Plant-TF-Dose-Response': 'ys_ind',
-    'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_ind',
 }
 
 map_config_file = {
+    'ys_annot': {'FLOW': 'annot_ind__fc_etl.json',
+                 'PLATE_READER': 'annot_ind__pr.json'},
+    'rs_A': {'PLATE_READER': 'riboswitches_pr_1-32.json'},
+    'rs_B': {'PLATE_READER': 'riboswitches_pr_1-32-B-3.json'},
     'ys_1.0': {'FLOW': 'ys1_fc_etl.json',
                'PLATE_READER': 'ys1_pr.json'},
     'ys_ind': {'FLOW': 'general_ts_fc_etl_inducer.json',
