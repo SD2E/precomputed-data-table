@@ -17,9 +17,6 @@ map_data_type = {
     'YeastSTATES-Dual-Response-CRISPR-Short-Duration-Time-Series-30C': 'ys_annot',
     'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_annot',
 
-    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32-B-3-Nov-2020': 'rs',
-    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32': 'rs',
-
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
@@ -34,7 +31,6 @@ map_data_type = {
 
 map_data_file = {
     'ys_annot': 'per_sample_metric_str_cir_med_ind_tmp_tim.tsv',
-    'rs': 'per_sample_metric_str_indconc_time.tsv',
     'ys_1.0': 'per_sample_metric_cir_med_tim.tsv',
     'ys_ind': 'per_sample_metric_str_med_ind_tmp_tim.tsv',
     'default': 'per_sample_metric_str_tim.tsv',

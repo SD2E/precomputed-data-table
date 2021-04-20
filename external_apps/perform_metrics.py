@@ -17,9 +17,6 @@ map_config_type = {
     'YeastSTATES-Dual-Response-CRISPR-Short-Duration-Time-Series-30C': 'ys_annot',
     'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_annot',
 
-    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32-B-3-Nov-2020': 'rs_B',
-    'Cell-Free-Transcriptional-Riboswitch-Characterization-Sequences-1-32': 'rs_A',
-
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-2-0': 'ys_1.0',
@@ -35,8 +32,6 @@ map_config_type = {
 map_config_file = {
     'ys_annot': {'FLOW': 'annot_ind__fc_etl.json',
                  'PLATE_READER': 'annot_ind__pr.json'},
-    'rs_A': {'PLATE_READER': 'riboswitches_pr_1-32.json'},
-    'rs_B': {'PLATE_READER': 'riboswitches_pr_1-32-B-3.json'},
     'ys_1.0': {'FLOW': 'ys1_fc_etl.json',
                'PLATE_READER': 'ys1_pr.json'},
     'ys_ind': {'FLOW': 'general_ts_fc_etl_inducer.json',
