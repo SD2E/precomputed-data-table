@@ -58,15 +58,21 @@ Except for Omics Tools, which requires manual launch, all other PDT analysis too
 
 ```
 abaco run -m '{"experiment_id":"experiment.ginkgo.29422", "input_dir": "/products/v2/1068bfdb0f2a53f1a97eb08c946ee732/OZ6vNeWjwAnkPGxO63ZoApyJ/PAVJ5WXoBNGrBjZvQjjdoAxe", "config_file": "/src/omics_tools/tests/config/Bacillus_Inducer_1_0.json", "analysis":"omics_tools"}' precomputed-data-table-reactor.prod
-
+```
+```
 abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "fcs_signal_prediction"}' precomputed-data-table-reactor.prod
-
+```
+```
 abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "control_set_dir": "agave://data-sd2e-projects.sd2e-project-14/xplan-reactor/data/transcriptic", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "live-dead-prediction"}' precomputed-data-table-reactor.prod
-
+```
+```
 abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "perform-metrics", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
-
+```
+```
 abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "pm_batch_path": "agave://data-sd2e-projects.sd2e-project-48/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420222801", "datetime_stamp": "20210420222801", "analysis": "diagnose", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
 ```
+
+To manually launch Omics Tools at scale, see https://gitlab.sd2e.org/sd2program/omics_tools
 
 ### PDT Output
 Output is in the precomputed_data_table project folder:
@@ -74,13 +80,10 @@ Output is in the precomputed_data_table project folder:
 `/home/jupyter/sd2e-projects/sd2e-project-48`
 
 each run is marked with its experiment reference and a datetime stamp 
-<!--- Unsure if these descriptions are accurate -->
-* testing/  
-    <!--- this seems to only contain a test.txt file -->
 * complete/  
-    all experiments in an experiment reference passed upstream validation
+    all experiments in an experiment reference passed upstream metadata check, ETL processing and validation
 * preview/  
-    experiments in an experiment reference HAVE NOT passed upstream validation
+    not all experiments in an experiment reference HAVE passed upstream metadata check, ETL processing and validation
   
 Within each datetime stamp folder for an experiment reference, a folder will be created for each analysis that was run on the respective experiment reference. 
 
@@ -122,6 +125,7 @@ Most analyses output data frames that are written to csv or json. When possible,
 **Live/Dead Prediction**
 
 **Omics Tools**
+See https://gitlab.sd2e.org/sd2program/omics_tools
 
 **FC Signal Prediction**
 
