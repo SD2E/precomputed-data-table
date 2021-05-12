@@ -59,13 +59,13 @@ Except for Omics Tools, which requires manual launch, all other PDT analysis too
 ```
 abaco run -m '{"experiment_id":"experiment.ginkgo.29422", "input_dir": "/products/v2/1068bfdb0f2a53f1a97eb08c946ee732/OZ6vNeWjwAnkPGxO63ZoApyJ/PAVJ5WXoBNGrBjZvQjjdoAxe", "config_file": "/src/omics_tools/tests/config/Bacillus_Inducer_1_0.json", "analysis":"omics_tools"}' precomputed-data-table-reactor.prod
 
-abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/test/batch_20201126030447_49-speed-up-fc-raw-processing/YeastSTATES-1-0-Time-Series-Round-3-0", "datetime_stamp": "20201211193953", "analysis": "fcs_signal_prediction"}' precomputed-data-table-reactor.prod
+abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "fcs_signal_prediction"}' precomputed-data-table-reactor.prod
 
-abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "control_set_dir": "agave://data-sd2e-projects.sd2e-project-14/xplan-reactor/data/transcriptic", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/test/batch_20201126030447_49-speed-up-fc-raw-processing/YeastSTATES-1-0-Time-Series-Round-3-0", "datetime_stamp": "20201211193953", "analysis": "live-dead-prediction"}' precomputed-data-table-reactor.prod
+abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "control_set_dir": "agave://data-sd2e-projects.sd2e-project-14/xplan-reactor/data/transcriptic", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "live-dead-prediction"}' precomputed-data-table-reactor.prod
 
-abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201109155217", "datetime_stamp": "20201109170334", "analysis": "perform-metrics", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
+abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420212751", "datetime_stamp": "20210420222801", "analysis": "perform-metrics", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
 
-abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "pm_batch_path": "agave://data-sd2e-projects.sd2e-project-48/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201216224304", "datetime_stamp": "20201216224304", "analysis": "diagnose", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
+abaco run -m '{"experiment_ref": "YeastSTATES-OR-Gate-CRISPR-Dose-Response", "pm_batch_path": "agave://data-sd2e-projects.sd2e-project-48/complete/YeastSTATES-OR-Gate-CRISPR-Dose-Response/20210420222801", "datetime_stamp": "20210420222801", "analysis": "diagnose", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
 ```
 
 ### PDT Output
