@@ -26,7 +26,7 @@ abaco deploy -u precomputed-data-table-reactor.prod
 ```
 where `precomputed-data-table-reactor.prod` is the alias to the production instance of the PDT reactor. You can replace it with another reactor id or simply use `abaco deploy` to create a new reactor instance.
 
-The following sections uses `FCS Signal Prediction` to show how to build the Docker image of an analysis, deploy it to TACC, and launch it using the PDT reactor created above.
+The following commands use `FCS Signal Prediction` to show how to build the Docker image of an analysis and deploy it to TACC.
 
 ```
 cd precomputed-data-table
