@@ -45,7 +45,7 @@ make deploy-fcs-signal-prediction
 |FCS Signal Prediction| | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: | | | | |
 |Growth Analysis | | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: | | | | |
 
-#### Note:
+#### Notes:
 * `input_dir` is used by Omics Tools and should point to the output folder containing RNASeq pipeline output, matching the `archive_path` field of an entry in the `jobs` table, e.g., `/products/v2/1068bfdb0f2a53f1a97eb08c946ee732/OZ6vNeWjwAnkPGxO63ZoApyJ/PAVJ5WXoBNGrBjZvQjjdoAxe`
 * `config_file` is used by Omics Tools and is the path to the configuration file in the omics_tools repo. Because these files are copied into the Docker container under `/src`, it needs to start with the leading `/`, e.g., `/src/omics_tools/config/NAND_2_0.json`
 * `data_converge_dir` is needed by all analysis tools except Omics Tools. It is the Agave path to the folder containing the Data Converge output, e.g., `agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/preview/Microbe-LiveDeadClassification/20200721171808`
@@ -54,7 +54,19 @@ make deploy-fcs-signal-prediction
 * `pm_batch_Path` is used by Diagnose and is the Agave path to the folder containing the Performance Metrics output, e.g., `agave://data-sd2e-projects.sd2e-project-48/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201216224304`
 
 ### Run
+Except for Omics Tools, which requires manual launch, all other PDT analysis tools have been integrated into the automated pipeline so they are launched automatically, as soon as Data Converge has finished processing the corresponding experiment_ref. In the case of Diagnose, it is launched as soon as Performance Metrics has finished processing the data. In some cases, it may be desirable to manually launch these tools, e.g., if a change has been made in the analysis itself to test out a modified algorithm. There are two ways to do this. The first is to use the PDT reactor to launch the analysis. The advantage of this approach is that all the input data will be automatically staged if running in the TACC infrastructure. The second approach is to bypass the reactor and launch the analysis directly. This would usually require inspecting the corresponding `runner-template.sh` script to see how the input data are staged so they can be manually staged. Once input data are staged and accessible by the analysis code, the corresponding entry python script can be launched by providing the command line input arguments listed in the above table. Below are examples showing how to launch some of these analysis tools via the PDT reactor:
 
+```
+abaco run -m '{"experiment_id":"experiment.ginkgo.29422", "input_dir": "/products/v2/1068bfdb0f2a53f1a97eb08c946ee732/OZ6vNeWjwAnkPGxO63ZoApyJ/PAVJ5WXoBNGrBjZvQjjdoAxe", "config_file": "/src/omics_tools/tests/config/Bacillus_Inducer_1_0.json", "analysis":"omics_tools"}' precomputed-data-table-reactor.prod
+
+abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/test/batch_20201126030447_49-speed-up-fc-raw-processing/YeastSTATES-1-0-Time-Series-Round-3-0", "datetime_stamp": "20201211193953", "analysis": "fcs_signal_prediction"}' precomputed-data-table-reactor.prod
+
+abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "control_set_dir": "agave://data-sd2e-projects.sd2e-project-14/xplan-reactor/data/transcriptic", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/test/batch_20201126030447_49-speed-up-fc-raw-processing/YeastSTATES-1-0-Time-Series-Round-3-0", "datetime_stamp": "20201211193953", "analysis": "live-dead-prediction"}' precomputed-data-table-reactor.prod
+
+abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "data_converge_dir": "agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201109155217", "datetime_stamp": "20201109170334", "analysis": "perform-metrics", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
+
+abaco run -m '{"experiment_ref": "YeastSTATES-1-0-Time-Series-Round-3-0", "pm_batch_path": "agave://data-sd2e-projects.sd2e-project-48/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201216224304", "datetime_stamp": "20201216224304", "analysis": "diagnose", "mtype": "FLOW"}' precomputed-data-table-reactor.prod
+```
 
 ### PDT Output
 Output is in the precomputed_data_table project folder:
