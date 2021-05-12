@@ -11,18 +11,50 @@ tools to data in order to support automation of analyses. Along with automating 
 | Diagnose|Identifies variables associated with variation in performance, and which high or low values should be investigated. Identifies dependent variables that cause redundancies in analysis or require a change in experimental design to investigate |
 |Live/Dead Prediction | Predicts live/dead cellular events to gate dead/debris cells from downstream analysis|
 |Omics Tools |Configuration based differential expression and enrichment analysis of transcriptional counts data |
-| FC Signal Prediction|Fluorescent output prediction at the flow cytometer event-level for samples based on negative and positive control samples|
+| FCS Signal Prediction|Fluorescent output prediction at the flow cytometer event-level for samples based on negative and positive control samples|
 |Growth Analysis |Estimates growth rates and doubling times of cultures and if the culture is growing or not|
 
 
 ## User Guide
-### Install
-```buildoutcfg
+### Build
+There is a `Makefile` in the project folder that can be used to create the Docker images for the PDT reactor as well as each of the analysis modules listed above, except for `Performance Metrics` and `Diagnose`, which are two external applications covered in https://gitlab.sd2e.org/gda/perform_metrics.git and https://gitlab.sd2e.org/gda/diagnose.git. To build the PDT reactor:
 
 ```
+cd precomputed-data-table
+make reactor-image
+abaco deploy -u precomputed-data-table-reactor.prod
+```
+where `precomputed-data-table-reactor.prod` is the alias to the production instance of the PDT reactor. You can replace it with another reactor id or simply use `abaco deploy` to create a new reactor instance.
+
+The following sections uses `FCS Signal Prediction` to show how to build the Docker image of an analysis, deploy it to TACC, and launch it using the PDT reactor created above.
+
+```
+cd precomputed-data-table
+make fcs-signal-prediction-image
+make deploy-fcs-signal-prediction
+```
+
 ### Input Data
+| Tool | experiment_id | experiment_ref | input_dir | config_file | data_converge_dir | datetime_stamp | control_set_dir|mtypes | pm_batch_path |
+|-------|------------|-------------|------|------|----------|----------|-----|---------|--------|
+|Wasserstein Distance Metric|  | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  |
+|Performance Metrics |  | :heavy_check_mark: | | |:heavy_check_mark: | :heavy_check_mark: |  |:heavy_check_mark: |  | |
+|Diagnose| | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: |  | :heavy_check_mark:| :heavy_check_mark: |  |
+|Live/Dead Prediction | | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | |
+|Omics Tools | :heavy_check_mark: | |:heavy_check_mark: |:heavy_check_mark: | | | | | | |
+|FCS Signal Prediction| | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: | | | | |
+|Growth Analysis | | :heavy_check_mark: | | | :heavy_check_mark: | :heavy_check_mark: | | | | |
+
+#### Note:
+* `input_dir` is used by Omics Tools and should point to the output folder containing RNASeq pipeline output, matching the `archive_path` field of an entry in the `jobs` table, e.g., `/products/v2/1068bfdb0f2a53f1a97eb08c946ee732/OZ6vNeWjwAnkPGxO63ZoApyJ/PAVJ5WXoBNGrBjZvQjjdoAxe`
+* `config_file` is used by Omics Tools and is the path to the configuration file in the omics_tools repo. Because these files are copied into the Docker container under `/src`, it needs to start with the leading `/`, e.g., `/src/omics_tools/config/NAND_2_0.json`
+* `data_converge_dir` is needed by all analysis tools except Omics Tools. It is the Agave path to the folder containing the Data Converge output, e.g., `agave://data-sd2e-projects.sd2e-project-43/reactor_outputs/preview/Microbe-LiveDeadClassification/20200721171808`
+* `control_set_dir` is used by Live/Dead Prediction and it is the Agave path to the folder containing the control FCS files, i.e., `agave://data-sd2e-projects.sd2e-project-14/xplan-reactor/data/transcriptic`
+* `mtypes` is used by both Performance Metrics and Diagnose. It is a summary string indicating the measurement types contained in experiments associated with experiment_ref, e.g., `PF---`, where P is for PLATE_READER and F is for FLOW
+* `pm_batch_Path` is used by Diagnose and is the Agave path to the folder containing the Performance Metrics output, e.g., `agave://data-sd2e-projects.sd2e-project-48/preview/YeastSTATES-1-0-Time-Series-Round-3-0/20201216224304`
 
 ### Run
+
 
 ### PDT Output
 Output is in the precomputed_data_table project folder:
