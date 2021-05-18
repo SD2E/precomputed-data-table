@@ -45,7 +45,7 @@ mkdir data_converge_dir
 tar zxvf ${inputTarball} --directory data_converge_dir
 echo "data_converge_dir" >> .agave.archive
 
-# No need to archive the tarball and its content since they exists elsewhere
+# No need to archive the tarball and its content since they exist elsewhere
 echo "${inputTarball}" >> .agave.archive
 dirNames=`tar -tzf ${inputTarball} | cut -f1 -d"/" | sort -u`
 for d in ${dirNames}
