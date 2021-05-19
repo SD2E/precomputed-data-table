@@ -12,7 +12,7 @@ logs:
 
 storagesystems:
   data-sd2e-community:
-    posix_path: /work2/projects/SD2E-Community/prod/data
+    posix_path: /work/projects/SD2E-Community/prod/data
 
 mongodb:
   authn: ~
