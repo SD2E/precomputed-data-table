@@ -97,37 +97,75 @@ Also included with the analysis folders is a file named `record.json`. This file
     * 'data-converge directory' : The location of the experiment reference's data used by the PDT
 
 ### Analysis Output
-Most analyses output data frames that are written to csv or json. When possible, PDT merges or appends the output of analyses with the input. Therefore, most output files contain columns taken from the input file and these columns respective descriptions will NOT be found here. The subsequent descriptions of files or folder contents will only pertain to their respective analysis.
-
-
-**Wasserstein Distance Metric**
-* Data Types:
-  * Flow Cytometry:
-    * Log10 normalized
-    * ETL normalized <!--- Could be more specific -->
-* Three types of comparisons (configurations) are currently used to analyze data on a per strain or replicate basis:
-  * The min. inducer concentration vs max. inducer concentration for each time point sampled for each strain
-  * The min. time point vs max. time point for each inducer concentration for a replicate of a strain
-  * 
-* Files:
-    * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_params\_\<datetimestamp>.json 
-    * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_summary\_\<datetimestamp>.csv
-    * pdt_\<experiment reference>\__\<data type>\_stats_time_diff_params\_\<datetimestamp>.json 
-    * pdt_\<experiment reference>\__\<data type>\_stats_time_diff_summary\_\<datetimestamp>.csv
-    * pdt_\<experiment reference>\__\<data type>\_stats_reps_diff_params\_\<datetimestamp>.json 
-    * pdt_\<experiment reference>\__\<data type>\_stats_reps_diff_summary\_\<datetimestamp>.csv
-    * pdt_\<experiment reference>\__\<data type>\_stats_wasserstein_dists\_\<datetimestamp>.csv
+Most analyses output data frames that are written to csv or json. When possible, PDT merges or appends the output of analyses with the input. Therefore, most output files contain columns taken from the input file and these columns respective descriptions will NOT be found here. The subsequent descriptions of files or folder contents will only pertain to their respective analysis. Some of the analyses have their own gitlab repository containing the relevant information, and so their gitlab links are provided.
 
 **Performance Metrics**
 
+See https://gitlab.sd2e.org/gda/perform_metrics
+
 **Diagnose**
 
-**Live/Dead Prediction**
+See https://gitlab.sd2e.org/gda/diagnose
 
 **Omics Tools**
 
 See https://gitlab.sd2e.org/sd2program/omics_tools
 
+**Growth Analysis**
+
+See https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis
+
+**Wasserstein Distance Metric**
+* Data types used:
+  * Flow Cytometry:
+    * Log10 normalized (fc_raw_log10)
+    * TASBE processed and normalized (fc_etl)
+* Three types of comparisons (configurations) are currently used to analyze data on a per strain or replicate basis:
+  * inducer_diff: The min. inducer concentration vs max. inducer concentration for each time point sampled for each strain
+  * time_reps_diff: The min. time point vs max. time point for each inducer concentration for a replicate of a strain
+  * time_diff: The min. time point vs max. time point for each inducer concentration for each strain
+* Files:
+    * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_params\_\<datetimestamp>.json 
+    * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_summary\_\<datetimestamp>.csv
+    * pdt_\<experiment reference>\__\<data type>\_stats_time_diff_params\_\<datetimestamp>.json 
+    * pdt_\<experiment reference>\__\<data type>\_stats_time_diff_summary\_\<datetimestamp>.csv
+    * pdt_\<experiment reference>\__\<data type>\_stats_time_reps_diff_params\_\<datetimestamp>.json 
+    * pdt_\<experiment reference>\__\<data type>\_stats_time_reps_diff_summary\_\<datetimestamp>.csv
+    * pdt_\<experiment reference>\__\<data type>\_stats_wasserstein_dists\_\<datetimestamp>.csv
+        * This file contains the pairwise calculation of the wasserstein distance between all samples 
+* Columns (for summary files):
+    * group_name: The columns used to group samples by
+    * wasserstein_min: The minimum wasserstein distance
+    * wasserstein_median: The median wasserstein distance
+    * wasserstein_max: The maximum wasserstein distance
+    * sample_id-init: One sample of the two samples in the comparison 
+    * sample_id-fin: The other sample of the two samples in the comparison
+
+
+**Live/Dead Prediction**
+
+See https://gitlab.sd2e.org/sd2program/precomputed-data-table/tree/master/app/precomputed-data-table-live-dead-prediction/grouped_control_prediction for instructions on installing and using the analysis individually from the PDT.
+
+* Data types used:
+  * Flow Cytometry:
+    * raw flow cytometry data (data type: fc_raw)
+* Along with the file listed in Files, Live/Dead Prediction contains a directory named `runs`, which contains the model information and the training, testing, and predicted data from the analysis. 
+* Files:
+    * pdt_\<experiment reference>\__live_dead_prediction.csv
+* Columns:
+    * RF_prediction_mean: The mean of the Random Forest prediction
+    * RF_prediction_std: The standard deviation of the Random Forest prediction
+
 **FC Signal Prediction**
 
-**Growth Analysis**
+* Data types used:
+  * Flow Cytometry:
+    * raw flow cytometry data (data type: fc_raw)
+* FC Signal Prediction makes predictions on if an event is high or low, based on the high/positive and low/negative controls in the experiment. With these event-level predictions, a sample-level prediction is made and reported. As some experiments can have more than one type of positive or negative control, each combination of high/positive and low/negative controls is used in the analysis. This is indicated in the file name as `HLn` with `n` being an integer.
+* Files:
+    * pdt_\<experiment reference>\__<high/low control combination int>_live_dead_prediction.csv
+* Columns:
+    * predicted_output_mean: The mean of the event-level predictions
+    * predicted_output_std: The standard deviation of the event-level predictions
+    * high_control: The high/positive control used
+    * low_control: The low/negative control used
