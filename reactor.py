@@ -35,6 +35,31 @@ def get_database(r):
     myclient = MongoClient(mongodb_uri)
     return mongodb, myclient[database_name]
 
+def query_experiment_reference(experiment_ref, r):
+    (mongodb, database) = get_database(r)
+    experiments = database.experiment_view
+    query={}
+    query['experiment_design.experiment_design_id'] = experiment_ref
+    # grab one experiment_design_id
+    matches = experiments.find(query)
+    if matches.count() == 0:
+        err_msg = "experiment_reference does not exist"
+        key = "catalog_error"
+        message = {
+            "subject": key + "has no matches" ,
+            "body": err_msg
+        }
+        send_email_notification(message, key, r)
+        raise Exception("No matches found!")
+    else:
+        experiment_design = matches[0]
+    # return list of experiment_ids
+    query_results = []
+    for match in experiments.find(query):
+        query_results.append(match)
+    experiment_ids = [experiment['experiment']['experiment_id'] for experiment in query_results]
+    return(experiment_design, experiment_ids)
+
 def load_structured_request(experiment_id, r):
     (mongodb, database) = get_database(r)
     ref_store = linkedstores.structured_request.StructuredRequestStore(mongodb) 
@@ -361,19 +386,7 @@ def launch_app(m, r):
     # Capture initial parameterization passed in as message
     job_data = copy.copy(m)
 
-    mongodb, database = get_database(r)
-    experiment_ids = []
-    experiments = database.structured_requests
-    query = { "experiment_reference" : experiment_ref}
-    matches = database.structured_requests.find(query)
-    if matches.count() == 0:
-        raise Exception("structured requests not found for {}".format(experiment_ref))
-    elif matches.count() == 1:
-        experiment_ids.append(matches[0]["experiment_id"])
-    else:
-        for match in matches:
-            if match["derived_from"]:
-                experiment_ids.append(match["experiment_id"])
+    experiment_design, experiment_ids  = query_experiment_reference(experiment_ref, r)
 
     archive_path = os.path.join(state, experiment_ref, datetime_stamp, analysis)
     r.logger.info("archive_path: {}".format(archive_path))
@@ -382,6 +395,7 @@ def launch_app(m, r):
     control_set_dir = None
     product_patterns = []
     if analysis in ["perform-metrics", "diagnose"]:
+        r.logger.info(f"getting job_def and product_patterns from external_apps for {analysis}")
         if "mtype" not in m:
             err_msg = f"launch_app for {analysis}: missing mtype"
             key = "abaco_message"
