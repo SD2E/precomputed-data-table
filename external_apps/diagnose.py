@@ -89,6 +89,9 @@ def get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtyp
             job_template['inputs']['diagnose_optional_metadata'] = diagnose_optional_data
             data_files = [diagnose_exp_file, diagnose_optional_data]
 
+            config_file = 'diagnose_pm__fc_etl.json'
+            job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
+
         if mtype == 'PLATE_READER':
             diagnose_exp_file = os.path.join(base_in_dir, data_file)
             diagnose_optional_data = os.path.join(base_in_dir,
@@ -97,9 +100,8 @@ def get_job_template(out_sys, out_dir, pm_batch_path, experiment_reference, mtyp
             job_template['inputs']['diagnose_optional_metadata'] = diagnose_optional_data
             data_files = [diagnose_exp_file, diagnose_optional_data]
 
-        # figure out configuration files
-        config_file = 'diagnose_pm_general.json'
-        job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
+            config_file = 'diagnose_pm__platereader.json'
+            job_template['parameters']['diagnose_config_json'] = os.path.join(diagnose_config_path, config_file)
 
         product_patterns = [
             {'patterns': ['^.*(tsv)$'],
