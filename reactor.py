@@ -241,7 +241,7 @@ def launch_omics(m, r):
 
     if "precomputed_data_table" not in sr["status"]:
         state = "complete"
-        now = datetime.datetime.now()
+        now = datetime.now()
         datetime_stamp = now.strftime('%Y%m%d%H%M%S')
     else:
         # This could happen if other PDT analyses have already run via the automated pipeline
