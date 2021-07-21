@@ -1,7 +1,6 @@
 # SD2 Precomputed Data Table (PDT)
 
-This project's goal is to enable easier linking of analytical computational
-tools to data in order to support automation of analyses. Along with automating analysis tools, PDT also tracks versions and provenance of the data produced from each analysis.
+This project's goal is to improve analytical reproducibility by enabling automated and consistent execution of stereotyped analyses of different degrees of algorithmic complexity, as well as providing versioned, organized, analysis-ready, precomputed data for custom analyses.
 
 ### Analysis tools currently in PDT and their brief descriptions:
 | Tool | Description |
