@@ -17,6 +17,7 @@ map_data_type = {
     'YeastSTATES-Dual-Response-CRISPR-Short-Duration-Time-Series-30C': 'ys_annot',
     'YeastSTATES-OR-Gate-CRISPR-Dose-Response': 'ys_annot',
     'YeastSTATES-Dual-Response-CRISPR-Redesigns-Short-Duration-Time-Series-30C-Titration': 'ys_annot',
+    'YeastSTATES-Dual-Response-CRISPR-Redesigns-Short-Duration-Time-Series-30C-Fixed-Ratio': 'ys_annot',
 
     'YeastSTATES-1-0-Time-Series-Round-1': 'ys_1.0',
     'YeastSTATES-1-0-Time-Series-Round-1-1': 'ys_1.0',
