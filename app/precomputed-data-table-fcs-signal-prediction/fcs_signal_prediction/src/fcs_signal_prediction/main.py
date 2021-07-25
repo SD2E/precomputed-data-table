@@ -1,3 +1,4 @@
+import os
 import argparse
 import numpy as np
 import pandas as pd
@@ -16,6 +17,8 @@ parser.add_argument('high_control', type=str,
                     help='Strain Name of High Control')
 parser.add_argument('hl_idx', type=int,
                     help='The High/Low control combo index')
+parser.add_argument('out_dir', type=str,
+                    help='The directory where results are saved to')
 parser.add_argument('--id_col', type=str,
                     help='Sample id column name', default="sample_id")
 parser.add_argument('--strain_col', type=str,
@@ -30,6 +33,7 @@ def main(data_converge_path: str,
          low_control : str,
          high_control : str,
          hl_idx: str,
+         out_dir: str,
          id_col : Optional[str]="sample_id",
          strain_col : Optional[str]='strain_name'):
     """
@@ -74,7 +78,6 @@ def main(data_converge_path: str,
 
         print('\tlog10 normalizing and binning data')
         pred_data_df = pd.concat([df, pred.drop(labels='sample_id', axis=1)], axis=1)
-        pred_data_df.to_csv('pred_data.csv')
         print('\tCreating "pON" histograms')
         on_df = du.make_log10_df(pred_data_df, 1)
         print('\tCreating "pOFF" histograms')
@@ -84,7 +87,7 @@ def main(data_converge_path: str,
         log10_pred_df.sort_values(by=['sample_id'], inplace=True)
 
         log10_pred_fname = 'pdt_{}__{}_HL{}_fcs_signal_prediction__fc_raw_log10_stats.csv'.format(experiment_identifier, plate_id.split('.')[-1], hl_idx+1)
-        log10_pred_df.to_csv(log10_pred_fname, index=False)
+        log10_pred_df.to_csv(os.path.join(out_dir, log10_pred_fname), index=False)
         results_fname_list.append(log10_pred_fname)
 
         ## Get the mean and std output signal for each sample
@@ -114,7 +117,7 @@ def main(data_converge_path: str,
         result['low_control'] = low_control
         results_fname = 'pdt_{}__{}_HL{}_fcs_signal_prediction.csv'.format(experiment_identifier, plate_id.split('.')[-1], hl_idx+1)
 
-        result.to_csv(results_fname, index=False)
+        result.to_csv(os.path.join(out_dir, results_fname), index=False)
 
         results_fname_list.append(results_fname)
 
@@ -131,6 +134,7 @@ if __name__ == '__main__':
     low_control = args.low_control
     high_control = args.high_control
     hl_idx = args.hl_idx
+    out_dir = args.out_dir
     id_col = args.id_col
     strain_col = args.strain_col
     
@@ -139,5 +143,6 @@ if __name__ == '__main__':
          low_control,
          high_control,
          hl_idx,
+         out_dir,
          id_col=id_col,
          strain_col=strain_col)
