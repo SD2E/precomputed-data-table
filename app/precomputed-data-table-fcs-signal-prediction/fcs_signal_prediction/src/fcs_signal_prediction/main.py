@@ -44,15 +44,15 @@ def main(data_converge_path: str,
     
     meta = du.get_meta(data_converge_path, du.get_record(data_converge_path))
     plate_samples_dict = du.make_plate_samples_dict(meta)
-    plate_ids_in_record = du.get_plate_ids(data_converge_path, experiment_identifier)
+    # plate_ids_in_record = du.get_plate_ids(data_converge_path, experiment_identifier)
     ## check record ids match ids in meta and print confirmation along with number of samples per plate
-    du.match_exp_ids(plate_samples_dict, plate_ids_in_record)
+    # du.match_exp_ids(plate_samples_dict, plate_ids_in_record)
     
     ## Run FSP on each plate separately.
     
     results_fname_list = list()
 
-    for plate_id in plate_ids_in_record:
+    for plate_id in plate_samples_dict.keys():
 
         ## Get the data
         df = du.grab_plate_samples_df(plate_id, plate_samples_dict, data_converge_path)

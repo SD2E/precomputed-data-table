@@ -25,7 +25,7 @@ def get_controls(exp_dir):
 
     return high_controls, low_controls
 
-def run_fcs_signal_prediction(exp_ref, exp_dir):
+def run_fcs_signal_prediction(exp_ref, exp_dir, out_dir):
 
     # get unique combos of high/low controls and analyze all combos
     high_controls_list, low_controls_list = get_controls(exp_dir)
@@ -40,7 +40,7 @@ def run_fcs_signal_prediction(exp_ref, exp_dir):
         high_control = combo[0]
         low_control = combo[1]
 
-        hl_results_fname_list = fsp(exp_dir, exp_ref, low_control, high_control, idx)
+        hl_results_fname_list = fsp(exp_dir, exp_ref, low_control, high_control, idx, out_dir)
         results_fnames_list += hl_results_fname_list
 
         # # timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=100)
@@ -65,7 +65,7 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
 
     record_path = os.path.join(out_dir, "record.json")
 
-    results_fnames_list, raw_event_fname = run_fcs_signal_prediction(exp_ref, data_converge_dir)
+    results_fnames_list, raw_event_fname = run_fcs_signal_prediction(exp_ref, data_converge_dir, out_dir)
     # for results_name, results_df in fcs_result_dict.items():
     #     results_df.to_csv(results_name, index=False)
 
