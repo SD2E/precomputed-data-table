@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import pandas as pd
 from typing import Optional
 from fcs_signal_prediction.predict import predict_signal
 from fcs_signal_prediction.utils import data_utils as du
@@ -43,8 +44,6 @@ def main(data_converge_path: str,
     ## check record ids match ids in meta and print confirmation along with number of samples per plate
     du.match_exp_ids(plate_samples_dict, plate_ids_in_record)
     
-    import pandas as pd
-    import os, json
     ## Run FSP on each plate separately.
     
     results_fname_list = list()
