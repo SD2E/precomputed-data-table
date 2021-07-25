@@ -6,3 +6,6 @@
 **/.pytest_cache
 **/*.pyc
 secrets.json
+
+# VS Code
+.vscode/

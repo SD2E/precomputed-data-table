@@ -28,33 +28,29 @@ def get_controls(exp_dir):
 def run_fcs_signal_prediction(exp_ref, exp_dir):
 
     # get unique combos of high/low controls and analyze all combos
-    # high_control = 'CRISPR_CEN.PK2_positive_control_NOR_00_24864'
-    # low_control = 'CRISPR_CEN.PK2_negative_control_23970'
     high_controls_list, low_controls_list = get_controls(exp_dir)
     print("high: {}".format(high_controls_list))
     print("low: {}".format(low_controls_list))
 
-    results_dict = {}
+    results_fnames_list = list()
     hl_combinations = list(product(high_controls_list, low_controls_list))
 
+    # Predict using each combo of controls
     for idx, combo in enumerate(hl_combinations):
         high_control = combo[0]
         low_control = combo[1]
 
-        result = fsp(exp_dir, exp_ref, low_control, high_control)
-        result['high_control'] = high_control
-        result['low_control'] = low_control
-        # timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=100)
-        # samples_and_controls_fig.savefig('{}__samples_and_controls_figure.png'.format(exp_ref), format='png', dpi=100)
+        hl_results_fname_list = fsp(exp_dir, exp_ref, low_control, high_control, idx)
+        results_fnames_list += hl_results_fname_list
 
-        results_fname = 'pdt_{}__HL{}_fcs_signal_prediction.csv'.format(exp_ref, idx+1)
-        results_dict[results_fname] = result
+        # # timeseries_fig.savefig('{}__well_timeseries_figure.png'.format(exp_ref), format='png', dpi=100)
+        # # samples_and_controls_fig.savefig('{}__samples_and_controls_figure.png'.format(exp_ref), format='png', dpi=100)
 
     record = du.get_record(exp_dir)
     dc_raw_events_dict = du.get_record_file(record, file_type="fc_raw_events")
     dc_input_fname = dc_raw_events_dict['name']
 
-    return results_dict, dc_input_fname
+    return results_fnames_list, dc_input_fname
 
 
 def main(exp_ref, analysis, out_dir, data_converge_dir):
@@ -69,11 +65,11 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
 
     record_path = os.path.join(out_dir, "record.json")
 
-    fcs_result_dict, raw_event_fname = run_fcs_signal_prediction(exp_ref, data_converge_dir)
-    for results_name, results_df in fcs_result_dict.items():
-        results_df.to_csv(results_name, index=False)
+    results_fnames_list, raw_event_fname = run_fcs_signal_prediction(exp_ref, data_converge_dir)
+    # for results_name, results_df in fcs_result_dict.items():
+    #     results_df.to_csv(results_name, index=False)
 
-    fcs_signal_dict = {raw_event_fname: list(fcs_result_dict.keys())}
+    fcs_signal_dict = {raw_event_fname: results_fnames_list}
     record = {}
     record = rpi.append_record(record, fcs_signal_dict, analysis, out_dir)
 
