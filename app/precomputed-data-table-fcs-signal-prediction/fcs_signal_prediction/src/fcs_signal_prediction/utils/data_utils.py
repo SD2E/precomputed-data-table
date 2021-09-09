@@ -225,52 +225,60 @@ def bin_data(pts, bin_endpoints):
     return all_bins
 
 
-def make_log10_df(fcs_data, prediction):
+def make_log10_df(fcs_data, prediction, pred_class_col):
 
-    pred_fcs_data = fcs_data[fcs_data['predicted_output'] == prediction]
+    pred_fcs_data = fcs_data[fcs_data[pred_class_col] == prediction]
+    print(f'Prediction: {prediction}; Raw FCS df shape: {pred_fcs_data.shape}')
     fcs_sample_list = list(set(pred_fcs_data['sample_id'].tolist()))
 
     bin_col_names = [0.1 * x for x in range(0, 71)]
     bin_col_names = ['bin(log10)_' + str(round(bin + 0.05, 2)) for bin in bin_col_names]
     bin_col_names = ['bin(log10)_NAN'] + bin_col_names
 
-    fcs_record_list = []
+    if pred_fcs_data.empty:
+        print('Raw FCS df is empty')
+        cols = ['sample_id', 'channel', pred_class_col, 'mean_log10', 'std_log10']
+        cols += bin_col_names
+        return pd.DataFrame(columns=cols)
+    else:
+        fcs_record_list = []
 
-    for sample in fcs_sample_list:
+        for sample in fcs_sample_list:
 
-        try:
+            try:
 
-            fcs_data = pred_fcs_data[pred_fcs_data['sample_id'] == sample]
-            print(f'sample_id: {sample} | Prediction: {prediction} | # of events: {fcs_data.shape[0]}')
-            
-            # get channel names, ignoring the sample_id and predicted_output columns
-            ignore_channels = ['sample_id', 'predicted_output']
-            channel_names = [ch for ch in fcs_data.columns if ch not in ignore_channels]
+                fcs_data = pred_fcs_data[pred_fcs_data['sample_id'] == sample]
+                print(f'sample_id: {sample} | Prediction: {prediction} | # of events: {fcs_data.shape[0]}')
+                
+                # get channel names, ignoring the sample_id and predicted_output columns
+                ignore_channels = ['sample_id', pred_class_col]
+                channel_names = [ch for ch in fcs_data.columns if ch not in ignore_channels]
 
-            # loop over channel names to perform log10 transformations
-            for channel in channel_names:
+                # loop over channel names to perform log10 transformations
+                for channel in channel_names:
 
-                single_fcs_dict = OrderedDict()
-                single_fcs_dict['sample_id'] = sample
-                single_fcs_dict['channel'] = channel
-                single_fcs_dict['predicted_output'] = prediction
-                # log10 transform data
-                log_data_fcs_df = log_transform(fcs_data, [channel])
-                # get states: mean, std
-                single_fcs_dict['mean_log10'] = round(log_data_fcs_df[channel].mean(), round_log_decimal)
-                single_fcs_dict['std_log10'] = round(log_data_fcs_df[channel].std(), round_log_decimal)
+                    single_fcs_dict = OrderedDict()
+                    single_fcs_dict['sample_id'] = sample
+                    single_fcs_dict['channel'] = channel
+                    single_fcs_dict[pred_class_col] = prediction
+                    # log10 transform data
+                    log_data_fcs_df = log_transform(fcs_data, [channel])
+                    # get states: mean, std
+                    single_fcs_dict['mean_log10'] = round(log_data_fcs_df[channel].mean(), round_log_decimal)
+                    single_fcs_dict['std_log10'] = round(log_data_fcs_df[channel].std(), round_log_decimal)
 
-                # bin data and add histogram data to dataframe
-                binned_log_data = bin_data(log_data_fcs_df[channel], [0.1 * x for x in range(0, 71)])
-                for bin_col, single_bin_data in zip(bin_col_names, binned_log_data):
-                    single_fcs_dict['{}'.format(bin_col)] = single_bin_data
+                    # bin data and add histogram data to dataframe
+                    binned_log_data = bin_data(log_data_fcs_df[channel], [0.1 * x for x in range(0, 71)])
+                    for bin_col, single_bin_data in zip(bin_col_names, binned_log_data):
+                        single_fcs_dict['{}'.format(bin_col)] = single_bin_data
 
-                fcs_record_list.append(single_fcs_dict)
-        except:
-            print("PROBLEM SAMPLE: ", sample)
+                    fcs_record_list.append(single_fcs_dict)
+            except:
+                print("PROBLEM SAMPLE: ", sample)
 
-    # Convert the rowWells dictionary created above into a dataframe
-    fcs_row_wells_df = pd.DataFrame(fcs_record_list)
-    fcs_row_wells_df.sort_values(by=['sample_id'])
+        # Convert the rowWells dictionary created above into a dataframe
+        fcs_row_wells_df = pd.DataFrame(fcs_record_list)
+        print(f'Prediction: {prediction}; Log10 FCS df shape: {fcs_row_wells_df.shape}')
+        fcs_row_wells_df.sort_values(by=['sample_id'])
 
-    return fcs_row_wells_df
+        return fcs_row_wells_df
