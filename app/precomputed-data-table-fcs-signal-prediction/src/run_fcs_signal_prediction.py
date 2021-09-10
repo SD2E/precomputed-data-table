@@ -7,7 +7,8 @@ import argparse
 import os
 import json
 from itertools import product
-from fcs_signal_prediction.main import main as fsp
+# from fcs_signal_prediction.main import main as fsp
+from fcs_signal_prediction.main_clean import main as fsp
 from fcs_signal_prediction.utils import data_utils as du
 from common import record_product_info as rpi
 from common import preproc
