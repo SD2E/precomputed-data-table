@@ -34,9 +34,10 @@ def run_fcs_signal_prediction(exp_ref, exp_dir, out_dir):
     print("low: {}".format(low_controls_list))
 
     results_fnames_list = list()
-
+    
     # Make 'CRISPR_CEN.PK2_positive_control_NOR_00_24864' the first positive control
-    high_controls_list.insert(0, high_controls_list.pop(high_controls_list.index('CRISPR_CEN.PK2_positive_control_NOR_00_24864')))
+    if 'CRISPR_CEN.PK2_positive_control_NOR_00_24864' in high_controls_list:
+        high_controls_list.insert(0, high_controls_list.pop(high_controls_list.index('CRISPR_CEN.PK2_positive_control_NOR_00_24864')))
 
     hl_combinations = list(product(high_controls_list, low_controls_list))
 
