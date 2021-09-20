@@ -119,10 +119,12 @@ See https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis
   * Flow Cytometry:
     * Log10 normalized (fc_raw_log10)
     * TASBE processed and normalized (fc_etl)
+
 * Three types of comparisons (configurations) are currently used to analyze data on a per strain or replicate basis:
   * inducer_diff: The min. inducer concentration vs max. inducer concentration for each time point sampled for each strain
   * time_reps_diff: The min. time point vs max. time point for each inducer concentration for a replicate of a strain
   * time_diff: The min. time point vs max. time point for each inducer concentration for each strain
+
 * Files:
     * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_params\_\<datetimestamp>.json 
     * pdt_\<experiment reference>\__\<data type>\_stats_inducer_diff_summary\_\<datetimestamp>.csv
@@ -132,6 +134,7 @@ See https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis
     * pdt_\<experiment reference>\__\<data type>\_stats_time_reps_diff_summary\_\<datetimestamp>.csv
     * pdt_\<experiment reference>\__\<data type>\_stats_wasserstein_dists\_\<datetimestamp>.csv
         * This file contains the pairwise calculation of the wasserstein distance between all samples 
+
 * Columns (for summary files):
     * group_name: The columns used to group samples by
     * wasserstein_min: The minimum wasserstein distance
@@ -148,28 +151,42 @@ See https://gitlab.sd2e.org/sd2program/precomputed-data-table/tree/master/app/pr
 * Data types used:
   * Flow Cytometry:
     * raw flow cytometry data (data type: fc_raw)
+
 * Along with the file listed in Files, Live/Dead Prediction contains a directory named `runs`, which contains the model information and the training, testing, and predicted data from the analysis. 
+
 * Files:
     * pdt_\<experiment reference>\__live_dead_prediction.csv
-* Columns:
-    * RF_prediction_mean: The mean of the Random Forest prediction
-    * RF_prediction_std: The standard deviation of the Random Forest prediction
+        * Columns:
+            * RF_prediction_mean: The mean of the Random Forest prediction
+            * RF_prediction_std: The standard deviation of the Random Forest prediction
 
 **FC Signal Prediction**
 
 * Data types used:
   * Flow Cytometry:
     * raw flow cytometry data (data type: fc_raw)
-* FC Signal Prediction makes predictions on if an event is high or low, based on the high/positive and low/negative controls in the experiment. With these event-level predictions, a sample-level prediction is made and reported. As some experiments can have more than one type of positive or negative control, each combination of high/positive and low/negative controls is used in the analysis. This is indicated in the file name as `HLn` with `n` being an integer. A fc_raw_log10_stats file (similar to Data Converge's) is generated for each plate where each sample's predicted ON and OFF populations are segregated into two histograms.
+
+* FC Signal Prediction makes predictions on if an event is high or low, based on the high/positive and low/negative controls in the experiment. With these event-level predictions, a sample-level prediction is made and reported. As some experiments can have more than one type of positive or negative control, each combination of high/positive and low/negative controls is used in the analysis. This is indicated in the file name as `HLn` with `n` being an integer. Two models are made (and hence two preditions are made per plate and per high/low combo): 1) (fullModel) all data for the high/positive and low/negative controls are used to train a model for subsequent predictions and 2) (cleanModel) the data for the high/positive and low/negative controls are thresholded on a probability of being high or low, repsectively, while maintaining at least 10,000 events for each control type (control samples are concatenated based on control type and then the concatenated data is thresholded on. This means data is dropped agnostic to the sample id).
+
+* For each model type (fullModel and cleanModel), two files are generated: 1) an fc_raw_log10_stats.csv file (similar to Data Converge's) is generated for each plate where each sample's predicted ON and OFF populations are segregated into two histograms and 2) an fc_meta.csv file (similar to Data Converge's) containing additional columns related to the FCS Signal Prediction analysis. One additional fc_raw_log10_stats.cs file is generated containing the word 'cleanControls'. This file contains the fcs data histograms for the concatenated controls so only one sample_id is used for each control type and this sample_id is chosen randomly. 
+
 * Files:
-    * pdt_\<experiment reference>\__<high/low control combination int>_fcs_signal_prediction.csv
-        * Columns:
-            * predicted_output_mean: The mean of the event-level predictions
-            * predicted_output_std: The standard deviation of the event-level predictions
-            * pOFF: The number of events predicted as off
-            * pON: The number of events predicted as on
-            * high_control: The high/positive control used
-            * low_control: The low/negative control used
-    * pdt_\<experiment reference>\__\<plate id>\_<high/low control combination int>_fcs_signal_prediction__fc_raw_log10_stats.csv
-        * Columns:
-            * predicted_output: The predicted output for all events in the histogram
+    * pdt_\<experiment reference>\__<plate id>_<high/low control combination int>_fullModel_fcs_signal_prediction__fc_meta.csv
+    * pdt_\<experiment reference>\__<plate id>_<high/low control combination int>_fullModel_fcs_signal_prediction__fc_raw_log10_stats.csv
+    * pdt_\<experiment reference>\__<plate id>_<high/low control combination int>_cleanModel_fcs_signal_prediction__fc_meta.csv
+    * pdt_\<experiment reference>\__<plate id>_<high/low control combination int>_cleanModel_fcs_signal_prediction__fc_raw_log10_stats.csv
+    * pdt_\<experiment reference>\__<plate id>_<high/low control combination int>_cleanControls_fcs_signal_prediction__fc_raw_log10_stats.csv
+
+* Columns:
+    * fc_raw_log10_stats.csv files:
+        * class_label: The predicted output for all events in the histogram
+        * mean_log10: The mean of the log10 distribution 
+        * std_log10: The standard deviation of the log10 distribution
+    * fc_meta.csv files:
+        * predicted_output_mean: The mean of the event-level predictions
+        * predicted_output_std: The standard deviation of the event-level predictions
+        * pOFF: The number of events predicted as off
+        * pON: The number of events predicted as on
+        * high_control: The high/positive control used
+        * low_control: The low/negative control used
+
