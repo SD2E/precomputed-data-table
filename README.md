@@ -160,7 +160,9 @@ See https://gitlab.sd2e.org/sd2program/precomputed-data-table/tree/master/app/pr
 * Data types used:
   * Flow Cytometry:
     * raw flow cytometry data (data type: fc_raw)
-* FC Signal Prediction makes predictions on if an event is high or low, based on the high/positive and low/negative controls in the experiment. With these event-level predictions, a sample-level prediction is made and reported. As some experiments can have more than one type of positive or negative control, each combination of high/positive and low/negative controls is used in the analysis. This is indicated in the file name as `HLn` with `n` being an integer. A fc_raw_log10_stats file (similar to Data Converge's) is generated for each plate where each sample's predicted ON and OFF populations are segregated into two histograms.
+* FC Signal Prediction makes predictions on if an event is high or low, based on the high/positive and low/negative controls in the experiment. With these event-level predictions, a sample-level prediction is made and reported. As some experiments can have more than one type of positive or negative control, each combination of high/positive and low/negative controls is used in the analysis. This is indicated in the file name as `HLn` with `n` being an integer. Two models are made and hence two preditions are made per plate and per high/low combo: 1) all data for the high/positive and low/negative controls are used to train a model for subsequent predictions and 2) the data for the high/positive and low/negative controls are thresholded on a probability of being high or low, repsectively, while maintaining at least 10,000 events for each control (control samples are concatenated based on control type and then the concatenated data is thresholded on. This means data is dropped agnostic to the sample id).
+
+A fc_raw_log10_stats file (similar to Data Converge's) is generated for each plate where each sample's predicted ON and OFF populations are segregated into two histograms.
 * Files:
     * pdt_\<experiment reference>\__<high/low control combination int>_fcs_signal_prediction.csv
         * Columns:
