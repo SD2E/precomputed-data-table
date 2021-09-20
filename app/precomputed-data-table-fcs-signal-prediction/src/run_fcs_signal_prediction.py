@@ -10,8 +10,8 @@ from itertools import product
 # from fcs_signal_prediction.main import main as fsp
 from fcs_signal_prediction.main_clean import main as fsp
 from fcs_signal_prediction.utils import data_utils as du
-from common import record_product_info as rpi
-from common import preproc
+# from common import record_product_info as rpi
+# from common import preproc
 
 
 def get_controls(exp_dir):
@@ -34,6 +34,10 @@ def run_fcs_signal_prediction(exp_ref, exp_dir, out_dir):
     print("low: {}".format(low_controls_list))
 
     results_fnames_list = list()
+
+    # Make 'CRISPR_CEN.PK2_positive_control_NOR_00_24864' the first positive control
+    high_controls_list.insert(0, high_controls_list.pop(high_controls_list.index('CRISPR_CEN.PK2_positive_control_NOR_00_24864')))
+
     hl_combinations = list(product(high_controls_list, low_controls_list))
 
     # Predict using each combo of controls
@@ -58,13 +62,13 @@ def main(exp_ref, analysis, out_dir, data_converge_dir):
     print(f"out_dir: f{out_dir} data_converge_dir: {data_converge_dir}")
 
     # Check status of data in ER's record.json file
-    path_to_record_json = preproc.return_er_record_path(data_converge_dir)
-    preproc.check_er_status(path_to_record_json)
+    # path_to_record_json = preproc.return_er_record_path(data_converge_dir)
+    # preproc.check_er_status(path_to_record_json)
 
     # confirm presence of data(frame) types
     #data_confirm_dict = preproc.confirm_data_types(os.listdir(data_converge_dir))
 
-    record_path = os.path.join(out_dir, "record.json")
+    # record_path = os.path.join(out_dir, "record.json")
 
     results_fnames_list, raw_event_fname = run_fcs_signal_prediction(exp_ref, data_converge_dir, out_dir)
     # for results_name, results_df in fcs_result_dict.items():
