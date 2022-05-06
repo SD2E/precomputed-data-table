@@ -1,5 +1,3 @@
-# pdt_test
-=======
 # SD2 Precomputed Data Table (PDT)
 
 This project's goal is to improve analytical reproducibility by enabling automated and consistent execution of stereotyped analyses of different degrees of algorithmic complexity, as well as providing versioned, organized, analysis-ready, precomputed data for custom analyses.
