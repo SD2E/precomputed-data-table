@@ -1,0 +1,112 @@
+{
+  "name": "{{ app.name }}",
+  "version": "{{ app.version }}",
+  "executionType": "CLI",
+  "executionSystem": "hpc-tacc-jetstream-public",
+  "parallelism": "SERIAL",
+  "deploymentPath": "apps/{{ app.bundle }}",
+  "deploymentSystem": "data-sd2e-app-assets",
+  "defaultQueue": "all",
+  "label": "precomputed data table",
+  "modules": [
+    "load tacc-singularity"
+  ],
+  "shortDescription": "First level analysis post data-converge",
+  "templatePath": "runner-template.sh",
+  "testPath": "tester.sh",
+  "inputs": [
+	{
+		"id": "inputData",
+		"value": {
+			"default": "",
+			"visible": true,
+			"required": true,
+			"order": 0
+		},
+		"semantics": {
+			"minCardinality": 1,
+			"maxCardinality": 500,
+			"ontology": [
+				"http://edamontology.org/data_1049"
+			]
+		},
+		"details": {
+			"label": "Data Converge Directory"
+		}
+	}
+  ],
+  "parameters": [
+    {
+      "id": "CONTAINER_IMAGE",
+      "value": {
+        "default": "{{ docker.username }}/{{ docker.repo }}:{{ docker.tag }}",
+        "description": "Container Image. Do not edit.",
+        "type": "string",
+        "visible": false,
+        "required": true
+      }
+    },
+	{
+		"id": "sift_ga_sbh_url",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_sbh_user",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_sbh_password",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+	{
+		"id": "sift_ga_mongo_user",
+		"value": {
+			"default": "",
+			"type": "string",
+			"visible": true,
+			"required": true
+		}
+	},
+    {
+      "id": "experiment_ref",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "data_converge_dir",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    },
+    {
+      "id": "analysis",
+      "value": {
+        "type": "string",
+        "visible": true,
+        "required": true
+      }
+    }
+  ],
+  "outputs": [
+  ]
+}

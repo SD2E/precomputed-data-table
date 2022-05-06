@@ -1,0 +1,19 @@
+name: xplan-od-growth-analysis
+channels:
+- defaults
+dependencies:
+    - python = 3.8
+    - pip
+    - pytest = 5.0.0
+    - numpy
+    - pandas
+    - pymongo
+    - matplotlib = 3.1
+
+    - pip:
+      - pytest-html
+      - pytest-timeout
+      - flowcytometrytools
+      - agavepy
+#      - xplan-od-growth-analysis
+      - /src/xplan-od-growth-analysis
