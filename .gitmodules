@@ -1,12 +1,12 @@
 [submodule "app/precomputed-data-table-growth-analysis/xplan-od-growth-analysis"]
 	path = app/precomputed-data-table-growth-analysis/xplan-od-growth-analysis
 	url = https://gitlab.sd2e.org/rpg/xplan-od-growth-analysis.git
-[submodule "app/precomputed-data-table-omics-tools/omics_tools"]
-	path = app/precomputed-data-table-omics-tools/omics_tools
-	url = https://gitlab.sd2e.org/sd2program/omics_tools.git
-[submodule "app/precomputed-data-table-fcs-signal-prediction/pysd2cat"]
-	path = app/precomputed-data-table-fcs-signal-prediction/pysd2cat
-	url = https://gitlab.sd2e.org/dbryce/pysd2cat.git
 [submodule "app/precomputed-data-table-live-dead-prediction/pysd2cat"]
 	path = app/precomputed-data-table-live-dead-prediction/pysd2cat
-	url = https://gitlab.sd2e.org/dbryce/pysd2cat.git
+	url = https://github.com/SD2E/pysd2cat.git
+[submodule "app/precomputed-data-table-fcs-signal-prediction/pysd2cat"]
+	path = app/precomputed-data-table-fcs-signal-prediction/pysd2cat
+	url = https://github.com/SD2E/pysd2cat.git
+[submodule "app/precomputed-data-table-omics-tools/omics_tools"]
+	path = app/precomputed-data-table-omics-tools/omics_tools
+	url = https://github.com/SD2E/omics_tools.git
